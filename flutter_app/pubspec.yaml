@@ -1,0 +1,33 @@
+name: carsiqai_app
+description: CarsiqAi - Your AI Car Assistant
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  webview_flutter: ^4.4.2
+  connectivity_plus: ^5.0.2
+  flutter_native_splash: ^2.3.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+
+flutter_native_splash:
+  color: "#ffffff"
+  color_dark: "#1a1a1a"
+  # image: assets/images/splash_logo.png  # Uncomment when you add your logo
+  android_12:
+    color: "#ffffff"
+    color_dark: "#1a1a1a"
+    # image: assets/images/splash_logo.png  # Uncomment when you add your logo
