@@ -28,18 +28,41 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
       {/* Header */}
-      <header className="relative w-full py-8 px-4 md:px-8 lg:px-12 bg-gradient-to-r from-slate-900 via-gray-800 to-slate-900">
+      <header className="relative w-full py-6 px-4 md:px-8 lg:px-12 header-enhanced">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Image src="/logo.png" alt="هندسة السيارات" width={72} height={72} className="rounded-full shadow-lg" />
+            <div className="relative w-20 h-20 header-logo-enhanced">
+              <Image 
+                src="/logo.png" 
+                alt="هندسة السيارات" 
+                width={72} 
+                height={72} 
+                className="relative z-10 rounded-full logo-text-sharp w-full h-full object-cover" 
+                style={{
+                  filter: 'contrast(1.1) brightness(1.05) saturate(1.1)'
+                }}
+              />
+            </div>
             <div className="flex flex-col">
-              <span className="font-bold text-2xl md:text-3xl text-white">هندسة السيارات</span>
-              <span className="text-sm md:text-base text-gray-300 mt-1">المساعد الذكي لاختيار زيت سيارتك</span>
+              <span className="font-bold text-2xl md:text-3xl text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] filter brightness-125 contrast-125 text-3d-enhanced" 
+                    style={{
+                      textShadow: '2px 2px 4px rgba(0,0,0,0.7), 0 0 15px rgba(255,255,255,0.3), inset 0 1px 0 rgba(255,255,255,0.4), 0 1px 0 rgba(255,255,255,0.3), 0 2px 0 rgba(0,0,0,0.2), 0 3px 0 rgba(0,0,0,0.15), 0 4px 0 rgba(0,0,0,0.1)',
+                      transform: 'perspective(500px) rotateX(3deg)',
+                      filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.4)) drop-shadow(0 0 12px rgba(255,255,255,0.3))',
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%)',
+                      WebkitBackgroundClip: 'text',
+                      backgroundClip: 'text'
+                    }}>
+                هندسة السيارات
+              </span>
+              <span className="text-sm md:text-base text-gray-300 mt-1 text-inner-shadow" style={{
+                textShadow: 'inset 0 1px 1px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.1)'
+              }}>المساعد الذكي لاختيار زيت سيارتك</span>
             </div>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/chat">
-              <Button className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white border-0 rounded-full px-8 py-3 text-lg font-bold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
+              <Button className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white border-0 px-8 py-3 text-lg font-bold btn-unified">
                 <span className="flex items-center gap-2">
                   💬 بدء المحادثة
                 </span>
@@ -50,59 +73,75 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative py-16 md:py-24 px-4 overflow-hidden">
+      <section className="relative py-8 md:py-12 px-4 overflow-hidden">
         {/* Background Elements */}
         <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-yellow-50 to-red-50 dark:from-gray-900 dark:via-gray-800 dark:to-orange-900/20"></div>
         <div className="absolute top-20 right-10 w-72 h-72 bg-orange-200/30 dark:bg-orange-500/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-20 left-10 w-96 h-96 bg-yellow-200/30 dark:bg-yellow-500/10 rounded-full blur-3xl"></div>
         <div className="absolute inset-0 bg-[url('/engine-hero.jpg')] bg-cover bg-center opacity-5"></div>
+        {/* Dark gradient overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20 dark:from-black/20 dark:via-transparent dark:to-black/40"></div>
 
         <div className="relative max-w-7xl mx-auto text-center">
-          {/* الشعار الكبير */}
-          <div className="mb-8">
+          {/* الشعار الكبير المحسن */}
+          <div className="mb-4">
             <div className="relative flex items-center justify-center w-full">
-              <div className="relative w-64 h-48 sm:w-80 sm:h-60 md:w-96 md:h-72 lg:w-[500px] lg:h-[375px] flex items-center justify-center logo-pulse">
-                <div className="absolute inset-0 logo-glow rounded-full opacity-70" aria-hidden="true"></div>
-                <div className="absolute inset-0 bg-gradient-to-r from-red-200/30 via-orange-200/30 to-yellow-200/30 rounded-full blur-xl opacity-60 animate-pulse" aria-hidden="true"></div>
-                <Image
-                  src="/logo.png"
-                  alt="هندسة السيارات - مساعد زيوت السيارات الذكي"
-                  width={500}
-                  height={375}
-                  priority
-                  className="object-contain max-h-full max-w-full relative z-10 drop-shadow-2xl animate-float"
-                  style={{
-                    width: 'auto',
-                    height: 'auto'
-                  }}
-                />
+              <div className="relative w-80 h-80 sm:w-96 sm:h-96 md:w-[400px] md:h-[400px] lg:w-[450px] lg:h-[450px] flex items-center justify-center">
+                {/* Enhanced circular background with professional effects */}
+                <div className="absolute inset-4 logo-circle-enhanced logo-badge-professional logo-metallic-effect rounded-full" aria-hidden="true"></div>
+                
+                {/* Logo image with enhanced sharpness */}
+                <div className="relative z-20 w-3/4 h-3/4 flex items-center justify-center">
+                  <Image
+                    src="/logo.png"
+                    alt="هندسة السيارات - مساعد زيوت السيارات الذكي"
+                    width={300}
+                    height={300}
+                    priority
+                    className="object-contain max-h-full max-w-full logo-text-sharp"
+                    style={{
+                      width: 'auto',
+                      height: 'auto',
+                      filter: 'contrast(1.5) brightness(1.3) saturate(1.4) drop-shadow(0 0 20px rgba(255,255,255,0.4))'
+                    }}
+                  />
+                </div>
+                
+                {/* Much stronger gloss highlight */}
+                <div className="absolute top-6 left-1/5 right-1/5 h-20 bg-gradient-to-r from-transparent via-white/60 to-transparent rounded-full blur-md opacity-80 z-10" aria-hidden="true"></div>
+                <div className="absolute top-8 left-1/4 right-1/4 h-12 bg-gradient-to-r from-transparent via-white/40 to-transparent rounded-full blur-sm opacity-70 z-10" aria-hidden="true"></div>
               </div>
             </div>
           </div>
 
           {/* النص التوضيحي تحت الشعار */}
-          <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
-            <span className="bg-gradient-to-r from-red-600 via-orange-600 to-red-700 bg-clip-text text-transparent animate-gradient-text">
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-8 leading-tight">
+            <span className="bg-gradient-to-r from-red-600 via-orange-600 to-red-700 bg-clip-text text-transparent animate-gradient-text text-3d-enhanced text-arabic-3d" style={{
+              filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3)) drop-shadow(0 0 20px rgba(239, 68, 68, 0.4))'
+            }}>
               المساعد الذكي لاختيار زيوت سيارتك
             </span>
           </h1>
 
-          <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-10 max-w-4xl mx-auto leading-relaxed">
+          <p className="text-2xl md:text-3xl text-gray-700 dark:text-gray-200 mb-10 max-w-4xl mx-auto leading-relaxed text-embossed font-medium">
             احصل على توصيات دقيقة ومخصصة لاختيار أفضل زيت محرك لسيارتك
             <br />
-            <span className="text-lg text-red-600 dark:text-red-400 font-medium">مناسب للظروف المناخية العراقية القاسية</span>
+            <span className="text-xl md:text-2xl text-red-600 dark:text-red-400 font-semibold text-inner-shadow mt-2 block" style={{
+              textShadow: 'inset 0 1px 1px rgba(239, 68, 68, 0.2), 0 1px 0 rgba(255,255,255,0.1)',
+              lineHeight: '1.6'
+            }}>مناسب للظروف المناخية العراقية القاسية</span>
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-12">
             <Link href="/chat">
-              <Button size="lg" className="group relative overflow-hidden bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white border-0 rounded-2xl px-12 py-8 text-xl font-bold shadow-2xl hover:shadow-3xl transform hover:scale-110 hover:-translate-y-2 transition-all duration-300">
+              <Button size="lg" className="group relative overflow-hidden bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white border-0 px-12 py-8 text-xl font-bold btn-unified">
                 <span className="relative z-10 flex items-center gap-3">
                   🚀 ابدأ المحادثة الآن
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="rounded-2xl px-10 py-6 text-lg font-semibold border-2 border-orange-300 dark:border-orange-600 hover:border-orange-500 dark:hover:border-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-all duration-300">
+            <Button size="lg" variant="outline" className="rounded-2xl px-10 py-6 text-lg font-semibold border-2 border-red-300 dark:border-red-600 hover:border-red-500 dark:hover:border-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
               📹 شاهد كيف يعمل
             </Button>
           </div>
