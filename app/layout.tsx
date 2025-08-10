@@ -1,4 +1,5 @@
 import "./globals.css"
+import "../styles/chat-animations.css"
 import Script from "next/script"
 import { Analytics } from "@vercel/analytics/react"
 import { ThemeProvider } from '@/components/theme-provider'

@@ -117,38 +117,38 @@ export function ChatSidebar({
       
       <aside 
         className={cn(
-          "fixed top-0 bottom-0 right-0 z-50 w-80 md:w-72 bg-white dark:bg-gray-900 shadow-2xl transition-all duration-300 transform border-l border-gray-200 dark:border-gray-700",
+          "fixed top-0 bottom-0 right-0 z-50 w-80 md:w-72 bg-gradient-to-b from-red-50 via-orange-50 to-yellow-50 dark:from-gray-900 dark:via-gray-850 dark:to-gray-800 shadow-2xl transition-all duration-300 transform border-l-4 border-red-200 dark:border-red-800/50",
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
         style={{ right: 0 }}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gradient-to-r from-blue-50 to-white dark:from-gray-800 dark:to-gray-900">
-            <h2 className="text-xl font-bold text-blue-600 dark:text-blue-400 flex items-center">
-              <MessageSquare className="h-5 w-5 ml-2" />
+          <div className="p-6 border-b-2 border-red-200 dark:border-red-800/50 flex items-center justify-between bg-gradient-to-r from-red-100 via-orange-100 to-yellow-100 dark:from-red-900/30 dark:via-orange-900/30 dark:to-yellow-900/30 shadow-lg">
+            <h2 className="text-xl font-bold text-red-700 dark:text-red-300 flex items-center animate-gradient-text">
+              <MessageSquare className="h-6 w-6 ml-2 text-red-600 dark:text-red-400 animate-pulse" />
               المحادثات
             </h2>
             <Button
               variant="ghost"
               size="icon"
               onClick={onClose}
-              className="h-9 w-9 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800"
+              className="h-10 w-10 rounded-full hover:bg-red-200/50 dark:hover:bg-red-900/30 transition-all duration-300 hover:scale-110 border-2 border-transparent hover:border-red-300"
               aria-label="إغلاق القائمة"
             >
-              <X className="h-5 w-5" />
+              <X className="h-5 w-5 text-red-600 dark:text-red-400" />
             </Button>
           </div>
           
           {/* New Chat Button */}
-          <div className="p-4 sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+          <div className="p-5 sticky top-0 z-10 bg-gradient-to-r from-red-50/90 via-orange-50/90 to-yellow-50/90 dark:from-gray-900/90 dark:via-gray-850/90 dark:to-gray-800/90 backdrop-blur-sm">
             <Button
               variant="default"
               size="default"
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl py-5 shadow-md hover:shadow-lg transition-all duration-200"
+              className="w-full bg-gradient-to-r from-red-500 via-orange-500 to-red-600 hover:from-red-600 hover:via-orange-600 hover:to-red-700 text-white font-bold rounded-2xl py-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 border-2 border-red-400 animate-pulse-ring"
               onClick={onNewSession}
             >
-              <PlusCircle className="h-5 w-5 ml-2" />
+              <PlusCircle className="h-6 w-6 ml-2 animate-spin-slow" />
               محادثة جديدة
             </Button>
           </div>
@@ -157,13 +157,13 @@ export function ChatSidebar({
           <div className="flex-1 overflow-y-auto pb-4">
             {sessions.length === 0 ? (
               <div className="p-8 text-center flex flex-col items-center justify-center h-full">
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-full mb-3">
-                  <MessageSquare className="h-8 w-8 text-blue-500 dark:text-blue-400" />
+                <div className="bg-gradient-to-r from-red-100 via-orange-100 to-yellow-100 dark:from-red-900/30 dark:via-orange-900/30 dark:to-yellow-900/30 p-6 rounded-full mb-4 shadow-lg animate-pulse-ring">
+                  <MessageSquare className="h-10 w-10 text-red-600 dark:text-red-400 animate-float" />
                 </div>
-                <p className="text-gray-500 dark:text-gray-400 text-sm">
+                <p className="text-gray-600 dark:text-gray-300 text-base font-medium">
                 لا توجد محادثات سابقة
                 </p>
-                <p className="text-gray-400 dark:text-gray-500 text-xs mt-2">
+                <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
                   ابدأ محادثة جديدة للحصول على توصيات زيوت السيارات
                 </p>
               </div>
@@ -175,25 +175,30 @@ export function ChatSidebar({
                       role="button"
                       tabIndex={0}
                       className={cn(
-                        "w-full text-right px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group flex items-center cursor-pointer",
+                        "w-full text-right px-5 py-4 rounded-2xl hover:bg-gradient-to-r hover:from-red-100/50 hover:via-orange-100/50 hover:to-yellow-100/50 dark:hover:from-red-900/20 dark:hover:via-orange-900/20 dark:hover:to-yellow-900/20 transition-all duration-300 group flex items-center cursor-pointer hover:scale-[1.02] hover:shadow-md",
                         activeSessionId === session.id 
-                          ? "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800" 
-                          : "border border-transparent"
+                          ? "bg-gradient-to-r from-red-100 via-orange-100 to-yellow-100 dark:from-red-900/30 dark:via-orange-900/30 dark:to-yellow-900/30 border-2 border-red-300 dark:border-red-700 shadow-lg animate-glow" 
+                          : "border-2 border-transparent hover:border-red-200 dark:hover:border-red-800/50"
                       )}
                       onClick={() => handleSessionClick(session.id)}
                       onKeyDown={(e) => handleKeyDown(e, () => handleSessionClick(session.id))}
                     >
                       <div className="flex-1 truncate">
                         <span className={cn(
-                          "block font-medium truncate",
+                          "block font-bold truncate text-base",
                           activeSessionId === session.id 
-                            ? "text-blue-700 dark:text-blue-400" 
+                            ? "text-red-800 dark:text-red-300 animate-gradient-text" 
                             : "text-gray-900 dark:text-gray-100"
                         )}>
                           {session.title}
                         </span>
-                        <span className="block text-xs text-gray-500 mt-1 flex items-center">
-                          <Clock className="h-3 w-3 ml-1 inline-block" />
+                        <span className={cn(
+                          "block text-sm mt-2 flex items-center font-medium",
+                          activeSessionId === session.id 
+                            ? "text-red-600 dark:text-red-400" 
+                            : "text-gray-500 dark:text-gray-400"
+                        )}>
+                          <Clock className="h-4 w-4 ml-1 inline-block animate-pulse" />
                           {formatDate(session.updatedAt)}
                         </span>
                       </div>
@@ -205,24 +210,24 @@ export function ChatSidebar({
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                          className="h-9 w-9 rounded-full hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-all duration-300 hover:scale-110 border-2 border-transparent hover:border-orange-300"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleRename(session);
                           }}
                         >
-                          <Edit className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                          <Edit className="h-4 w-4 text-orange-600 dark:text-orange-400 animate-pulse" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 rounded-full text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                          className="h-9 w-9 rounded-full text-red-500 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 transition-all duration-300 hover:scale-110 border-2 border-transparent hover:border-red-300"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDelete(session);
                           }}
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
+                          <Trash2 className="h-4 w-4 animate-pulse" />
                         </Button>
                       </div>
                     </div>
@@ -233,9 +238,9 @@ export function ChatSidebar({
           </div>
           
           {/* Footer */}
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-            <p className="text-xs text-center text-gray-500 dark:text-gray-400">
-              هندسة السيارات - مساعد زيوت السيارات الذكي
+          <div className="p-5 border-t-2 border-red-200 dark:border-red-800/50 bg-gradient-to-r from-red-100 via-orange-100 to-yellow-100 dark:from-red-900/30 dark:via-orange-900/30 dark:to-yellow-900/30 shadow-lg">
+            <p className="text-sm text-center text-red-700 dark:text-red-300 font-bold animate-gradient-text">
+              🛢️ هندسة السيارات - مساعد زيوت السيارات الذكي 🚗
             </p>
           </div>
         </div>
@@ -256,8 +261,18 @@ export function ChatSidebar({
             />
           </div>
           <DialogFooter className="sm:justify-start flex-row-reverse">
-            <Button type="submit" onClick={confirmRename}>تأكيد</Button>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>
+            <Button 
+              type="submit" 
+              onClick={confirmRename}
+              className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            >
+              تأكيد
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => setDialogOpen(false)}
+              className="border-2 border-red-200 hover:bg-red-50 hover:border-red-300 text-red-700 font-medium"
+            >
               إلغاء
             </Button>
           </DialogFooter>
@@ -266,25 +281,26 @@ export function ChatSidebar({
 
       {/* Delete Confirmation */}
       {sessionToDelete && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-900 p-6 rounded-xl max-w-md w-full mx-4 text-right shadow-2xl border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-              حذف المحادثة
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 animate-fade-in">
+          <div className="bg-gradient-to-br from-white via-red-50 to-orange-50 dark:from-gray-900 dark:via-gray-850 dark:to-gray-800 p-8 rounded-3xl max-w-md w-full mx-4 text-right shadow-2xl border-4 border-red-200 dark:border-red-800/50 animate-scale-in">
+            <h3 className="text-xl font-bold text-red-800 dark:text-red-300 mb-3 animate-gradient-text">
+              🗑️ حذف المحادثة
             </h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-6">
-              هل أنت متأكد من حذف محادثة "{sessionToDelete.title}"؟ لا يمكن التراجع عن هذا الإجراء.
+            <p className="text-gray-600 dark:text-gray-300 mb-8 text-base leading-relaxed">
+              هل أنت متأكد من حذف محادثة "<span className="font-bold text-red-700 dark:text-red-400">{sessionToDelete.title}</span>"؟ لا يمكن التراجع عن هذا الإجراء.
             </p>
-            <div className="flex justify-start space-x-3 space-x-reverse">
+            <div className="flex justify-start space-x-4 space-x-reverse">
               <Button 
                 variant="destructive" 
                 onClick={confirmDelete}
-                className="bg-red-500 hover:bg-red-600"
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-2 border-red-400"
               >
-                حذف
+                حذف نهائياً
               </Button>
               <Button 
                 variant="outline" 
                 onClick={() => setSessionToDelete(null)}
+                className="border-2 border-gray-300 hover:bg-gray-100 hover:border-gray-400 text-gray-700 font-medium px-6 py-3 transition-all duration-300 hover:scale-105"
               >
                 إلغاء
               </Button>

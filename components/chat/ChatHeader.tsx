@@ -25,7 +25,7 @@ export function ChatHeader({
   toggleSidebar
 }: ChatHeaderProps) {
   return (
-    <Card className="rounded-none border-0 shadow-md bg-gradient-to-r from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 flex-shrink-0 z-20">
+    <Card className="rounded-none border-0 shadow-lg bg-gradient-to-r from-red-50 via-orange-50 to-yellow-50 dark:from-gray-800 dark:via-gray-850 dark:to-gray-900 flex-shrink-0 z-20 border-b-2 border-red-100 dark:border-red-900/30">
       <CardContent className="p-3 sm:p-4">
         <div className="flex items-center justify-between w-full mx-auto">
           <div className="flex flex-1 items-center space-x-3 space-x-reverse">
@@ -36,10 +36,10 @@ export function ChatHeader({
                     variant="ghost"
                     size="icon"
                     onClick={toggleSidebar}
-                    className="mr-1 p-1.5 rounded-full hover:bg-blue-100/50 dark:hover:bg-gray-800/80 transition-all duration-200"
+                    className="mr-1 p-1.5 rounded-full hover:bg-red-100/50 dark:hover:bg-red-900/20 transition-all duration-300 hover:scale-110"
                     aria-label="فتح قائمة المحادثات"
                   >
-                    <Menu className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    <Menu className="h-5 w-5 text-red-600 dark:text-red-400" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -49,17 +49,18 @@ export function ChatHeader({
             )}
             
             <div className="logo-container flex items-center justify-center">
-              <div className="relative flex-shrink-0 h-10 w-16 sm:h-12 sm:w-20 flex items-center justify-center">
+              <div className="relative flex-shrink-0 h-12 w-20 sm:h-16 sm:w-24 flex items-center justify-center">
                 <ClientOnly>
                   <div className="relative group">
-                    <div className="absolute inset-0 bg-blue-100 dark:bg-blue-900/30 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-red-100 to-orange-100 dark:from-red-900/30 dark:to-orange-900/30 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 animate-pulse-ring" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-red-200/50 to-orange-200/50 rounded-full blur-sm opacity-0 group-hover:opacity-60 transition-all duration-300" />
                   <Image
                     src="/logo.png"
                     alt="هندسة السيارات"
-                    width={96}
-                    height={72}
+                    width={120}
+                    height={90}
                     priority
-                      className="object-contain max-h-full max-w-full relative z-10 transition-transform duration-300 group-hover:scale-105"
+                      className="object-contain max-h-full max-w-full relative z-10 transition-all duration-300 group-hover:scale-110 drop-shadow-lg"
                     style={{
                       width: 'auto',
                       height: 'auto'
@@ -78,13 +79,13 @@ export function ChatHeader({
             <div className="flex flex-col">
               <Badge
                 variant="secondary"
-                className="bg-gradient-to-r from-blue-100 to-blue-50 dark:from-blue-900/70 dark:to-blue-900/30 text-blue-800 dark:text-blue-200 text-[10px] sm:text-xs font-semibold mb-1.5 px-2.5 py-1 shadow-sm"
+                className="bg-gradient-to-r from-red-100 via-orange-100 to-yellow-100 dark:from-red-900/70 dark:via-orange-900/70 dark:to-yellow-900/70 text-red-800 dark:text-red-200 text-[10px] sm:text-xs font-bold mb-1.5 px-3 py-1.5 shadow-md border border-red-200/50 dark:border-red-700/50 animate-shimmer"
               >
-                <span className="inline-block ml-1.5">🇮🇶</span> مخصص للعراق
+                <span className="inline-block ml-1.5 animate-bounce">🇮🇶</span> مخصص للعراق
               </Badge>
-              <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 flex items-center">
-                <MessageSquare className="h-3 w-3 ml-1 inline-block" />
-                مساعد زيوت السيارات الذكي
+              <p className="text-[11px] sm:text-sm text-gray-700 dark:text-gray-300 flex items-center font-medium">
+                <MessageSquare className="h-3 w-3 ml-1 inline-block text-red-500" />
+                المساعد الذكي لاختيار زيت سيارتك
               </p>
             </div>
           </div>
@@ -96,11 +97,11 @@ export function ChatHeader({
                   variant="outline"
                   size="sm"
                   onClick={() => setDarkMode(!darkMode)}
-                  className="p-1.5 sm:p-2 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full shadow-sm"
+                  className="p-2 sm:p-2.5 border-2 border-red-200 dark:border-red-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-orange-50 dark:hover:from-red-900/20 dark:hover:to-orange-900/20 rounded-full shadow-md transition-all duration-300 hover:scale-110 hover:-translate-y-1"
                 >
                   {darkMode ? 
-                    <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" /> : 
-                    <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                    <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 animate-spin-slow" /> : 
+                    <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 animate-pulse" />
                   }
                 </Button>
               </TooltipTrigger>
@@ -116,16 +117,16 @@ export function ChatHeader({
                   size="sm"
                   onClick={() => setShowSettings(!showSettings)}
                   className={cn(
-                    "p-1.5 sm:p-2 rounded-full transition-all duration-200 shadow-sm",
+                    "p-2 sm:p-2.5 rounded-full transition-all duration-300 shadow-md hover:scale-110 hover:-translate-y-1",
                     showSettings 
-                      ? "bg-blue-500 hover:bg-blue-600 text-white border-blue-600" 
-                      : "border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      ? "bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white border-2 border-red-600 shadow-lg" 
+                      : "border-2 border-red-200 dark:border-red-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-orange-50 dark:hover:from-red-900/20 dark:hover:to-orange-900/20"
                   )}
                 >
                   {showSettings ? (
-                    <X className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <X className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
                   ) : (
-                    <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <Settings className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 dark:text-red-400 animate-pulse" />
                   )}
                 </Button>
               </TooltipTrigger>

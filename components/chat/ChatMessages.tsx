@@ -452,15 +452,16 @@ const WelcomeScreen = ({ isFaqExpanded }: { isFaqExpanded: boolean }) => {
           </h2>
           <div className="w-full flex justify-center mt-6">
             <Button
-              className={`inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-white border-0 shadow-2xl hover:shadow-blue-500/25 ${
-                isFaqExpanded ? 'text-sm py-3 px-8 min-w-[200px]' : 'text-lg py-4 px-12 min-w-[280px]'
-              } font-bold transform hover:scale-105 transition-all duration-300 rounded-full hover:translate-y-[-3px] relative overflow-hidden group`}
+              className={`inline-flex items-center justify-center gap-3 bg-gradient-to-r from-red-500 via-orange-500 to-red-600 hover:from-red-600 hover:via-orange-600 hover:to-red-700 text-white border-0 shadow-2xl hover:shadow-red-500/30 ${
+                isFaqExpanded ? 'text-base py-4 px-10 min-w-[220px]' : 'text-xl py-5 px-14 min-w-[320px]'
+              } font-bold transform hover:scale-110 transition-all duration-300 rounded-full hover:translate-y-[-4px] relative overflow-hidden group animate-pulse-ring`}
               onClick={handleGetStarted}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <span className="relative z-10 flex items-center gap-2">
-                <span>احصل على استشارتك الآن</span>
-                <span className="text-xl">🚀</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-shimmer"></div>
+              <span className="relative z-10 flex items-center gap-3">
+                <span className="text-2xl animate-bounce">💬</span>
+                <span>ابدأ المحادثة الآن</span>
+                <span className="text-2xl animate-pulse">🚀</span>
               </span>
             </Button>
           </div>
@@ -530,11 +531,11 @@ export function ChatMessages({
                 )}
                 
                 <Card
-                  className={`w-auto overflow-hidden shadow-md hover:shadow-lg ${
+                  className={`w-auto overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 my-2 ${
                     message.role === "user"
-                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white border-none"
-                      : "bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700"
-                  } rounded-2xl transition-shadow duration-300 my-1`}
+                      ? "bg-gradient-to-r from-red-500 via-orange-500 to-red-600 text-white border-none hover:from-red-600 hover:via-orange-600 hover:to-red-700 hover:scale-[1.02]"
+                      : "bg-white dark:bg-gray-800 border-2 border-red-100 dark:border-red-900/30 hover:border-red-200 dark:hover:border-red-800/50 hover:shadow-red-100/20 dark:hover:shadow-red-900/20"
+                  } rounded-3xl`}
                   style={{ 
                     maxWidth: message.role === "user" ? "85%" : "95%",
                     wordBreak: "break-word",
@@ -543,7 +544,7 @@ export function ChatMessages({
                   role="article"
                   aria-label={`رسالة من ${message.role === "user" ? "المستخدم" : "المساعد"}`}
                 >
-                  <CardContent className={`p-4 relative group ${message.role === "user" ? "pb-3" : "pb-3"}`}>
+                  <CardContent className={`p-5 sm:p-6 relative group ${message.role === "user" ? "pb-4" : "pb-4"}`}>
                     <MessageActions
                       message={message}
                       copiedMessageId={copiedMessageId}
@@ -552,7 +553,9 @@ export function ChatMessages({
                       shareMessage={shareMessage}
                     />
 
-                    <div className="text-sm leading-relaxed pr-10 whitespace-normal overflow-hidden overflow-wrap-break-word break-words">
+                    <div className={`leading-relaxed pr-12 whitespace-normal overflow-hidden overflow-wrap-break-word break-words ${
+                      message.role === "user" ? "text-base sm:text-lg font-medium" : "text-sm sm:text-base"
+                    }`}>
                       <MessageContent content={message.content} role={message.role} />
                     </div>
 
@@ -561,9 +564,9 @@ export function ChatMessages({
                         <div className="flex justify-start">
                           <Badge
                             variant="secondary"
-                            className="bg-gradient-to-r from-green-100 to-blue-100 dark:from-green-900/40 dark:to-blue-900/40 text-green-800 dark:text-green-200 text-xs shadow-sm"
+                            className="bg-gradient-to-r from-red-100 via-orange-100 to-yellow-100 dark:from-red-900/40 dark:via-orange-900/40 dark:to-yellow-900/40 text-red-800 dark:text-red-200 text-xs sm:text-sm font-bold shadow-md border border-red-200/50 dark:border-red-700/50 animate-shimmer"
                           >
-                            🤖 مساعد خبير - مخصص للعراق
+                            🤖 مساعد خبير - مخصص للعراق 🇮🇶
                           </Badge>
                         </div>
                         
