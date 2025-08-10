@@ -58,18 +58,39 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-[url('/engine-hero.jpg')] bg-cover bg-center opacity-5"></div>
 
         <div className="relative max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-            <span className="text-gray-900 dark:text-white">مساعد ذكي</span>
-            <br />
-            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              لاختيار زيوت سيارتك
+          {/* الشعار الكبير */}
+          <div className="mb-8">
+            <div className="relative flex items-center justify-center w-full">
+              <div className="relative w-64 h-48 sm:w-80 sm:h-60 md:w-96 md:h-72 lg:w-[500px] lg:h-[375px] flex items-center justify-center logo-pulse">
+                <div className="absolute inset-0 logo-glow rounded-full opacity-70" aria-hidden="true"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-red-200/30 via-orange-200/30 to-yellow-200/30 rounded-full blur-xl opacity-60 animate-pulse" aria-hidden="true"></div>
+                <Image
+                  src="/logo.png"
+                  alt="هندسة السيارات - مساعد زيوت السيارات الذكي"
+                  width={500}
+                  height={375}
+                  priority
+                  className="object-contain max-h-full max-w-full relative z-10 drop-shadow-2xl animate-float"
+                  style={{
+                    width: 'auto',
+                    height: 'auto'
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* النص التوضيحي تحت الشعار */}
+          <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
+            <span className="bg-gradient-to-r from-red-600 via-orange-600 to-red-700 bg-clip-text text-transparent animate-gradient-text">
+              المساعد الذكي لاختيار زيوت سيارتك
             </span>
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-10 max-w-4xl mx-auto leading-relaxed">
             احصل على توصيات دقيقة ومخصصة لاختيار أفضل زيت محرك لسيارتك
             <br />
-            <span className="text-lg text-blue-600 dark:text-blue-400 font-medium">مناسب للظروف المناخية العراقية القاسية</span>
+            <span className="text-lg text-red-600 dark:text-red-400 font-medium">مناسب للظروف المناخية العراقية القاسية</span>
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-12">
