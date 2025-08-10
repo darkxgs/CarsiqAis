@@ -58,12 +58,6 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-[url('/engine-hero.jpg')] bg-cover bg-center opacity-5"></div>
 
         <div className="relative max-w-7xl mx-auto text-center">
-          <div className="mb-6">
-            <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-700">
-              🚗 مساعد خبير زيوت السيارات
-            </span>
-          </div>
-
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
             <span className="text-gray-900 dark:text-white">مساعد ذكي</span>
             <br />
