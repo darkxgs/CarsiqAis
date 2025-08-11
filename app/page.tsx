@@ -109,7 +109,6 @@ export default function LandingPage() {
                 
                 {/* Much stronger gloss highlight */}
                 <div className="absolute top-6 left-1/5 right-1/5 h-20 bg-gradient-to-r from-transparent via-white/60 to-transparent rounded-full blur-md opacity-80 z-10" aria-hidden="true"></div>
-                <div className="absolute top-8 left-1/4 right-1/4 h-12 bg-gradient-to-r from-transparent via-white/40 to-transparent rounded-full blur-sm opacity-70 z-10" aria-hidden="true"></div>
               </div>
             </div>
           </div>
