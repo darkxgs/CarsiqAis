@@ -768,4 +768,44 @@ nav a:hover::after {
 .mobile-cta-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6);
+}/* CHAT ANIM
+ATIONS FIX - Disable all problematic animations */
+.chat-container [class*="animate-"],
+.chat-container .animate-spin-slow,
+.chat-container .animate-shimmer,
+.chat-container .animate-pulse-ring,
+.chat-container .animate-gradient-text,
+.chat-container .animate-float,
+.chat-container .animate-bounce-slow,
+.chat-container .animate-glow,
+.chat-container .animate-scale-in {
+  animation: none !important;
+  transform: none !important;
+}
+
+/* Remove pseudo-elements that cause layout issues */
+.chat-container .animate-pulse-ring::before,
+.chat-container .animate-pulse-ring::after {
+  display: none !important;
+}
+
+/* Override gradient text backgrounds that cause issues */
+.chat-container .animate-gradient-text {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  -webkit-text-fill-color: unset !important;
+  background-clip: unset !important;
+}
+
+/* Keep only essential animations */
+.chat-container .animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.chat-container .animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.chat-container .animate-bounce {
+  animation: bounce 1s infinite;
 }
