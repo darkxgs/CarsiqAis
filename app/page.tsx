@@ -29,17 +29,17 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
       {/* Functional Navigation Header - Sticky */}
-      <header className="sticky top-0 z-50 w-full py-4 px-4 md:px-8 lg:px-12 header-enhanced backdrop-blur-md">
+      <header className="sticky top-0 z-50 w-full py-2 sm:py-3 md:py-4 px-4 md:px-8 lg:px-12 header-enhanced backdrop-blur-md">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo and Brand */}
           <div className="flex items-center gap-3">
             <div className="relative w-12 h-12 header-logo-enhanced">
-              <Image 
-                src="/logo.png" 
-                alt="هندسة السيارات" 
-                width={48} 
-                height={48} 
-                className="relative z-10 rounded-full logo-text-sharp w-full h-full object-cover" 
+              <Image
+                src="/logo.png"
+                alt="هندسة السيارات"
+                width={48}
+                height={48}
+                className="relative z-10 rounded-full logo-text-sharp w-full h-full object-cover"
                 style={{
                   filter: 'contrast(1.1) brightness(1.05) saturate(1.1)'
                 }}
@@ -78,7 +78,7 @@ export default function LandingPage() {
             <Link href="/chat" className="hidden sm:block">
               <Button className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white border-0 px-6 py-2 text-sm font-bold btn-unified">
                 <span className="flex items-center gap-2">
-                  💬 ابدأ الآن
+                  <span>💬</span> ابدأ الآن
                 </span>
               </Button>
             </Link>
@@ -102,53 +102,53 @@ export default function LandingPage() {
         <div className={`lg:hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
           <div className="px-4 py-6 bg-slate-900/95 backdrop-blur-md border-t border-white/10">
             <nav className="flex flex-col gap-4">
-              <Link 
-                href="/chat" 
+              <Link
+                href="/chat"
                 className="flex items-center gap-3 text-gray-300 hover:text-white transition-colors duration-300 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <span className="text-lg">💬</span>
                 <span className="font-medium">المحادثة</span>
               </Link>
-              <Link 
-                href="/about" 
+              <Link
+                href="/about"
                 className="flex items-center gap-3 text-gray-300 hover:text-white transition-colors duration-300 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <span className="text-lg">ℹ️</span>
                 <span className="font-medium">عن الخدمة</span>
               </Link>
-              <Link 
-                href="/support" 
+              <Link
+                href="/support"
                 className="flex items-center gap-3 text-gray-300 hover:text-white transition-colors duration-300 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <span className="text-lg">🛠️</span>
                 <span className="font-medium">الدعم</span>
               </Link>
-              <Link 
-                href="/faq" 
+              <Link
+                href="/faq"
                 className="flex items-center gap-3 text-gray-300 hover:text-white transition-colors duration-300 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <span className="text-lg">❓</span>
                 <span className="font-medium">الأسئلة الشائعة</span>
               </Link>
-              <Link 
-                href="/contact" 
+              <Link
+                href="/contact"
                 className="flex items-center gap-3 text-gray-300 hover:text-white transition-colors duration-300 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <span className="text-lg">📞</span>
                 <span className="font-medium">اتصل بنا</span>
               </Link>
-              
+
               {/* Mobile CTA Button */}
               <div className="pt-4 border-t border-white/10">
                 <Link href="/chat" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white border-0 py-3 text-base font-bold btn-unified">
+                  <Button className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white border-0 py-3 text-base font-bold btn-unified md:btn-unified">
                     <span className="flex items-center justify-center gap-2">
-                      🚀 ابدأ المحادثة الآن
+                      <span>🚀</span> ابدأ المحادثة الآن
                     </span>
                   </Button>
                 </Link>
@@ -159,7 +159,7 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative py-8 md:py-12 px-4 overflow-hidden">
+      <section className="relative py-2 md:py-4 px-4 overflow-hidden">
         {/* Background Elements */}
         <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-yellow-50 to-red-50 dark:from-gray-900 dark:via-gray-800 dark:to-orange-900/20"></div>
         <div className="absolute top-20 right-10 w-72 h-72 bg-orange-200/30 dark:bg-orange-500/10 rounded-full blur-3xl"></div>
@@ -170,12 +170,12 @@ export default function LandingPage() {
 
         <div className="relative max-w-7xl mx-auto text-center">
           {/* الشعار الكبير المحسن */}
-          <div className="mb-4">
+          <div className="mb-1 sm:mb-2">
             <div className="relative flex items-center justify-center w-full">
-              <div className="relative w-80 h-80 sm:w-96 sm:h-96 md:w-[400px] md:h-[400px] lg:w-[450px] lg:h-[450px] flex items-center justify-center">
+              <div className="relative w-56 h-56 sm:w-72 sm:h-72 md:w-[320px] md:h-[320px] lg:w-[360px] lg:h-[360px] flex items-center justify-center">
                 {/* Enhanced circular background with professional effects */}
                 <div className="absolute inset-4 logo-circle-enhanced logo-badge-professional logo-metallic-effect rounded-full" aria-hidden="true"></div>
-                
+
                 {/* Logo image with enhanced sharpness */}
                 <div className="relative z-20 w-3/4 h-3/4 flex items-center justify-center">
                   <Image
@@ -192,7 +192,7 @@ export default function LandingPage() {
                     }}
                   />
                 </div>
-                
+
                 {/* Much stronger gloss highlight */}
                 <div className="absolute top-6 left-1/5 right-1/5 h-20 bg-gradient-to-r from-transparent via-white/60 to-transparent rounded-full blur-md opacity-80 z-10" aria-hidden="true"></div>
               </div>
@@ -200,30 +200,30 @@ export default function LandingPage() {
           </div>
 
           {/* النص التوضيحي تحت الشعار */}
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-8 leading-tight">
-            <span className="bg-gradient-to-r from-red-600 via-orange-600 to-red-700 bg-clip-text text-transparent animate-gradient-text text-3d-enhanced text-arabic-3d" style={{
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-4 leading-tight">
+            <span className="bg-gradient-to-r from-red-600 via-orange-600 to-red-700 bg-clip-text text-transparent animate-gradient-text md:animate-gradient-text text-3d-enhanced text-arabic-3d" style={{
               filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3)) drop-shadow(0 0 20px rgba(239, 68, 68, 0.4))'
             }}>
               المساعد الذكي لاختيار زيوت سيارتك
             </span>
           </h1>
 
-          <p className="text-2xl md:text-3xl text-gray-700 dark:text-gray-200 mb-10 max-w-4xl mx-auto leading-relaxed text-embossed font-medium">
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-700 dark:text-gray-200 mb-4 sm:mb-6 max-w-4xl mx-auto leading-relaxed text-embossed font-medium">
             احصل على توصيات دقيقة ومخصصة لاختيار أفضل زيت محرك لسيارتك
             <br />
-            <span className="text-xl md:text-2xl text-red-600 dark:text-red-400 font-semibold text-inner-shadow mt-2 block" style={{
+            <span className="text-base sm:text-lg md:text-xl text-red-600 dark:text-red-400 font-semibold text-inner-shadow mt-1 sm:mt-2 block" style={{
               textShadow: 'inset 0 1px 1px rgba(239, 68, 68, 0.2), 0 1px 0 rgba(255,255,255,0.1)',
               lineHeight: '1.6'
             }}>مناسب للظروف المناخية العراقية القاسية</span>
           </p>
 
-          <div className="flex flex-col items-center justify-center gap-4 mb-12">
+          <div className="flex flex-col items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
             <Link href="/chat">
-              <Button size="lg" className="group relative overflow-hidden bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white border-0 px-16 py-8 text-2xl font-bold btn-unified shadow-2xl">
+              <Button size="lg" className="group relative overflow-hidden bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white border-0 px-8 sm:px-12 md:px-16 py-4 sm:py-6 md:py-8 text-lg sm:text-xl md:text-2xl font-bold btn-unified md:btn-unified shadow-2xl">
                 <span className="relative z-10 flex items-center gap-3">
-                  🚀 ابدأ المحادثة الآن
+                  <span>🚀</span> ابدأ المحادثة الآن
                 </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 md:transition-opacity md:duration-300"></div>
               </Button>
             </Link>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
@@ -233,23 +233,23 @@ export default function LandingPage() {
 
           {/* Stats */}
           <div className="max-w-4xl mx-auto">
-            <h3 className="text-2xl md:text-3xl font-bold text-center mb-8 text-gray-900 dark:text-white">لماذا تختارنا؟</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
-                <div className="text-5xl font-black text-red-600 dark:text-red-400 mb-2">150+</div>
-                <div className="text-gray-600 dark:text-gray-300 font-semibold">فلتر زيت معتمد</div>
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-4 sm:mb-6 text-gray-900 dark:text-white">لماذا تختارنا؟</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+              <div className="text-center bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-2xl shadow-lg">
+                <div className="text-3xl sm:text-4xl md:text-5xl font-black text-red-600 dark:text-red-400 mb-2">150+</div>
+                <div className="text-sm sm:text-base text-gray-600 dark:text-gray-300 font-semibold">فلتر زيت معتمد</div>
               </div>
-              <div className="text-center bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
-                <div className="text-5xl font-black text-orange-600 dark:text-orange-400 mb-2">25+</div>
-                <div className="text-gray-600 dark:text-gray-300 font-semibold">علامة تجارية</div>
+              <div className="text-center bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-2xl shadow-lg">
+                <div className="text-3xl sm:text-4xl md:text-5xl font-black text-orange-600 dark:text-orange-400 mb-2">25+</div>
+                <div className="text-sm sm:text-base text-gray-600 dark:text-gray-300 font-semibold">علامة تجارية</div>
               </div>
-              <div className="text-center bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
-                <div className="text-5xl font-black text-yellow-600 dark:text-yellow-400 mb-2">100%</div>
-                <div className="text-gray-600 dark:text-gray-300 font-semibold">دقة التوصيات</div>
+              <div className="text-center bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-2xl shadow-lg">
+                <div className="text-3xl sm:text-4xl md:text-5xl font-black text-yellow-600 dark:text-yellow-400 mb-2">100%</div>
+                <div className="text-sm sm:text-base text-gray-600 dark:text-gray-300 font-semibold">دقة التوصيات</div>
               </div>
             </div>
-            <div className="text-center mt-8 p-4 bg-gradient-to-r from-green-100 to-blue-100 dark:from-green-900/30 dark:to-blue-900/30 rounded-xl">
-              <p className="text-lg font-semibold text-green-800 dark:text-green-200">
+            <div className="text-center mt-4 sm:mt-6 p-3 sm:p-4 bg-gradient-to-r from-green-100 to-blue-100 dark:from-green-900/30 dark:to-blue-900/30 rounded-xl">
+              <p className="text-sm sm:text-base md:text-lg font-semibold text-green-800 dark:text-green-200">
                 ✅ موصى به من خبراء الزيوت في العراق
               </p>
             </div>
@@ -379,7 +379,7 @@ export default function LandingPage() {
             </h2>
             <p className="text-gray-600 dark:text-gray-300">نتعامل مع أفضل العلامات التجارية العالمية</p>
           </div>
-          
+
           {/* Animated Slider */}
           <div className="relative overflow-hidden">
             <div className="flex animate-scroll space-x-8 rtl:space-x-reverse">
@@ -419,6 +419,68 @@ export default function LandingPage() {
 
 
 
+      {/* FAQ Section */}
+      <section className="py-16 px-4 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900 dark:text-white">
+              الأسئلة الشائعة
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-300">
+              إجابات على أكثر الأسئلة شيوعاً حول زيوت السيارات
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+                🛢️ ما أفضل نوع زيت للجو الحار في العراق؟
+              </h3>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                للأجواء الحارة في العراق، يُنصح بزيوت اصطناعية كاملة (Full Synthetic) بلزوجة 5W-30 أو 5W-40 أو 10W-40 حسب توصية الشركة المصنعة.
+              </p>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+                🔧 متى أحتاج لتغيير زيت السيارة؟
+              </h3>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                الحرارة العالية في العراق تسرع من تدهور حالة زيت المحرك. من المستحسن تغيير الزيت كل 5,000 كم في الصيف، وكل 7,500 كم في الشتاء.
+              </p>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+                🔍 كيف أعرف رقم فلتر الزيت المناسب؟
+              </h3>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                يختلف رقم فلتر الزيت حسب موديل ونوع السيارة. يمكنك استخدام مساعدنا الذكي لمعرفة رقم الفلتر المناسب لسيارتك بدقة 100%.
+              </p>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+                💡 نصائح للحفاظ على محرك السيارة في الجو الحار
+              </h3>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                تأكد من فحص نظام التبريد بانتظام، استخدم سائل تبريد عالي الجودة، وافحص البطارية حيث أن الحرارة العالية تؤثر عليها بشكل كبير.
+              </p>
+            </div>
+          </div>
+
+          <div className="text-center mt-12">
+            <Link href="/chat">
+              <Button size="lg" className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white border-0 rounded-2xl px-8 py-4 text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-300">
+                <span className="flex items-center gap-2">
+                  <span>💬</span> اسأل المساعد الذكي
+                </span>
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="relative py-20 px-4 overflow-hidden">
         {/* Background */}
@@ -448,9 +510,9 @@ export default function LandingPage() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
             <Link href="/chat">
-              <Button size="lg" className="group relative overflow-hidden bg-white text-blue-600 hover:bg-gray-100 border-0 rounded-2xl px-10 py-6 text-lg font-bold shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300">
+              <Button size="lg" className="group relative overflow-hidden bg-white text-blue-600 hover:bg-gray-100 border-0 rounded-2xl px-10 py-6 text-lg font-bold shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 md:transform md:hover:-translate-y-1 md:transition-all md:duration-300">
                 <span className="relative z-10 flex items-center gap-2">
-                  🚀 ابدأ المحادثة الآن
+                  <span>🚀</span> ابدأ المحادثة الآن
                 </span>
               </Button>
             </Link>
@@ -637,7 +699,7 @@ export default function LandingPage() {
           <Link href="/chat">
             <Button size="lg" className="bg-white text-red-600 hover:bg-gray-100 border-0 rounded-2xl px-12 py-8 text-xl font-bold shadow-2xl hover:shadow-3xl transform hover:scale-110 hover:-translate-y-2 transition-all duration-300">
               <span className="flex items-center gap-3">
-                💬 ابدأ المحادثة الآن
+                <span>💬</span> ابدأ المحادثة الآن
               </span>
             </Button>
           </Link>
