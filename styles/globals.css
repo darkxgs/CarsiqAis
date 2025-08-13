@@ -631,4 +631,141 @@ ader logo mini professional effect */
   border-radius: 50%;
   filter: blur(2px);
   pointer-events: none;
+}/* Sm
+ooth scrolling for navigation */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced sticky header */
+.header-enhanced {
+  background: linear-gradient(135deg, 
+    rgba(15, 23, 42, 0.98) 0%, 
+    rgba(31, 41, 55, 0.96) 50%, 
+    rgba(15, 23, 42, 0.98) 100%);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+/* Navigation hover effects */
+nav a {
+  position: relative;
+  overflow: hidden;
+}
+
+nav a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ef4444, #f97316);
+  transition: width 0.3s ease;
+}
+
+nav a:hover::after {
+  width: 100%;
+}
+
+/* Enhanced testimonials cards */
+.testimonial-card {
+  transition: all 0.3s ease;
+  transform: translateY(0);
+}
+
+.testimonial-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Stats animation */
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stats-number {
+  animation: countUp 0.8s ease-out;
+}/
+* Mobile Navigation Menu */
+.mobile-menu-enter {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.mobile-menu-enter-active {
+  max-height: 400px;
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.3s ease-in-out;
+}
+
+.mobile-menu-exit {
+  max-height: 400px;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mobile-menu-exit-active {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease-in-out;
+}
+
+/* Hamburger Menu Animation */
+.hamburger-line {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+}
+
+/* Mobile menu backdrop */
+.mobile-menu-backdrop {
+  background: rgba(15, 23, 42, 0.98);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Mobile menu items hover effect */
+.mobile-menu-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.mobile-menu-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: right 0.5s ease;
+}
+
+.mobile-menu-item:hover::before {
+  right: 100%;
+}
+
+/* Improved mobile button */
+.mobile-cta-button {
+  background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+  transition: all 0.3s ease;
+}
+
+.mobile-cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6);
 }

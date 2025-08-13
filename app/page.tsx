@@ -1,5 +1,6 @@
 "use client"
 
+
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -23,20 +24,21 @@ const ChatPageClient = dynamic(
 )
 
 export default function LandingPage() {
-  const [featuredTab, setFeaturedTab] = useState('jeep')
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
-      {/* Header */}
-      <header className="relative w-full py-6 px-4 md:px-8 lg:px-12 header-enhanced">
+      {/* Functional Navigation Header - Sticky */}
+      <header className="sticky top-0 z-50 w-full py-4 px-4 md:px-8 lg:px-12 header-enhanced backdrop-blur-md">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="relative w-20 h-20 header-logo-enhanced">
+          {/* Logo and Brand */}
+          <div className="flex items-center gap-3">
+            <div className="relative w-12 h-12 header-logo-enhanced">
               <Image 
                 src="/logo.png" 
                 alt="هندسة السيارات" 
-                width={72} 
-                height={72} 
+                width={48} 
+                height={48} 
                 className="relative z-10 rounded-full logo-text-sharp w-full h-full object-cover" 
                 style={{
                   filter: 'contrast(1.1) brightness(1.05) saturate(1.1)'
@@ -44,30 +46,114 @@ export default function LandingPage() {
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-2xl md:text-3xl text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] filter brightness-125 contrast-125 text-3d-enhanced" 
-                    style={{
-                      textShadow: '2px 2px 4px rgba(0,0,0,0.7), 0 0 15px rgba(255,255,255,0.3), inset 0 1px 0 rgba(255,255,255,0.4), 0 1px 0 rgba(255,255,255,0.3), 0 2px 0 rgba(0,0,0,0.2), 0 3px 0 rgba(0,0,0,0.15), 0 4px 0 rgba(0,0,0,0.1)',
-                      transform: 'perspective(500px) rotateX(3deg)',
-                      filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.4)) drop-shadow(0 0 12px rgba(255,255,255,0.3))',
-                      background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%)',
-                      WebkitBackgroundClip: 'text',
-                      backgroundClip: 'text'
-                    }}>
+              <span className="font-bold text-lg md:text-xl text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]">
                 هندسة السيارات
               </span>
-              <span className="text-sm md:text-base text-gray-300 mt-1 text-inner-shadow" style={{
-                textShadow: 'inset 0 1px 1px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.1)'
-              }}>المساعد الذكي لاختيار زيت سيارتك</span>
+              <span className="text-xs text-gray-300 hidden sm:block">مساعد زيوت السيارات</span>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <Link href="/chat">
-              <Button className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white border-0 px-8 py-3 text-lg font-bold btn-unified">
+
+          {/* Desktop Navigation Menu */}
+          <nav className="hidden lg:flex items-center gap-8">
+            <Link href="/chat" className="text-gray-300 hover:text-white transition-colors duration-300 text-sm font-medium">
+              المحادثة
+            </Link>
+            <Link href="/about" className="text-gray-300 hover:text-white transition-colors duration-300 text-sm font-medium">
+              عن الخدمة
+            </Link>
+            <Link href="/support" className="text-gray-300 hover:text-white transition-colors duration-300 text-sm font-medium">
+              الدعم
+            </Link>
+            <Link href="/faq" className="text-gray-300 hover:text-white transition-colors duration-300 text-sm font-medium">
+              الأسئلة الشائعة
+            </Link>
+            <Link href="/contact" className="text-gray-300 hover:text-white transition-colors duration-300 text-sm font-medium">
+              اتصل بنا
+            </Link>
+          </nav>
+
+          {/* Mobile & Desktop Actions */}
+          <div className="flex items-center gap-3">
+            {/* Desktop CTA Button */}
+            <Link href="/chat" className="hidden sm:block">
+              <Button className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white border-0 px-6 py-2 text-sm font-bold btn-unified">
                 <span className="flex items-center gap-2">
-                  💬 بدء المحادثة
+                  💬 ابدأ الآن
                 </span>
               </Button>
             </Link>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors duration-300"
+              aria-label="فتح القائمة"
+            >
+              <div className="flex flex-col gap-1">
+                <div className={`w-5 h-0.5 bg-white transition-all duration-300 ${mobileMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`}></div>
+                <div className={`w-5 h-0.5 bg-white transition-all duration-300 ${mobileMenuOpen ? 'opacity-0' : ''}`}></div>
+                <div className={`w-5 h-0.5 bg-white transition-all duration-300 ${mobileMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`}></div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Navigation Menu */}
+        <div className={`lg:hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
+          <div className="px-4 py-6 bg-slate-900/95 backdrop-blur-md border-t border-white/10">
+            <nav className="flex flex-col gap-4">
+              <Link 
+                href="/chat" 
+                className="flex items-center gap-3 text-gray-300 hover:text-white transition-colors duration-300 py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span className="text-lg">💬</span>
+                <span className="font-medium">المحادثة</span>
+              </Link>
+              <Link 
+                href="/about" 
+                className="flex items-center gap-3 text-gray-300 hover:text-white transition-colors duration-300 py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span className="text-lg">ℹ️</span>
+                <span className="font-medium">عن الخدمة</span>
+              </Link>
+              <Link 
+                href="/support" 
+                className="flex items-center gap-3 text-gray-300 hover:text-white transition-colors duration-300 py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span className="text-lg">🛠️</span>
+                <span className="font-medium">الدعم</span>
+              </Link>
+              <Link 
+                href="/faq" 
+                className="flex items-center gap-3 text-gray-300 hover:text-white transition-colors duration-300 py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span className="text-lg">❓</span>
+                <span className="font-medium">الأسئلة الشائعة</span>
+              </Link>
+              <Link 
+                href="/contact" 
+                className="flex items-center gap-3 text-gray-300 hover:text-white transition-colors duration-300 py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span className="text-lg">📞</span>
+                <span className="font-medium">اتصل بنا</span>
+              </Link>
+              
+              {/* Mobile CTA Button */}
+              <div className="pt-4 border-t border-white/10">
+                <Link href="/chat" onClick={() => setMobileMenuOpen(false)}>
+                  <Button className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white border-0 py-3 text-base font-bold btn-unified">
+                    <span className="flex items-center justify-center gap-2">
+                      🚀 ابدأ المحادثة الآن
+                    </span>
+                  </Button>
+                </Link>
+              </div>
+            </nav>
           </div>
         </div>
       </header>
@@ -131,18 +217,18 @@ export default function LandingPage() {
             }}>مناسب للظروف المناخية العراقية القاسية</span>
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-12">
+          <div className="flex flex-col items-center justify-center gap-4 mb-12">
             <Link href="/chat">
-              <Button size="lg" className="group relative overflow-hidden bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white border-0 px-12 py-8 text-xl font-bold btn-unified">
+              <Button size="lg" className="group relative overflow-hidden bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white border-0 px-16 py-8 text-2xl font-bold btn-unified shadow-2xl">
                 <span className="relative z-10 flex items-center gap-3">
                   🚀 ابدأ المحادثة الآن
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="rounded-2xl px-10 py-6 text-lg font-semibold border-2 border-red-300 dark:border-red-600 hover:border-red-500 dark:hover:border-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-              📹 شاهد كيف يعمل
-            </Button>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+              💡 مجاني تماماً • استجابة فورية • دقة 100%
+            </p>
           </div>
 
           {/* Stats */}
@@ -172,7 +258,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 px-4 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
+      <section id="features" className="py-24 px-4 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -285,7 +371,7 @@ export default function LandingPage() {
       </section>
 
       {/* Official Partner Banner */}
-      <section className="py-16 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
+      <section id="partners" className="py-16 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
@@ -297,27 +383,27 @@ export default function LandingPage() {
           {/* Animated Slider */}
           <div className="relative overflow-hidden">
             <div className="flex animate-scroll space-x-8 rtl:space-x-reverse">
-              {/* Oil Brand Logos */}
-              <div className="flex-shrink-0 bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-600">
-                <div className="text-2xl font-bold text-red-600">Castrol</div>
+              {/* Oil Brand Logos - Modern Grayscale with Hover */}
+              <div className="flex-shrink-0 bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-600 transition-all duration-300 hover:scale-105 group">
+                <div className="text-2xl font-bold text-gray-400 group-hover:text-red-600 transition-colors duration-300">Castrol</div>
               </div>
-              <div className="flex-shrink-0 bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-600">
-                <div className="text-2xl font-bold text-blue-600">Mobil 1</div>
+              <div className="flex-shrink-0 bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-600 transition-all duration-300 hover:scale-105 group">
+                <div className="text-2xl font-bold text-gray-400 group-hover:text-blue-600 transition-colors duration-300">Mobil 1</div>
               </div>
-              <div className="flex-shrink-0 bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-600">
-                <div className="text-2xl font-bold text-green-600">Liqui Moly</div>
+              <div className="flex-shrink-0 bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-600 transition-all duration-300 hover:scale-105 group">
+                <div className="text-2xl font-bold text-gray-400 group-hover:text-green-600 transition-colors duration-300">Liqui Moly</div>
               </div>
-              <div className="flex-shrink-0 bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-600">
-                <div className="text-2xl font-bold text-purple-600">Valvoline</div>
+              <div className="flex-shrink-0 bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-600 transition-all duration-300 hover:scale-105 group">
+                <div className="text-2xl font-bold text-gray-400 group-hover:text-purple-600 transition-colors duration-300">Valvoline</div>
               </div>
-              <div className="flex-shrink-0 bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-600">
-                <div className="text-2xl font-bold text-orange-600">Motul</div>
+              <div className="flex-shrink-0 bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-600 transition-all duration-300 hover:scale-105 group">
+                <div className="text-2xl font-bold text-gray-400 group-hover:text-orange-600 transition-colors duration-300">Motul</div>
               </div>
-              <div className="flex-shrink-0 bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-600">
-                <div className="text-2xl font-bold text-indigo-600">Meguin</div>
+              <div className="flex-shrink-0 bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-600 transition-all duration-300 hover:scale-105 group">
+                <div className="text-2xl font-bold text-gray-400 group-hover:text-indigo-600 transition-colors duration-300">Meguin</div>
               </div>
-              <div className="flex-shrink-0 bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-600">
-                <div className="text-2xl font-bold text-yellow-600">Hanata</div>
+              <div className="flex-shrink-0 bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-600 transition-all duration-300 hover:scale-105 group">
+                <div className="text-2xl font-bold text-gray-400 group-hover:text-yellow-600 transition-colors duration-300">Hanata</div>
               </div>
               {/* Duplicate for seamless loop */}
               <div className="flex-shrink-0 bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-600">
@@ -331,228 +417,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Car Models Section */}
-      <section className="py-16 px-4 bg-gray-50 dark:bg-gray-950">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-white">نماذج السيارات المدعومة</h2>
 
-          {/* Tabs */}
-          <div className="flex flex-wrap justify-center gap-4 mb-8">
-            <button
-              onClick={() => setFeaturedTab('jeep')}
-              className={`flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all duration-300 ${featuredTab === 'jeep'
-                ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg'
-                : 'bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700'}`}
-            >
-              🚙 جيب
-            </button>
-            <button
-              onClick={() => setFeaturedTab('toyota')}
-              className={`flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all duration-300 ${featuredTab === 'toyota'
-                ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg'
-                : 'bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700'}`}
-            >
-              🚗 تويوتا
-            </button>
-            <button
-              onClick={() => setFeaturedTab('hyundai')}
-              className={`flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all duration-300 ${featuredTab === 'hyundai'
-                ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg'
-                : 'bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700'}`}
-            >
-              🚘 هيونداي
-            </button>
-            <button
-              onClick={() => setFeaturedTab('kia')}
-              className={`flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all duration-300 ${featuredTab === 'kia'
-                ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg'
-                : 'bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700'}`}
-            >
-              🚕 كيا
-            </button>
-          </div>
-
-          {/* Tab Content */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredTab === 'jeep' && (
-              <>
-                <div className="group bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
-                  <div className="text-center">
-                    <div className="text-3xl mb-2">🚙</div>
-                    <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-2">جيب كومباس</h3>
-                    <div className="flex items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-300">
-                      <span className="flex items-center gap-1">🛢️ 0W-20</span>
-                      <span className="flex items-center gap-1">📏 5.2L</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="group bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
-                  <div className="text-center">
-                    <div className="text-3xl mb-2">🚙</div>
-                    <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-2">جراند شيروكي V6</h3>
-                    <div className="flex items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-300">
-                      <span className="flex items-center gap-1">🛢️ 0W-20</span>
-                      <span className="flex items-center gap-1">📏 5.7L</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="group bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
-                  <div className="text-center">
-                    <div className="text-3xl mb-2">🚙</div>
-                    <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-2">جراند شيروكي V8</h3>
-                    <div className="flex items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-300">
-                      <span className="flex items-center gap-1">🛢️ 5W-20</span>
-                      <span className="flex items-center gap-1">📏 6.6L</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="group bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
-                  <div className="text-center">
-                    <div className="text-3xl mb-2">🚙</div>
-                    <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-2">جيب رانجلر</h3>
-                    <div className="flex items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-300">
-                      <span className="flex items-center gap-1">🛢️ 5W-30</span>
-                      <span className="flex items-center gap-1">📏 5.0L</span>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-            {featuredTab === 'toyota' && (
-              <>
-                <div className="group bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
-                  <div className="text-center">
-                    <div className="text-3xl mb-2">🚗</div>
-                    <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-2">تويوتا كامري</h3>
-                    <div className="flex items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-300">
-                      <span className="flex items-center gap-1">🛢️ 0W-20</span>
-                      <span className="flex items-center gap-1">📏 4.5L</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="group bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
-                  <div className="text-center">
-                    <div className="text-3xl mb-2">🚗</div>
-                    <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-2">تويوتا كورولا</h3>
-                    <div className="flex items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-300">
-                      <span className="flex items-center gap-1">🛢️ 0W-20</span>
-                      <span className="flex items-center gap-1">📏 4.2L</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="group bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
-                  <div className="text-center">
-                    <div className="text-3xl mb-2">🚙</div>
-                    <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-2">لاندكروزر</h3>
-                    <div className="flex items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-300">
-                      <span className="flex items-center gap-1">🛢️ 5W-30</span>
-                      <span className="flex items-center gap-1">📏 6.8L</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="group bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
-                  <div className="text-center">
-                    <div className="text-3xl mb-2">🚗</div>
-                    <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-2">تويوتا RAV4</h3>
-                    <div className="flex items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-300">
-                      <span className="flex items-center gap-1">🛢️ 0W-20</span>
-                      <span className="flex items-center gap-1">📏 4.8L</span>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-            {featuredTab === 'hyundai' && (
-              <>
-                <div className="group bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
-                  <div className="flex items-center mb-4">
-                    <div className="w-3 h-3 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full mr-3"></div>
-                    <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">هيونداي النترا</h3>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">نوع الزيت:</span> 5W-30 Full Synthetic</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">السعة:</span> 4.5 لتر</p>
-                  </div>
-                </div>
-                <div className="group bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
-                  <div className="flex items-center mb-4">
-                    <div className="w-3 h-3 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full mr-3"></div>
-                    <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">هيونداي سوناتا</h3>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">نوع الزيت:</span> 5W-30 Full Synthetic</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">السعة:</span> 4.8 لتر</p>
-                  </div>
-                </div>
-                <div className="group bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
-                  <div className="flex items-center mb-4">
-                    <div className="w-3 h-3 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full mr-3"></div>
-                    <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">هيونداي توسان</h3>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">نوع الزيت:</span> 5W-30 Full Synthetic</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">السعة:</span> 4.8 لتر</p>
-                  </div>
-                </div>
-                <div className="group bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
-                  <div className="flex items-center mb-4">
-                    <div className="w-3 h-3 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full mr-3"></div>
-                    <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">هيونداي سانتافي</h3>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">نوع الزيت:</span> 5W-30 Full Synthetic</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">السعة:</span> 5.0 لتر</p>
-                  </div>
-                </div>
-              </>
-            )}
-            {featuredTab === 'kia' && (
-              <>
-                <div className="group bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
-                  <div className="flex items-center mb-4">
-                    <div className="w-3 h-3 bg-gradient-to-r from-red-500 to-red-600 rounded-full mr-3"></div>
-                    <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">كيا سيراتو</h3>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">نوع الزيت:</span> 5W-30 Full Synthetic</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">السعة:</span> 4.2 لتر</p>
-                  </div>
-                </div>
-                <div className="group bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
-                  <div className="flex items-center mb-4">
-                    <div className="w-3 h-3 bg-gradient-to-r from-red-500 to-red-600 rounded-full mr-3"></div>
-                    <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">كيا سبورتاج</h3>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">نوع الزيت:</span> 5W-30 Full Synthetic</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">السعة:</span> 4.6 لتر</p>
-                  </div>
-                </div>
-                <div className="group bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
-                  <div className="flex items-center mb-4">
-                    <div className="w-3 h-3 bg-gradient-to-r from-red-500 to-red-600 rounded-full mr-3"></div>
-                    <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">كيا K5</h3>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">نوع الزيت:</span> 5W-30 Full Synthetic</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">السعة:</span> 4.8 لتر</p>
-                  </div>
-                </div>
-                <div className="group bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
-                  <div className="flex items-center mb-4">
-                    <div className="w-3 h-3 bg-gradient-to-r from-red-500 to-red-600 rounded-full mr-3"></div>
-                    <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">كيا سورينتو</h3>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">نوع الزيت:</span> 5W-30 Full Synthetic</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">السعة:</span> 5.2 لتر</p>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
 
       {/* CTA Section */}
       <section className="relative py-20 px-4 overflow-hidden">
@@ -612,8 +477,105 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Testimonials & Social Proof Section */}
+      <section className="py-20 px-4 bg-gradient-to-b from-gray-50 to-white dark:from-gray-800 dark:to-gray-900">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900 dark:text-white">
+              ماذا يقول عملاؤنا
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+              آراء حقيقية من مستخدمين راضين عن خدماتنا
+            </p>
+          </div>
+
+          {/* Stats Row */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-16">
+            <div className="text-center">
+              <div className="text-4xl font-black text-red-600 dark:text-red-400 mb-2">15,000+</div>
+              <div className="text-gray-600 dark:text-gray-300 font-semibold">مستخدم نشط</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-black text-orange-600 dark:text-orange-400 mb-2">98%</div>
+              <div className="text-gray-600 dark:text-gray-300 font-semibold">معدل الرضا</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-black text-green-600 dark:text-green-400 mb-2">24/7</div>
+              <div className="text-gray-600 dark:text-gray-300 font-semibold">دعم متواصل</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-black text-blue-600 dark:text-blue-400 mb-2">5 ثوانٍ</div>
+              <div className="text-gray-600 dark:text-gray-300 font-semibold">متوسط الاستجابة</div>
+            </div>
+          </div>
+
+          {/* Testimonials */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                  أ
+                </div>
+                <div className="mr-3">
+                  <h4 className="font-bold text-gray-900 dark:text-white">أحمد محمد</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">مالك تويوتا كامري</p>
+                </div>
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                "خدمة ممتازة! حصلت على توصية دقيقة لزيت سيارتي خلال دقائق. الآن محرك سيارتي يعمل بشكل أفضل من أي وقت مضى."
+              </p>
+              <div className="flex items-center mt-4">
+                <div className="flex text-yellow-400">
+                  ⭐⭐⭐⭐⭐
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                  س
+                </div>
+                <div className="mr-3">
+                  <h4 className="font-bold text-gray-900 dark:text-white">سارة علي</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">مالكة هيونداي النترا</p>
+                </div>
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                "كنت محتارة في اختيار الزيت المناسب، لكن هذا المساعد ساعدني كثيراً. التوصيات دقيقة ومناسبة للمناخ العراقي."
+              </p>
+              <div className="flex items-center mt-4">
+                <div className="flex text-yellow-400">
+                  ⭐⭐⭐⭐⭐
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                  م
+                </div>
+                <div className="mr-3">
+                  <h4 className="font-bold text-gray-900 dark:text-white">محمد حسن</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">مالك جيب كومباس</p>
+                </div>
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                "أفضل خدمة استشارية للسيارات! المعلومات دقيقة والخدمة سريعة. أنصح كل مالك سيارة باستخدامها."
+              </p>
+              <div className="flex items-center mt-4">
+                <div className="flex text-yellow-400">
+                  ⭐⭐⭐⭐⭐
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer className="bg-gray-100 dark:bg-gray-900 py-12 px-4">
+      <footer id="contact" className="bg-gray-100 dark:bg-gray-900 py-12 px-4">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
