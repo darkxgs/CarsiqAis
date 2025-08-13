@@ -544,7 +544,7 @@ export default function ChatPage() {
   return (
     <TooltipProvider>
       <div
-        className={`chat-container min-h-[100svh] transition-colors duration-300 ${darkMode ? 'dark bg-[#1a1f2c]' : 'bg-gray-50'} flex flex-col m-0 p-0 mobile-safe-container relative`}
+        className={`min-h-[100svh] transition-colors duration-300 ${darkMode ? 'dark bg-[#1a1f2c]' : 'bg-gray-50'} flex flex-col m-0 p-0 mobile-safe-container relative`}
         style={{ margin: 0, padding: 0 }}
       >
         {/* Chat Sidebar */}
@@ -555,6 +555,7 @@ export default function ChatPage() {
           activeSessionId={activeSessionId}
           onSessionSelect={handleSessionSelect}
           onNewSession={handleNewSession}
+          onSessionsUpdate={loadChatSessions}
         />
 
         <div

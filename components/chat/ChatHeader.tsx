@@ -26,7 +26,7 @@ export function ChatHeader({
 }: ChatHeaderProps) {
   return (
     <Card className="rounded-none border-0 shadow-lg bg-gradient-to-r from-red-50 via-orange-50 to-yellow-50 dark:from-gray-800 dark:via-gray-850 dark:to-gray-900 flex-shrink-0 z-20 border-b-2 border-red-100 dark:border-red-900/30">
-      <CardContent className="p-3 sm:p-4">
+      <CardContent className="p-2 sm:p-3 md:p-4">
         <div className="flex items-center justify-between w-full mx-auto">
           <div className="flex flex-1 items-center space-x-3 space-x-reverse">
             {toggleSidebar && (
@@ -49,7 +49,7 @@ export function ChatHeader({
             )}
             
             <div className="logo-container flex items-center justify-center">
-              <div className="relative flex-shrink-0 h-12 w-20 sm:h-16 sm:w-24 flex items-center justify-center">
+              <div className="relative flex-shrink-0 h-8 w-12 sm:h-12 sm:w-20 md:h-16 md:w-24 flex items-center justify-center">
                 <ClientOnly>
                   <div className="relative group">
                     <div className="absolute inset-0 bg-gradient-to-r from-red-100 to-orange-100 dark:from-red-900/30 dark:to-orange-900/30 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 animate-pulse-ring" />
@@ -60,7 +60,7 @@ export function ChatHeader({
                     width={120}
                     height={90}
                     priority
-                      className="object-contain max-h-full max-w-full relative z-10 transition-all duration-300 group-hover:scale-110 drop-shadow-lg"
+                      className="object-contain max-h-full max-w-full relative z-10 transition-all duration-300 group-hover:scale-110 drop-shadow-lg scale-75 sm:scale-100"
                     style={{
                       width: 'auto',
                       height: 'auto'
@@ -79,13 +79,14 @@ export function ChatHeader({
             <div className="flex flex-col">
               <Badge
                 variant="secondary"
-                className="bg-gradient-to-r from-red-100 via-orange-100 to-yellow-100 dark:from-red-900/70 dark:via-orange-900/70 dark:to-yellow-900/70 text-red-800 dark:text-red-200 text-[10px] sm:text-xs font-bold mb-1.5 px-3 py-1.5 shadow-md border border-red-200/50 dark:border-red-700/50 animate-shimmer"
+                className="bg-gradient-to-r from-red-100 via-orange-100 to-yellow-100 dark:from-red-900/70 dark:via-orange-900/70 dark:to-yellow-900/70 text-red-800 dark:text-red-200 text-[8px] sm:text-[10px] md:text-xs font-bold mb-1 sm:mb-1.5 px-2 sm:px-3 py-1 sm:py-1.5 shadow-md border border-red-200/50 dark:border-red-700/50 animate-shimmer"
               >
-                <span className="inline-block ml-1.5 animate-bounce">🇮🇶</span> مخصص للعراق
+                <span className="inline-block ml-1 sm:ml-1.5 animate-bounce">🇮🇶</span> مخصص للعراق
               </Badge>
-              <p className="text-[11px] sm:text-sm text-gray-700 dark:text-gray-300 flex items-center font-medium">
-                <MessageSquare className="h-3 w-3 ml-1 inline-block text-red-500" />
-                المساعد الذكي لاختيار زيت سيارتك
+              <p className="text-[9px] sm:text-[11px] md:text-sm text-gray-700 dark:text-gray-300 flex items-center font-medium">
+                <MessageSquare className="h-2.5 w-2.5 sm:h-3 sm:w-3 ml-1 inline-block text-red-500" />
+                <span className="hidden sm:inline">المساعد الذكي لاختيار زيت سيارتك</span>
+                <span className="sm:hidden">مساعد خبير زيوت السيارات</span>
               </p>
             </div>
           </div>

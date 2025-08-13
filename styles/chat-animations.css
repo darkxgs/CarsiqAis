@@ -1,63 +1,228 @@
-/* Chat-specific animations and styles - SIMPLIFIED */
+/* Chat-specific animations and styles */
 
-/* Disable all problematic animations */
-.animate-spin-slow,
-.animate-shimmer,
-.animate-pulse-ring,
-.animate-gradient-text,
-.animate-float,
-.animate-bounce-slow,
-.animate-glow {
-  animation: none !important;
+/* Slow spin animation for sun icon */
+.animate-spin-slow {
+  animation: spin 3s linear infinite;
 }
 
-/* Remove pseudo-elements that cause issues */
-.animate-pulse-ring::before {
-  display: none !important;
+/* Shimmer effect for badges and buttons */
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
 }
 
-/* Simple fade-in only */
-.animate-fade-in {
-  opacity: 1;
-  transform: none;
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
-/* Keep only basic chat message entrance */
+/* Chat message entrance animation */
 .chat-message-enter {
-  animation: none;
-  opacity: 1;
-  transform: none;
+  animation: slideInUp 0.3s ease-out;
 }
 
-/* Disable all complex animations globally for chat */
-.animate-spin-slow,
-.animate-shimmer,
-.animate-pulse-ring,
-.animate-gradient-text,
-.animate-float,
-.animate-bounce-slow,
-.animate-glow,
-.animate-scale-in {
-  animation: none !important;
-  transform: none !important;
-  background: none !important;
-}
-
-/* Override any remaining animation classes */
-[class*="animate-"] {
-  animation: none !important;
-}
-
-/* Keep only essential loading spinner */
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
+@keyframes slideInUp {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateY(20px);
   }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced fade-in animation */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Pulse ring animation for buttons */
+.animate-pulse-ring {
+  position: relative;
+}
+
+.animate-pulse-ring::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  background: linear-gradient(45deg, #ef4444, #f97316, #ef4444);
+  opacity: 0.7;
+  animation: pulseRing 2s infinite;
+  z-index: -1;
+}
+
+@keyframes pulseRing {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.7;
+  }
+}
+
+/* Gradient text animation */
+.animate-gradient-text {
+  background: linear-gradient(45deg, #ef4444, #f97316, #eab308, #ef4444);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientText 3s ease infinite;
+}
+
+@keyframes gradientText {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Floating animation for icons */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Bounce animation for emojis */
+.animate-bounce-slow {
+  animation: bounceGentle 2s infinite;
+}
+
+@keyframes bounceGentle {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Glow effect for active elements */
+.animate-glow {
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5), 0 0 20px rgba(239, 68, 68, 0.3), 0 0 30px rgba(239, 68, 68, 0.1);
+  }
+  to {
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.6), 0 0 30px rgba(249, 115, 22, 0.4), 0 0 40px rgba(249, 115, 22, 0.2);
+  }
+}
+
+/* Mobile optimizations - Remove ALL animations on mobile */
+@media (max-width: 768px) {
+  /* Disable ALL animations on mobile devices */
+  .animate-pulse-ring,
+  .animate-pulse-ring::before,
+  .animate-shimmer,
+  .animate-glow,
+  .animate-spin-slow,
+  .animate-bounce,
+  .animate-pulse,
+  .animate-float,
+  .animate-gradient-text,
+  .animate-bounce-slow,
+  .animate-fade-in,
+  .chat-message-enter {
+    animation: none !important;
+  }
+  
+  /* Remove transform animations on mobile */
+  .hover\:scale-110:hover,
+  .hover\:scale-105:hover,
+  .hover\:-translate-y-1:hover,
+  .hover\:-translate-y-2:hover,
+  .hover\:translate-y-\[-4px\]:hover,
+  .transform:hover {
+    transform: none !important;
+  }
+  
+  /* Remove transition effects on mobile for better performance */
+  .transition-all,
+  .transition-transform,
+  .transition-opacity,
+  .transition-colors {
+    transition: none !important;
+  }
+  
+  /* Keep colors and gradients but remove animations */
+  .animate-gradient-text {
+    background: linear-gradient(45deg, #ef4444, #f97316, #eab308, #ef4444);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    /* Remove animation but keep gradient */
+    animation: none !important;
+  }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .animate-shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  }
+  
+  .animate-glow {
+    filter: brightness(0.8);
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .animate-shimmer,
+  .animate-pulse-ring,
+  .animate-float,
+  .animate-bounce-slow,
+  .animate-glow,
+  .animate-gradient-text {
+    animation: none !important;
+  }
+  
+  .animate-fade-in {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }

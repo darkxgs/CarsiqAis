@@ -454,14 +454,14 @@ const WelcomeScreen = ({ isFaqExpanded }: { isFaqExpanded: boolean }) => {
             <Button
               className={`inline-flex items-center justify-center gap-3 bg-gradient-to-r from-red-500 via-orange-500 to-red-600 hover:from-red-600 hover:via-orange-600 hover:to-red-700 text-white border-0 shadow-2xl hover:shadow-red-500/30 ${
                 isFaqExpanded ? 'text-base py-4 px-10 min-w-[220px]' : 'text-xl py-5 px-14 min-w-[320px]'
-              } font-bold transform hover:scale-110 transition-all duration-300 rounded-full hover:translate-y-[-4px] relative overflow-hidden group animate-pulse-ring`}
+              } font-bold transform hover:scale-110 transition-all duration-300 rounded-full hover:translate-y-[-4px] relative overflow-hidden group animate-pulse-ring md:animate-pulse-ring`}
               onClick={handleGetStarted}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-shimmer"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-shimmer md:animate-shimmer"></div>
               <span className="relative z-10 flex items-center gap-3">
-                <span className="text-2xl animate-bounce">💬</span>
+                <span className="text-2xl animate-bounce md:animate-bounce">💬</span>
                 <span>ابدأ المحادثة الآن</span>
-                <span className="text-2xl animate-pulse">🚀</span>
+                <span className="text-2xl animate-pulse md:animate-pulse">🚀</span>
               </span>
             </Button>
           </div>

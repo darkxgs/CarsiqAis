@@ -584,6 +584,89 @@ ced Professional Circular Logo Design */
     inset 0 -2px 0 rgba(0, 0, 0, 0.2),
     0 0 0 1px rgba(239, 68, 68, 0.2),
     0 0 20px rgba(239, 68, 68, 0.15);
+}
+
+/* Mobile-specific animation disabling */
+@media (max-width: 768px) {
+  /* Disable ALL animations on mobile devices */
+  .logo-pulse,
+  .logo-glow,
+  .animate-float,
+  .animate-gradient-text,
+  .logo-glow-focused,
+  .logo-glow-professional,
+  .logo-circle-enhanced,
+  .logo-circle-enhanced::before,
+  .logo-circle-enhanced::after,
+  .logo-metallic-effect::before,
+  .header-logo-enhanced,
+  .btn-unified,
+  .animate-scroll,
+  .testimonial-card,
+  .stats-number,
+  .mobile-menu-item::before,
+  .mobile-cta-button,
+  .animate-pulse,
+  .animate-bounce,
+  .animate-spin,
+  .animate-spin-slow,
+  .animate-pulse-ring,
+  .animate-pulse-ring::before,
+  .animate-shimmer,
+  .animate-glow {
+    animation: none !important;
+  }
+  
+  /* Remove hover transforms on mobile */
+  .btn-unified:hover,
+  .header-logo-enhanced:hover,
+  .testimonial-card:hover,
+  .mobile-cta-button:hover,
+  .hover\:scale-105:hover,
+  .hover\:scale-110:hover,
+  .hover\:-translate-y-1:hover,
+  .hover\:-translate-y-2:hover,
+  .hover\:translate-y-\[-4px\]:hover,
+  .transform:hover,
+  .group:hover .group-hover\:scale-110,
+  .group:hover .group-hover\:opacity-100 {
+    transform: none !important;
+    opacity: inherit !important;
+  }
+  
+  /* Remove transitions on mobile for better performance */
+  .transition-all,
+  .transition-transform,
+  .transition-opacity,
+  .transition-colors,
+  .transition-shadow,
+  .duration-300,
+  .duration-500 {
+    transition: none !important;
+  }
+  
+  /* Keep gradients but remove animations */
+  .animate-gradient-text {
+    background: linear-gradient(45deg, #ef4444, #f97316, #eab308, #ef4444);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: none !important;
+  }
+  
+  .gradient-text-enhanced {
+    background: linear-gradient(135deg, #dc2626 0%, #ea580c 25%, #d97706 50%, #dc2626 75%, #b91c1c 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: none !important;
+  }
+  
+  /* Disable flag/Iraq-related animations if any */
+  .flag-animation,
+  .iraq-flag-wave {
+    animation: none !important;
+  }
 }/* He
 ader logo mini professional effect */
 .header-logo-enhanced {
@@ -768,44 +851,4 @@ nav a:hover::after {
 .mobile-cta-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6);
-}/* CHAT ANIM
-ATIONS FIX - Disable all problematic animations */
-.chat-container [class*="animate-"],
-.chat-container .animate-spin-slow,
-.chat-container .animate-shimmer,
-.chat-container .animate-pulse-ring,
-.chat-container .animate-gradient-text,
-.chat-container .animate-float,
-.chat-container .animate-bounce-slow,
-.chat-container .animate-glow,
-.chat-container .animate-scale-in {
-  animation: none !important;
-  transform: none !important;
-}
-
-/* Remove pseudo-elements that cause layout issues */
-.chat-container .animate-pulse-ring::before,
-.chat-container .animate-pulse-ring::after {
-  display: none !important;
-}
-
-/* Override gradient text backgrounds that cause issues */
-.chat-container .animate-gradient-text {
-  background: none !important;
-  -webkit-background-clip: unset !important;
-  -webkit-text-fill-color: unset !important;
-  background-clip: unset !important;
-}
-
-/* Keep only essential animations */
-.chat-container .animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-.chat-container .animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-.chat-container .animate-bounce {
-  animation: bounce 1s infinite;
 }

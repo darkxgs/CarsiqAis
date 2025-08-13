@@ -89,19 +89,21 @@ export function QuickActions({ onActionSelected, onFaqExpandChange }: QuickActio
         </div>
 
         {showQuickActions && (
-          <div className="grid grid-cols-3 gap-3 max-w-md mx-auto">
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 max-w-xs sm:max-w-md mx-auto">
             {Object.entries(quickActions).map(([key, data]) => (
               <div key={key} className="relative group">
                 <Button
                   variant="outline"
                   onClick={() => handleQuickAction(key)}
-                  className="h-20 w-full bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-300 flex flex-col justify-center items-center transition-all duration-300 text-xs p-2 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-2 group-hover:scale-105"
+                  className="h-16 sm:h-20 w-full bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-300 flex flex-col justify-center items-center transition-all duration-300 text-xs p-1.5 sm:p-2 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-2 group-hover:scale-105"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="relative flex justify-center items-center text-center mb-1 text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-all duration-300 group-hover:scale-110">
-                    {data.icon}
+                  <div className="relative flex justify-center items-center text-center mb-0.5 sm:mb-1 text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-all duration-300 group-hover:scale-110">
+                    <div className="w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center">
+                      {data.icon}
+                    </div>
                   </div>
-                  <span className="relative text-center text-xs font-semibold break-words leading-tight group-hover:font-bold transition-all duration-300">{data.title}</span>
+                  <span className="relative text-center text-[10px] sm:text-xs font-semibold break-words leading-tight group-hover:font-bold transition-all duration-300">{data.title}</span>
                 </Button>
                 
                 {/* Hover effect overlay */}

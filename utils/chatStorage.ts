@@ -117,15 +117,24 @@ export const addMessageToActiveSession = (message: ChatMessage): void => {
 export const deleteChatSession = (sessionId: string): void => {
   const storage = getChatStorage();
   
+  console.log('Deleting session:', sessionId);
+  const sessionExists = storage.sessions.find(s => s.id === sessionId);
+  if (!sessionExists) {
+    console.error('Session not found for deletion:', sessionId);
+    return;
+  }
+  
   // Remove the session
   storage.sessions = storage.sessions.filter(s => s.id !== sessionId);
   
   // If we deleted the active session, set a new active session or null
   if (storage.activeSessionId === sessionId) {
     storage.activeSessionId = storage.sessions.length > 0 ? storage.sessions[0].id : null;
+    console.log('Active session changed to:', storage.activeSessionId);
   }
   
   saveChatStorage(storage);
+  console.log('Session deleted successfully');
 };
 
 // Rename a chat session
@@ -134,10 +143,13 @@ export const renameChatSession = (sessionId: string, newTitle: string): void => 
   
   const sessionIndex = storage.sessions.findIndex(s => s.id === sessionId);
   if (sessionIndex === -1) {
-    console.error('Session not found');
+    console.error('Session not found for rename:', sessionId);
     return;
   }
   
+  console.log('Renaming session:', sessionId, 'to:', newTitle);
   storage.sessions[sessionIndex].title = newTitle;
+  storage.sessions[sessionIndex].updatedAt = Date.now();
   saveChatStorage(storage);
+  console.log('Session renamed successfully');
 }; 

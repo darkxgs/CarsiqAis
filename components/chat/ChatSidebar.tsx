@@ -16,6 +16,7 @@ interface ChatSidebarProps {
   activeSessionId: string | null
   onSessionSelect: (sessionId: string) => void
   onNewSession: () => void
+  onSessionsUpdate?: () => void
 }
 
 export function ChatSidebar({
@@ -24,7 +25,8 @@ export function ChatSidebar({
   sessions,
   activeSessionId,
   onSessionSelect,
-  onNewSession
+  onNewSession,
+  onSessionsUpdate
 }: ChatSidebarProps) {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [sessionToRename, setSessionToRename] = useState<ChatSession | null>(null)
@@ -36,7 +38,7 @@ export function ChatSidebar({
     onSessionSelect(sessionId)
     
     // On mobile, close the sidebar after selection
-    if (window.innerWidth < 768) {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
       onClose()
     }
   }
@@ -82,18 +84,51 @@ export function ChatSidebar({
 
   // Confirm rename
   const confirmRename = () => {
-    if (sessionToRename && (newTitle?.trim?.() || '')) {
-      renameChatSession(sessionToRename.id, newTitle?.trim?.() || newTitle || '')
+    console.log('Confirm rename called:', { sessionToRename, newTitle });
+    if (sessionToRename && newTitle && newTitle.trim().length > 0) {
+      console.log('Renaming session:', sessionToRename.id, 'to:', newTitle.trim());
+      renameChatSession(sessionToRename.id, newTitle.trim())
       setDialogOpen(false)
       setSessionToRename(null)
+      setNewTitle("")
+      // Refresh sessions list
+      if (onSessionsUpdate) {
+        console.log('Calling onSessionsUpdate');
+        onSessionsUpdate()
+      }
+    } else {
+      console.log('Rename validation failed');
     }
   }
 
   // Confirm delete
   const confirmDelete = () => {
+    console.log('Confirm delete called:', { sessionToDelete });
     if (sessionToDelete) {
+      const wasActiveSession = sessionToDelete.id === activeSessionId
+      console.log('Deleting session:', sessionToDelete.id, 'wasActive:', wasActiveSession);
       deleteChatSession(sessionToDelete.id)
       setSessionToDelete(null)
+      
+      // If we deleted the active session, we need to handle the UI update
+      if (wasActiveSession) {
+        // The deleteChatSession function will set a new active session or null
+        // We need to refresh the parent component's state
+        if (onSessionsUpdate) {
+          console.log('Calling onSessionsUpdate after active session deletion');
+          onSessionsUpdate()
+        }
+        // Close sidebar on mobile after deletion
+        if (window.innerWidth < 768) {
+          onClose()
+        }
+      } else {
+        // Just refresh sessions list
+        if (onSessionsUpdate) {
+          console.log('Calling onSessionsUpdate after non-active session deletion');
+          onSessionsUpdate()
+        }
+      }
     }
   }
 
@@ -117,7 +152,8 @@ export function ChatSidebar({
       
       <aside 
         className={cn(
-          "fixed top-0 bottom-0 right-0 z-50 w-80 md:w-72 bg-gradient-to-b from-red-50 via-orange-50 to-yellow-50 dark:from-gray-900 dark:via-gray-850 dark:to-gray-800 shadow-2xl transition-all duration-300 transform border-l-4 border-red-200 dark:border-red-800/50",
+          "fixed top-0 bottom-0 right-0 z-50 w-80 md:w-72 bg-gradient-to-b from-red-50 via-orange-50 to-yellow-50 dark:from-gray-900 dark:via-gray-850 dark:to-gray-800 shadow-2xl border-l-4 border-red-200 dark:border-red-800/50",
+          "transition-transform duration-300 ease-in-out",
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
         style={{ right: 0 }}
@@ -145,10 +181,10 @@ export function ChatSidebar({
             <Button
               variant="default"
               size="default"
-              className="w-full bg-gradient-to-r from-red-500 via-orange-500 to-red-600 hover:from-red-600 hover:via-orange-600 hover:to-red-700 text-white font-bold rounded-2xl py-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 border-2 border-red-400 animate-pulse-ring"
+              className="w-full bg-gradient-to-r from-red-500 via-orange-500 to-red-600 hover:from-red-600 hover:via-orange-600 hover:to-red-700 text-white font-bold rounded-2xl py-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 border-2 border-red-400 animate-pulse-ring md:animate-pulse-ring"
               onClick={onNewSession}
             >
-              <PlusCircle className="h-6 w-6 ml-2 animate-spin-slow" />
+              <PlusCircle className="h-6 w-6 ml-2 animate-spin-slow md:animate-spin-slow" />
               محادثة جديدة
             </Button>
           </div>
@@ -257,20 +293,33 @@ export function ChatSidebar({
               dir="rtl"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  confirmRename()
+                }
+              }}
               className="col-span-3"
+              placeholder="أدخل عنوان المحادثة الجديد"
+              autoFocus
             />
           </div>
           <DialogFooter className="sm:justify-start flex-row-reverse">
             <Button 
               type="submit" 
               onClick={confirmRename}
-              className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              disabled={!newTitle || newTitle.trim().length === 0}
+              className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               تأكيد
             </Button>
             <Button 
               variant="outline" 
-              onClick={() => setDialogOpen(false)}
+              onClick={() => {
+                setDialogOpen(false)
+                setNewTitle("")
+                setSessionToRename(null)
+              }}
               className="border-2 border-red-200 hover:bg-red-50 hover:border-red-300 text-red-700 font-medium"
             >
               إلغاء
