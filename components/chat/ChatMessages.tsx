@@ -443,7 +443,7 @@ const WelcomeScreen = ({ isFaqExpanded }: { isFaqExpanded: boolean }) => {
       <h1 className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl ${
             isFaqExpanded ? 'mb-1 sm:mb-2' : 'mb-2 sm:mb-3'
       } font-bold text-gray-900 dark:text-white`}>
-        مساعد خبير زيوت السيارات
+         خبير زيوت السيارات
       </h1>
       <h2 className={`text-sm sm:text-base md:text-lg lg:text-xl ${
             isFaqExpanded ? 'mb-4' : 'mb-8'

@@ -25,7 +25,7 @@ export default function ChatPage() {
   const [scale, setScale] = useState(1)
   const [keyboardVisible, setKeyboardVisible] = useState(false)
   const [viewportHeight, setViewportHeight] = useState(0)
-  const [isFaqExpanded, setIsFaqExpanded] = useState(true)
+  const [isFaqExpanded, setIsFaqExpanded] = useState(false)
   const [textareaHeight, setTextareaHeight] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)

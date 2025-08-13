@@ -11,7 +11,7 @@ interface QuickActionsProps {
 }
 
 export function QuickActions({ onActionSelected, onFaqExpandChange }: QuickActionsProps) {
-  const [showQuickActions, setShowQuickActions] = useState(true)
+  const [showQuickActions, setShowQuickActions] = useState(false)
 
   const quickActions = {
     "oil-change": {
