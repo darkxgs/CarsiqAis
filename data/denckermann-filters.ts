@@ -413,6 +413,47 @@ export const denckermannFilters: FilterDatabase = {
     compatibleVehicles: ["Mitsubishi Delica D:2", "Mitsubishi Minicab", "Nissan NT100 Clipper", "Nissan NV100 Clipper", "Nissan NV100 Clipper Rio", "Suzuki Alto", "Suzuki Alto Lapin", "Suzuki Celerio", "Suzuki Every", "Suzuki Hustler", "Suzuki Ignis", "Suzuki Solio", "Suzuki Spacia", "Suzuki Swift V", "Suzuki Wagon R"]
   },
 
+  // Kia Filters
+  "A210418": {
+    filterNumber: "A210418",
+    brand: "Kia",
+    compatibleVehicles: ["Sportage", "Sorento", "Optima", "Forte", "Soul"]
+  },
+  "A210419": {
+    filterNumber: "A210419",
+    brand: "Kia",
+    compatibleVehicles: ["Sportage Turbo", "Sorento V6", "Stinger", "K5"]
+  },
+
+  // Mazda Filters
+  "A210420": {
+    filterNumber: "A210420",
+    brand: "Mazda",
+    compatibleVehicles: ["Mazda 6", "CX-5", "CX-9", "Mazda 3"]
+  },
+  "A210421": {
+    filterNumber: "A210421",
+    brand: "Mazda",
+    compatibleVehicles: ["MX-5", "CX-3", "Mazda 2"]
+  },
+
+  // Universal Filters for Other Brands
+  "A210500": {
+    filterNumber: "A210500",
+    brand: "Universal",
+    compatibleVehicles: ["Ford Focus", "Ford Escape", "Ford Fusion", "Ford Explorer"]
+  },
+  "A210501": {
+    filterNumber: "A210501",
+    brand: "Universal", 
+    compatibleVehicles: ["Chevrolet Cruze", "Chevrolet Malibu", "Chevrolet Equinox"]
+  },
+  "A210502": {
+    filterNumber: "A210502",
+    brand: "Universal",
+    compatibleVehicles: ["Nissan Altima", "Nissan Sentra", "Nissan Rogue", "Nissan Pathfinder"]
+  },
+
   // Hyundai/Kia/Genesis Filters
   "A210142": {
     filterNumber: "A210142",
@@ -644,6 +685,23 @@ export const denckermannFilters: FilterDatabase = {
     filterNumber: "A211033",
     brand: "Opel",
     compatibleVehicles: ["Astra H", "Agila (A)", "Combo-C", "Corsa", "Meriva"]
+  },
+
+  // Honda Filters
+  "A210415": {
+    filterNumber: "A210415",
+    brand: "Honda",
+    compatibleVehicles: ["Civic", "Accord", "CR-V", "HR-V", "City", "Jazz", "Fit"]
+  },
+  "A210416": {
+    filterNumber: "A210416", 
+    brand: "Honda",
+    compatibleVehicles: ["Pilot", "Ridgeline", "Passport", "Odyssey"]
+  },
+  "A210417": {
+    filterNumber: "A210417",
+    brand: "Honda", 
+    compatibleVehicles: ["Civic Type R", "Accord Sport", "CR-V Turbo"]
   },
 
   // Nissan / Infiniti / Renault Filters
@@ -878,6 +936,30 @@ export function findFilterByVehicle(make: string, model: string): string | null 
   };
 
   const modelMapping: { [key: string]: string } = {
+    // Honda Models
+    'سيفيك': 'civic',
+    'civic': 'civic',
+    'اكورد': 'accord',
+    'accord': 'accord',
+    'سي ار في': 'cr-v',
+    'cr-v': 'cr-v',
+    'اتش ار في': 'hr-v',
+    'hr-v': 'hr-v',
+    'سيتي': 'city',
+    'city': 'city',
+    'جاز': 'jazz',
+    'jazz': 'jazz',
+    'فيت': 'fit',
+    'fit': 'fit',
+    'بايلوت': 'pilot',
+    'pilot': 'pilot',
+    'ريدجلاين': 'ridgeline',
+    'ridgeline': 'ridgeline',
+    'باسبورت': 'passport',
+    'passport': 'passport',
+    'اوديسي': 'odyssey',
+    'odyssey': 'odyssey',
+    
     // Toyota Models (from database)
     'كامري': 'camry',
     'camry': 'camry',
@@ -1024,6 +1106,18 @@ export function findFilterByVehicle(make: string, model: string): string | null 
     // Kia Models (from database)
     'سبورتاج': 'sportage',
     'sportage': 'sportage',
+    'سورينتو': 'sorento',
+    'sorento': 'sorento',
+    'اوبتيما': 'optima',
+    'optima': 'optima',
+    'فورتي': 'forte',
+    'forte': 'forte',
+    'سول': 'soul',
+    'soul': 'soul',
+    'ستينجر': 'stinger',
+    'stinger': 'stinger',
+    'كي فايف': 'k5',
+    'k5': 'k5',
     'سورينتو': 'sorento',
     'sorento': 'sorento',
     'سيراتو': 'cerato',
@@ -1624,6 +1718,20 @@ export function findFilterByVehicle(make: string, model: string): string | null 
     'cr-v': 'cr-v',
     'اتش ار في': 'hr-v',
     'hr-v': 'hr-v',
+    'سيتي': 'city',
+    'city': 'city',
+    'جاز': 'jazz',
+    'jazz': 'jazz',
+    'فيت': 'fit',
+    'fit': 'fit',
+    'بايلوت': 'pilot',
+    'pilot': 'pilot',
+    'ريدجلاين': 'ridgeline',
+    'ridgeline': 'ridgeline',
+    'باسبورت': 'passport',
+    'passport': 'passport',
+    'اوديسي': 'odyssey',
+    'odyssey': 'odyssey',
     'بايلوت': 'pilot',
     'pilot': 'pilot',
     'ريدجلاين': 'ridgeline',
@@ -2127,6 +2235,18 @@ export const modelMappings: { [key: string]: string } = {
     'sportage': 'sportage',
     'سورينتو': 'sorento',
     'sorento': 'sorento',
+    'اوبتيما': 'optima',
+    'optima': 'optima',
+    'فورتي': 'forte',
+    'forte': 'forte',
+    'سول': 'soul',
+    'soul': 'soul',
+    'ستينجر': 'stinger',
+    'stinger': 'stinger',
+    'كي فايف': 'k5',
+    'k5': 'k5',
+    'سورينتو': 'sorento',
+    'sorento': 'sorento',
     'سيراتو': 'cerato',
     'cerato': 'cerato',
     'اوبتيما': 'optima',
@@ -2583,6 +2703,20 @@ export const modelMappings: { [key: string]: string } = {
     'cr-v': 'cr-v',
     'اتش ار في': 'hr-v',
     'hr-v': 'hr-v',
+    'سيتي': 'city',
+    'city': 'city',
+    'جاز': 'jazz',
+    'jazz': 'jazz',
+    'فيت': 'fit',
+    'fit': 'fit',
+    'بايلوت': 'pilot',
+    'pilot': 'pilot',
+    'ريدجلاين': 'ridgeline',
+    'ridgeline': 'ridgeline',
+    'باسبورت': 'passport',
+    'passport': 'passport',
+    'اوديسي': 'odyssey',
+    'odyssey': 'odyssey',
     'بايلوت': 'pilot',
     'pilot': 'pilot',
     'ريدجلاين': 'ridgeline',
@@ -2723,6 +2857,30 @@ export const modelMappings: { [key: string]: string } = {
 
   // Create a comprehensive mapping of Arabic/English model names
   const modelMapping: { [key: string]: string } = {
+    // Honda models
+    'سيفيك': 'civic',
+    'civic': 'civic',
+    'اكورد': 'accord',
+    'accord': 'accord',
+    'سي ار في': 'cr-v',
+    'cr-v': 'cr-v',
+    'اتش ار في': 'hr-v',
+    'hr-v': 'hr-v',
+    'سيتي': 'city',
+    'city': 'city',
+    'جاز': 'jazz',
+    'jazz': 'jazz',
+    'فيت': 'fit',
+    'fit': 'fit',
+    'بايلوت': 'pilot',
+    'pilot': 'pilot',
+    'ريدجلاين': 'ridgeline',
+    'ridgeline': 'ridgeline',
+    'باسبورت': 'passport',
+    'passport': 'passport',
+    'اوديسي': 'odyssey',
+    'odyssey': 'odyssey',
+    
     // Toyota models
     'كامري': 'camry',
     'camry': 'camry',

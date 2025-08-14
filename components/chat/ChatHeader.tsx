@@ -52,7 +52,7 @@ export function ChatHeader({
               <div className="relative flex-shrink-0 h-8 w-12 sm:h-12 sm:w-20 md:h-16 md:w-24 flex items-center justify-center">
                 <ClientOnly>
                   <div className="relative group">
-                    <div className="absolute inset-0 bg-gradient-to-r from-red-100 to-orange-100 dark:from-red-900/30 dark:to-orange-900/30 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 animate-pulse-ring" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-red-100 to-orange-100 dark:from-red-900/30 dark:to-orange-900/30 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300" />
                     <div className="absolute inset-0 bg-gradient-to-r from-red-200/50 to-orange-200/50 rounded-full blur-sm opacity-0 group-hover:opacity-60 transition-all duration-300" />
                   <Image
                     src="/logo.png"
@@ -79,9 +79,9 @@ export function ChatHeader({
             <div className="flex flex-col">
               <Badge
                 variant="secondary"
-                className="bg-gradient-to-r from-red-100 via-orange-100 to-yellow-100 dark:from-red-900/70 dark:via-orange-900/70 dark:to-yellow-900/70 text-red-800 dark:text-red-200 text-[8px] sm:text-[10px] md:text-xs font-bold mb-1 sm:mb-1.5 px-2 sm:px-3 py-1 sm:py-1.5 shadow-md border border-red-200/50 dark:border-red-700/50 animate-shimmer"
+                className="bg-gradient-to-r from-red-100 via-orange-100 to-yellow-100 dark:from-red-900/70 dark:via-orange-900/70 dark:to-yellow-900/70 text-red-800 dark:text-red-200 text-[8px] sm:text-[10px] md:text-xs font-bold mb-1 sm:mb-1.5 px-2 sm:px-3 py-1 sm:py-1.5 shadow-md border border-red-200/50 dark:border-red-700/50"
               >
-                <span className="inline-block ml-1 sm:ml-1.5 animate-bounce">🇮🇶</span> مخصص للعراق
+                <span className="inline-block ml-1 sm:ml-1.5">🇮🇶</span> مخصص للعراق
               </Badge>
               <p className="text-[9px] sm:text-[11px] md:text-sm text-gray-700 dark:text-gray-300 flex items-center font-medium">
                 <MessageSquare className="h-2.5 w-2.5 sm:h-3 sm:w-3 ml-1 inline-block text-red-500" />
