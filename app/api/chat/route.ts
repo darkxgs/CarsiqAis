@@ -11,9 +11,8 @@ import { getAccurateOilRecommendation, decodeVIN } from '@/utils/vinEngineResolv
 // استيراد خدمة فلاتر Denckermann
 import { isFilterQuery, isAirFilterQuery, generateFilterRecommendationMessage, searchFiltersWithArabicSupport } from '@/services/filterRecommendationService'
 // استيراد خدمة البحث المباشر للحصول على بيانات حديثة من المصادر الرسمية
-// Temporarily commented out for build fix
-// import { braveSearchService } from '@/services/braveSearchService'
-// import { unifiedSearchService } from '@/services/unifiedSearchService'
+import { braveSearchService } from '@/services/braveSearchService'
+import { unifiedSearchService } from '@/services/unifiedSearchService'
 
 // Input validation schemas
 const MessageSchema = z.object({
@@ -1023,12 +1022,10 @@ function formatSearchResultsForAI(searchResults: any): string {
     // Extract and analyze capacity data intelligently
     let capacityData: any[] = [];
     try {
-      // Temporarily commented out for build fix
-      // capacityData = braveSearchService.extractStructuredData(
-      //   searchResults.oilCapacity.results, 
-      //   'oil_capacity'
-      // );
-      capacityData = [];
+      capacityData = braveSearchService.extractStructuredData(
+        searchResults.oilCapacity.results, 
+        'oil_capacity'
+      );
     } catch (error) {
       console.error('Error extracting capacity data:', error);
       capacityData = [];
@@ -1142,12 +1139,10 @@ function formatSearchResultsForAI(searchResults: any): string {
     // Extract and analyze viscosity data intelligently
     let viscosityData: any[] = [];
     try {
-      // Temporarily commented out for build fix
-      // viscosityData = braveSearchService.extractStructuredData(
-      //   searchResults.viscosity.results, 
-      //   'oil_viscosity'
-      // );
-      viscosityData = [];
+      viscosityData = braveSearchService.extractStructuredData(
+        searchResults.viscosity.results, 
+        'oil_viscosity'
+      );
     } catch (error) {
       console.error('Error extracting viscosity data:', error);
       viscosityData = [];
@@ -1791,13 +1786,11 @@ ${carTrimData.model_drive ? `- نظام الدفع: ${carTrimData.model_drive}` 
         console.log(`[${requestId}] 🔍 Starting Brave Search for: ${searchBrand} ${searchModel} ${searchYear || ''}`);
 
         // Search for comprehensive car oil data using Unified Search (Brave → DuckDuckGo → Scraping)
-        // Temporarily commented out for build fix
-        // const searchResults = await unifiedSearchService.searchCarOilSpecs(
-        //   searchBrand || 'car',
-        //   searchModel || 'oil',
-        //   searchYear
-        // );
-        const searchResults = { oilCapacity: { results: [] }, viscosity: { results: [] } };
+        const searchResults = await unifiedSearchService.searchCarOilSpecs(
+          searchBrand || 'car',
+          searchModel || 'oil',
+          searchYear
+        );
 
         // Debug: Always log search results regardless of confidence
         console.log(`[${requestId}] 📊 Search Results Debug:`, {
@@ -1825,13 +1818,11 @@ ${carTrimData.model_drive ? `- نظام الدفع: ${carTrimData.model_drive}` 
           console.log(`[${requestId}] ⚠️ No search results found, performing generic car oil search`);
           
           // Fallback: search for generic car oil information
-          // Temporarily commented out for build fix
-          // const genericResults = await unifiedSearchService.searchCarOilSpecs(
-          //   'car',
-          //   'oil capacity viscosity',
-          //   searchYear
-          // );
-          const genericResults = { oilCapacity: { results: [] }, viscosity: { results: [] } };
+          const genericResults = await unifiedSearchService.searchCarOilSpecs(
+            'car',
+            'oil capacity viscosity',
+            searchYear
+          );
           
           if (genericResults.oilCapacity.results.length > 0 || genericResults.viscosity.results.length > 0) {
             braveSearchData = formatSearchResultsForAI(genericResults);
