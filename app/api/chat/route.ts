@@ -325,10 +325,10 @@ function enhancedExtractCarData(query: string): ExtractedCarData {
         detectedModel = 'camaro'
         confidence += 5 // Extra confidence for this specific model
       }
-      
+
       // Special handling for Chrysler 300
-      if ((model === 'c300' || model === '300' || model === '300c') && 
-          (detectedBrand === 'كرايسلر' || detectedBrand === 'chrysler')) {
+      if ((model === 'c300' || model === '300' || model === '300c') &&
+        (detectedBrand === 'كرايسلر' || detectedBrand === 'chrysler')) {
         detectedModel = '300'
         confidence += 10 // Extra confidence for Chrysler 300
       }
@@ -836,7 +836,7 @@ function extractStructuredDataFromResults(searchResults: any): { oilCapacity?: s
 
     if (!extracted.oilCapacity) {
       const foundCapacities = [];
-      
+
       for (const pattern of capacityPatterns) {
         const matches = text.match(pattern);
         if (matches) {
@@ -845,7 +845,7 @@ function extractStructuredDataFromResults(searchResults: any): { oilCapacity?: s
             if (capacityMatch) {
               const [, amount, unit] = capacityMatch;
               const amountNum = parseFloat(amount);
-              
+
               // More restrictive filtering for Honda Civic (3-5 quarts typical)
               if (unit.toLowerCase().includes('quart') && amountNum >= 3 && amountNum <= 6) {
                 const liters = (amountNum * 0.946353).toFixed(2);
@@ -867,7 +867,7 @@ function extractStructuredDataFromResults(searchResults: any): { oilCapacity?: s
           }
         }
       }
-      
+
       // Sort by priority and pick the most reliable result
       if (foundCapacities.length > 0) {
         foundCapacities.sort((a, b) => a.priority - b.priority);
@@ -888,7 +888,7 @@ function extractStructuredDataFromResults(searchResults: any): { oilCapacity?: s
 
     if (!extracted.viscosity) {
       const foundViscosities = [];
-      
+
       for (const pattern of viscosityPatterns) {
         const matches = text.match(pattern);
         if (matches) {
@@ -896,7 +896,7 @@ function extractStructuredDataFromResults(searchResults: any): { oilCapacity?: s
             let viscosity = match.replace(/sae\s*/i, '').replace(/oil|viscosity|grade|recommended|uses?/gi, '').trim().toUpperCase();
             // Normalize format (add dash if missing)
             viscosity = viscosity.replace(/(\d+)W(\d+)/, '$1W-$2');
-            
+
             // Validate it's a realistic viscosity for Honda Civic (0W-20, 5W-20, 5W-30)
             if (/^(0W-20|5W-20|5W-30|0W20|5W20|5W30)$/i.test(viscosity)) {
               viscosity = viscosity.replace(/(\d+)W(\d+)/, '$1W-$2'); // Ensure dash format
@@ -908,7 +908,7 @@ function extractStructuredDataFromResults(searchResults: any): { oilCapacity?: s
           }
         }
       }
-      
+
       // Sort by priority and pick the most reliable result
       if (foundViscosities.length > 0) {
         foundViscosities.sort((a, b) => a.priority - b.priority);
@@ -958,8 +958,8 @@ function validateAndEnhanceSearchData(searchResults: any, brand: string, model: 
   const filteredCapacityResults = searchResults.oilCapacity.results.filter((result: any) => {
     const text = `${result.title} ${result.description}`.toLowerCase();
     // Must contain oil-related terms and reasonable capacity numbers
-    return (text.includes('oil') || text.includes('زيت')) && 
-           (text.match(/\d+\.?\d*\s*(liter|litre|quart|qt|لتر)/i));
+    return (text.includes('oil') || text.includes('زيت')) &&
+      (text.match(/\d+\.?\d*\s*(liter|litre|quart|qt|لتر)/i));
   });
 
   const filteredViscosityResults = searchResults.viscosity.results.filter((result: any) => {
@@ -1028,12 +1028,12 @@ function formatSearchResultsForAI(searchResults: any): string {
   // 🛢️ Oil Capacity Results - Enhanced with intelligent analysis
   if (searchResults?.oilCapacity?.results?.length > 0) {
     formattedData += '**🛢️ سعة الزيت - تحليل ذكي للنتائج:**\n';
-    
+
     // Extract and analyze capacity data intelligently
     let capacityData: any[] = [];
     try {
       capacityData = braveSearchService.extractStructuredData(
-        searchResults.oilCapacity.results, 
+        searchResults.oilCapacity.results,
         'oil_capacity'
       );
     } catch (error) {
@@ -1043,7 +1043,7 @@ function formatSearchResultsForAI(searchResults: any): string {
 
     if (capacityData.length > 0) {
       formattedData += '📊 **البيانات المستخرجة بذكاء:**\n';
-      
+
       // Group by engine size if available
       const groupedByEngine = capacityData.reduce((acc: any, item: any) => {
         const engineKey = item.engineContext?.length > 0 ? item.engineContext[0] : 'عام';
@@ -1055,10 +1055,10 @@ function formatSearchResultsForAI(searchResults: any): string {
       for (const [engine, data] of Object.entries(groupedByEngine)) {
         formattedData += `\n🔧 **${engine}:**\n`;
         (data as any[]).slice(0, 3).forEach((item: any, index: number) => {
-          const capacityInLiters = item.unit.includes('quart') || item.unit.includes('qt') 
-            ? (item.capacity * 0.946).toFixed(1) 
+          const capacityInLiters = item.unit.includes('quart') || item.unit.includes('qt')
+            ? (item.capacity * 0.946).toFixed(1)
             : item.capacity;
-          
+
           formattedData += `   • ${item.capacity} ${item.unit}`;
           if (item.unit.includes('quart')) {
             formattedData += ` (≈${capacityInLiters} لتر)`;
@@ -1083,13 +1083,13 @@ function formatSearchResultsForAI(searchResults: any): string {
     // If no oil capacity results found, add intelligent fallback based on car model
     formattedData += '**🛢️ سعة الزيت - معلومات ذكية بديلة:**\n';
     formattedData += '⚠️ لم يتم العثور على نتائج سعة الزيت في البحث، لكن بناءً على المعرفة العامة:\n\n';
-    
+
     // Add specific fallback data based on car model
     const hasSearchResults = searchResults?.viscosity?.results?.length > 0;
     if (hasSearchResults) {
       const firstResult = searchResults.viscosity.results[0];
       const resultText = `${firstResult.title} ${firstResult.description}`.toLowerCase();
-      
+
       if (resultText.includes('toyota camry')) {
         formattedData += '🎯 **Toyota Camry (2018-2022):**\n';
         formattedData += '   • محرك 2.5L: حوالي 4.6 كوارت (≈4.4 لتر) مع الفلتر\n';
@@ -1138,19 +1138,19 @@ function formatSearchResultsForAI(searchResults: any): string {
         formattedData += '   📍 نصيحة: راجع دليل المالك للحصول على المواصفات الدقيقة\n\n';
       }
     }
-    
+
     formattedData += '💡 **نصيحة:** يُنصح بالتحقق من دليل المالك للحصول على السعة الدقيقة.\n\n';
   }
 
   // ⚙️ Oil Viscosity Results - Enhanced with intelligent analysis
   if (searchResults?.viscosity?.results?.length > 0) {
     formattedData += '**⚙️ لزوجة الزيت - تحليل ذكي للنتائج:**\n';
-    
+
     // Extract and analyze viscosity data intelligently
     let viscosityData: any[] = [];
     try {
       viscosityData = braveSearchService.extractStructuredData(
-        searchResults.viscosity.results, 
+        searchResults.viscosity.results,
         'oil_viscosity'
       );
     } catch (error) {
@@ -1160,7 +1160,7 @@ function formatSearchResultsForAI(searchResults: any): string {
 
     if (viscosityData.length > 0) {
       formattedData += '📊 **اللزوجات المستخرجة بذكاء:**\n';
-      
+
       // Get most common viscosities with sources
       const viscosityCount = viscosityData.reduce((acc: any, item: any) => {
         if (!acc[item.viscosity]) acc[item.viscosity] = [];
@@ -1170,13 +1170,13 @@ function formatSearchResultsForAI(searchResults: any): string {
 
       // Sort by frequency and confidence
       const sortedViscosities = Object.entries(viscosityCount)
-        .sort(([,a], [,b]) => (b as any[]).length - (a as any[]).length)
+        .sort(([, a], [, b]) => (b as any[]).length - (a as any[]).length)
         .slice(0, 3);
 
       sortedViscosities.forEach(([viscosity, sources]: [string, any]) => {
         const highConfidenceSources = sources.filter((s: any) => s.confidence === 'high');
         const sourceCount = sources.length;
-        
+
         formattedData += `\n🎯 **${viscosity}** (${sourceCount} مصدر${sourceCount > 1 ? '' : ''})\n`;
         sources.slice(0, 2).forEach((source: any) => {
           formattedData += `   📍 ${source.source} ${source.confidence === 'high' ? '⭐' : ''}\n`;
@@ -1237,10 +1237,9 @@ function formatSearchResultsForAI(searchResults: any): string {
     formattedData += '\n🔴 **تعليمات صارمة: استخدم هذه الأرقام بالضبط ولا تضيف معلومات من مصادر أخرى**\n\n';
   }
 
-  formattedData += `**📊 مستوى الثقة:** ${
-    searchResults?.overallConfidence === 'high' ? 'عالي' :
-    searchResults?.overallConfidence === 'medium' ? 'متوسط' : 'منخفض'
-  }\n`;
+  formattedData += `**📊 مستوى الثقة:** ${searchResults?.overallConfidence === 'high' ? 'عالي' :
+      searchResults?.overallConfidence === 'medium' ? 'متوسط' : 'منخفض'
+    }\n`;
 
   const allSources = new Set();
   ['oilCapacity', 'viscosity', 'filter', 'maintenance'].forEach(key => {
@@ -1782,17 +1781,17 @@ ${carTrimData.model_drive ? `- نظام الدفع: ${carTrimData.model_drive}` 
     let braveSearchData = '';
 
     // Always search if we detect any car-related query
-    const isCarQuery = userQuery.includes('زيت') || userQuery.includes('oil') || 
-                      userQuery.includes('محرك') || userQuery.includes('engine') ||
-                      userQuery.includes('سيارة') || userQuery.includes('car');
-    
+    const isCarQuery = userQuery.includes('زيت') || userQuery.includes('oil') ||
+      userQuery.includes('محرك') || userQuery.includes('engine') ||
+      userQuery.includes('سيارة') || userQuery.includes('car');
+
     if ((carData && carData.carBrand) || isCarQuery) {
       try {
         // Use detected car data or extract from query for search
         const searchBrand = carData?.carBrand || extractBrandFromQuery(userQuery);
         const searchModel = carData?.carModel || extractModelFromQuery(userQuery);
         const searchYear = carData?.year || extractYearFromQuery(userQuery);
-        
+
         console.log(`[${requestId}] 🔍 Starting Brave Search for: ${searchBrand} ${searchModel} ${searchYear || ''}`);
 
         // Search for comprehensive car oil data using Unified Search (Brave → DuckDuckGo → Scraping)
@@ -1819,21 +1818,21 @@ ${carTrimData.model_drive ? `- نظام الدفع: ${carTrimData.model_drive}` 
 
           // Validate and enhance search data quality
           const validatedResults = validateAndEnhanceSearchData(searchResults, searchBrand, searchModel);
-          
+
           // Format search results for AI analysis
           braveSearchData = formatSearchResultsForAI(validatedResults);
 
           console.log(`[${requestId}] 📊 Formatted search data length: ${braveSearchData.length} characters`);
         } else {
           console.log(`[${requestId}] ⚠️ No search results found, performing generic car oil search`);
-          
+
           // Fallback: search for generic car oil information
           const genericResults = await unifiedSearchService.searchCarOilSpecs(
             'car',
             'oil capacity viscosity',
             searchYear
           );
-          
+
           if (genericResults.oilCapacity.results.length > 0 || genericResults.viscosity.results.length > 0) {
             braveSearchData = formatSearchResultsForAI(genericResults);
             console.log(`[${requestId}] 📊 Using generic search data: ${braveSearchData.length} characters`);
@@ -1920,7 +1919,7 @@ ${carTrimData.model_drive ? `- نظام الدفع: ${carTrimData.model_drive}` 
         if (verifiedOilFilter || verifiedAirFilter) {
           // We found filters, so add them to the prompt
           enhancedSystemPrompt += `\n\n📦 **فلاتر Denckermann المعتمدة:**\n`;
-          
+
           if (verifiedOilFilter) {
             enhancedSystemPrompt += `🛢️ **فلتر الزيت:** ${verifiedOilFilter.filterNumber} (Denckermann)\n`;
             enhancedSystemPrompt += `   مستوى الثقة: ${verifiedOilFilter.confidence === 'high' ? 'عالي' : verifiedOilFilter.confidence === 'medium' ? 'متوسط' : 'منخفض'}\n`;
@@ -1962,7 +1961,7 @@ ${carTrimData.model_drive ? `- نظام الدفع: ${carTrimData.model_drive}` 
         enhancedSystemPrompt += `• احضر الفلتر القديم عند الشراء\n`;
         enhancedSystemPrompt += `• تأكد من رقم المحرك وسنة الصنع\n\n`;
       }
-      
+
       enhancedSystemPrompt += `المستخدم سأل عن ${carData.carBrand} ${carData.carModel} ${carData.year || ''}`;
 
       // استخدام vinEngineResolver إذا تم اكتشاف VIN
@@ -2143,6 +2142,89 @@ ${carTrimData.model_drive ? `- نظام الدفع: ${carTrimData.model_drive}` 
 ⚠️ لا تفترض نوع المحرك. إذا لم يذكر المستخدم النوع، اطلب منه تحديده بدقة.`;
 
       console.log('Added Kia Cerato override specifications');
+    }
+
+    // ✅ Chrysler 300 override - استخدام بيانات officialSpecs
+    const isChrysler300Query = (userQuery.toLowerCase().includes('كرايسلر') || userQuery.toLowerCase().includes('chrysler')) &&
+      (userQuery.toLowerCase().includes('300') || userQuery.toLowerCase().includes('c300') || userQuery.toLowerCase().includes('٣٠٠'));
+
+    if (isChrysler300Query) {
+      const yearMatch = userQuery.match(/20(\d{2})/);
+      const year = yearMatch ? `20${yearMatch[1]}` : '2012';
+
+      // استخدام بيانات officialSpecs لكرايسلر 300
+      let chrysler300Specs: Record<string, any> = {};
+      try {
+        const chryslerData = officialSpecs['chrysler']?.['300'] || {};
+        
+        // تحديد نطاق السنوات المناسب
+        let yearRange = '2011-2014';
+        if (parseInt(year) >= 2015 && parseInt(year) <= 2019) {
+          yearRange = '2015-2019';
+        } else if (parseInt(year) >= 2020) {
+          yearRange = '2020-2024';
+        }
+        
+        chrysler300Specs = chryslerData[yearRange] || chryslerData['2011-2014'] || {};
+        console.log(`Using officialSpecs for Chrysler 300 ${year}, year range: ${yearRange}`);
+      } catch (specError) {
+        console.error('Error accessing officialSpecs for Chrysler 300:', specError);
+      }
+
+      // تحديد نوع المحرك من الاستعلام
+      const isV8 = userQuery.toLowerCase().includes('5.7') ||
+        userQuery.toLowerCase().includes('v8') ||
+        userQuery.toLowerCase().includes('هيمي') ||
+        userQuery.toLowerCase().includes('hemi') ||
+        userQuery.toLowerCase().includes('300c');
+
+      const isV6 = userQuery.toLowerCase().includes('3.6') ||
+        userQuery.toLowerCase().includes('v6') ||
+        userQuery.toLowerCase().includes('pentastar');
+
+      if (isV8) {
+        // محرك V8 HEMI
+        enhancedSystemPrompt += `\n\n
+🚗 كرايسلر 300C ${year} - محرك 5.7L V8 HEMI:
+🛢️ سعة الزيت: 7.0 لتر (مع الفلتر)
+⚙️ اللزوجة: 5W-20 (الموصى بها رسمياً من كرايسلر)
+🔧 نوع الزيت: Full Synthetic
+🌡️ مناسب لحرارة العراق: ✅
+📦 فلتر الزيت: MO-899 (Mopar الأصلي)
+🎯 التوصية النهائية: Mobil 1 5W-20 Full Synthetic (7.0 لتر)`;
+      } else if (isV6) {
+        // محرك V6 Pentastar
+        enhancedSystemPrompt += `\n\n
+🚗 كرايسلر 300 ${year} - محرك 3.6L V6 Pentastar:
+🛢️ سعة الزيت: 6.0 لتر (مع الفلتر)
+⚙️ اللزوجة: 5W-20 (الموصى بها رسمياً من كرايسلر)
+🔧 نوع الزيت: Full Synthetic
+🌡️ مناسب لحرارة العراق: ✅
+📦 فلتر الزيت: 68191349AA (Mopar الأصلي)
+🎯 التوصية النهائية: Castrol Edge 5W-20 Full Synthetic (6.0 لتر)`;
+      } else {
+        // عرض كلا المحركين إذا لم يتم تحديد النوع
+        enhancedSystemPrompt += `\n\n
+🚗 كرايسلر 300 ${year} يأتي بمحركين:
+
+1️⃣ <b>3.6L V6 Pentastar</b>
+🛢️ سعة الزيت: 6.0 لتر (مع الفلتر)
+⚙️ اللزوجة: 5W-20 (الموصى بها رسمياً)
+🔧 نوع الزيت: Full Synthetic
+📦 فلتر الزيت: 68191349AA (Mopar الأصلي)
+🎯 التوصية: Castrol Edge 5W-20 (6.0 لتر)
+
+2️⃣ <b>5.7L V8 HEMI</b>
+🛢️ سعة الزيت: 7.0 لتر (مع الفلتر)
+⚙️ اللزوجة: 5W-20 (الموصى بها رسمياً)
+🔧 نوع الزيت: Full Synthetic
+📦 فلتر الزيت: MO-899 (Mopar الأصلي)
+🎯 التوصية: Mobil 1 5W-20 (7.0 لتر)
+
+⚠️ يرجى تحديد نوع المحرك للحصول على توصية دقيقة.`;
+      }
+
+      console.log('Added Chrysler 300 override specifications');
     }
 
     // ✅ Jeep Compass override
