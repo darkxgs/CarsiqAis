@@ -173,8 +173,18 @@ export class BraveSearchService {
           );
         }
         
+        } else if (carBrand.toLowerCase() === 'chrysler' || carBrand.toLowerCase() === 'كرايسلر') {
+          queries.push(
+            `"Chrysler 300" ${yearStr} "3.6L V6" oil capacity "6.0 quarts" "5.7 liters"`,
+            `"Chrysler 300C" ${yearStr} "5.7L HEMI" oil capacity "7.0 quarts" "6.6 liters"`,
+            `"Chrysler 300" ${yearStr} oil capacity "with filter" specifications manual`,
+            `Chrysler 300 ${yearStr} "oil change" "how much oil" capacity maintenance guide`,
+            `"Chrysler 300" ${yearStr} "recommended oil" "5W-30" "0W-20" viscosity specifications`
+          );
+        }
+        
         // Universal queries for any brand not specifically handled above
-        if (!['honda', 'toyota', 'hyundai', 'kia', 'mazda'].includes(carBrand.toLowerCase())) {
+        if (!['honda', 'toyota', 'hyundai', 'kia', 'mazda', 'chrysler', 'كرايسلر'].includes(carBrand.toLowerCase())) {
           queries.push(
             `"${carBrand} ${carModel}" ${yearStr} oil capacity "with filter" quarts liters specifications`,
             `${carBrand} ${carModel} ${yearStr} "oil change" "how much oil" capacity manual`,
@@ -504,8 +514,9 @@ export class BraveSearchService {
 
       switch (dataType) {
         case 'oil_capacity':
-          // Enhanced capacity extraction with engine size context
+          // Enhanced capacity extraction with engine size context and Arabic support
           const capacityPatterns = [
+            // English patterns
             // Pattern: "4.4 quarts with filter" or "4.2 liters with filter"
             /(\d+\.?\d*)\s*(quarts?|qt|liters?|litres?|l)\s*(?:with\s*filter|including\s*filter)?/gi,
             // Pattern: "oil capacity: 4.4 qt" or "capacity is 4.2L"
@@ -513,7 +524,17 @@ export class BraveSearchService {
             // Pattern: "takes 4.4 quarts" or "needs 4.2 liters"
             /(?:takes|needs|requires)\s*(\d+\.?\d*)\s*(quarts?|qt|liters?|litres?|l)/gi,
             // Pattern: "~4.4 qt" or "≈4.2L"
-            /[~≈]\s*(\d+\.?\d*)\s*(quarts?|qt|liters?|litres?|l)/gi
+            /[~≈]\s*(\d+\.?\d*)\s*(quarts?|qt|liters?|litres?|l)/gi,
+            // More specific patterns for car manuals
+            /engine\s*oil\s*capacity\s*:?\s*(\d+\.?\d*)\s*(quarts?|qt|liters?|litres?|l)/gi,
+            /crankcase\s*capacity\s*:?\s*(\d+\.?\d*)\s*(quarts?|qt|liters?|litres?|l)/gi,
+            // Pattern for specifications tables
+            /oil\s*(?:pan\s*)?capacity\s*(?:with\s*filter)?\s*:?\s*(\d+\.?\d*)\s*(quarts?|qt|liters?|litres?|l)/gi,
+            // Pattern for maintenance info
+            /change\s*(?:oil\s*)?capacity\s*:?\s*(\d+\.?\d*)\s*(quarts?|qt|liters?|litres?|l)/gi,
+            // Arabic patterns
+            /سعة\s*الزيت\s*:?\s*(\d+\.?\d*)\s*(لتر|ليتر)/gi,
+            /كمية\s*الزيت\s*:?\s*(\d+\.?\d*)\s*(لتر|ليتر)/gi
           ];
 
           for (const pattern of capacityPatterns) {

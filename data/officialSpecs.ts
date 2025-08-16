@@ -1224,6 +1224,77 @@ const officialSpecs: ManufacturerSpecs = {
       },
     },
   },
+  
+  chrysler: {
+    "300": {
+      "2011-2014": {
+        capacity: "6.0L",
+        capacityL: 6.0,
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        filterNumber: "EF36296XL", // Denckermann filter
+        airFilterNumber: "A141009", // Denckermann air filter
+        engineSize: "3.6L V6 Pentastar",
+        engineCode: "ERB",
+        cylinders: 6,
+        apiSpec: "API SN",
+        changeInterval: "8000",
+        source: "Chrysler Official Manual",
+        lastVerifiedDate: "2024-08-16",
+        notes: "3.6L Pentastar V6 engine, common in 300C models"
+      },
+      "2015-2019": {
+        capacity: "5.9L",
+        capacityL: 5.9,
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        filterNumber: "EF36296XL", // Denckermann filter
+        airFilterNumber: "A141009", // Denckermann air filter
+        engineSize: "3.6L V6 Pentastar",
+        engineCode: "ERB",
+        cylinders: 6,
+        apiSpec: "API SN PLUS",
+        changeInterval: "10000",
+        source: "Chrysler Official Manual",
+        lastVerifiedDate: "2024-08-16",
+        notes: "Updated Pentastar engine with improved efficiency"
+      },
+      "2020-2024": {
+        capacity: "5.9L",
+        capacityL: 5.9,
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        filterNumber: "EF36296XL", // Denckermann filter
+        airFilterNumber: "A141009", // Denckermann air filter
+        engineSize: "3.6L V6 Pentastar eTorque",
+        engineCode: "ERB",
+        cylinders: 6,
+        apiSpec: "API SP",
+        changeInterval: "10000",
+        source: "Chrysler Official Manual",
+        lastVerifiedDate: "2024-08-16",
+        notes: "eTorque mild hybrid system, requires 0W-20 for fuel efficiency"
+      }
+    },
+    "300c": {
+      "2011-2014": {
+        capacity: "7.0L",
+        capacityL: 7.0,
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        filterNumber: "EF36296XL", // Denckermann filter
+        airFilterNumber: "A141009", // Denckermann air filter
+        engineSize: "5.7L V8 HEMI",
+        engineCode: "EZH",
+        cylinders: 8,
+        apiSpec: "API SN",
+        changeInterval: "8000",
+        source: "Chrysler Official Manual",
+        lastVerifiedDate: "2024-08-16",
+        notes: "5.7L HEMI V8 engine, high performance variant"
+      }
+    }
+  },
 }
 
 export default officialSpecs

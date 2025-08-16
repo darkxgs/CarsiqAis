@@ -635,7 +635,11 @@ Special cases:
 - "جيب شيروكي" = "Jeep Cherokee"
 - "جيب رانجلر" = "Jeep Wrangler"
 - "جيب" = "Jeep"
-- Handle Arabic numerals: ٢٠٢٠ = 2020
+- "كرايسلر c300" = "Chrysler 300"
+- "كرايسلر ٣٠٠" = "Chrysler 300"
+- "كرايسلر سي ٣٠٠" = "Chrysler 300"
+- "كرايسلر" = "Chrysler"
+- Handle Arabic numerals: ٢٠٢٠ = 2020, ٣٠٠ = 300
 
 Confidence scoring:
 - 90-100: Exact match with known model

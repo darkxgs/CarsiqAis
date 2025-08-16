@@ -113,6 +113,7 @@ export class CarAnalyzer {
     else if (message.includes("فورد") || message.includes("ford")) carBrand = "ford"
     else if (message.includes("فولكس واجن") || message.includes("فولكسفاجن") || message.includes("volkswagen")) carBrand = "volkswagen"
     else if (message.includes("دودج") || message.includes("dodge")) carBrand = "dodge"
+    else if (message.includes("كرايسلر") || message.includes("chrysler")) carBrand = "chrysler"
 
     // تحديد الموديل
     if (message.includes("النترا") || message.includes("elantra")) carModel = "elantra"
@@ -148,6 +149,7 @@ export class CarAnalyzer {
     else if (message.includes("ماليبو") || message.includes("malibu")) carModel = "malibu"
     else if (message.includes("تاهو") || message.includes("tahoe")) carModel = "tahoe"
     else if (message.includes("سلفرادو") || message.includes("silverado")) carModel = "silverado"
+    else if (message.includes("c300") || message.includes("سي 300") || message.includes("٣٠٠") || message.includes("300")) carModel = "300"
     else if (message.includes("باجيرو") || message.includes("pajero")) carModel = "pajero"
     else if (message.includes("لانسر") || message.includes("lancer")) carModel = "lancer"
     else if (message.includes("ال 200") || message.includes("l200")) carModel = "l200"
