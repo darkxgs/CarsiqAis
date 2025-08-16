@@ -228,6 +228,118 @@ function checkAndResetTokenLimitStatus(): void {
 }
 
 /**
+ * Simple AI-powered oil recommendation (inspired by successful approach)
+ */
+async function simpleAIOilRecommendation(carQuery: string): Promise<string> {
+  try {
+    const oilRecommendationPrompt = `You are Carsiq, a professional car engine oil assistant. Provide detailed oil recommendations for cars.
+
+ALWAYS respond in this EXACT format:
+🔍 [Car Make Model Year]
+🛠️ Engine: [Engine specifications]
+🛢️ Oil Capacity: [Amount in Liters]
+⚙️ Viscosity: [Oil viscosity grade]
+🔧 Oil Type: [Conventional/Synthetic/etc]
+🌡️ Suitable for Iraq heat: ✅ / ❌
+🎯 Final Recommendation: [Specific oil brand and product]
+📦 Oil Filter: [Filter part number if known]
+
+If you have multiple engine options, list them all and note that user should confirm their engine type.
+If you don't have complete data, use "⚠️ Data not available. Please check the owner's manual."
+Focus on providing accurate, professional recommendations suitable for hot climates like Iraq.
+
+Special notes for accuracy:
+- Chrysler 300 2012: 6.0L capacity, 5W-20 viscosity, Mopar filter 68191349AA
+- Always prioritize manufacturer specifications
+- Consider Iraq's hot climate in recommendations`;
+
+    const openAI = createOpenAI({
+      apiKey: process.env.OPENROUTER_API_KEY || "",
+      baseURL: "https://openrouter.ai/api/v1",
+      headers: {
+        "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+        "X-Title": "CarsiqAi - Enhanced",
+      },
+    });
+
+    const oilResult = await streamText({
+      model: openAI('google/gemini-2.0-flash-001'),
+      messages: [
+        {
+          role: 'user',
+          content: `I need oil recommendations for: ${carQuery}. Please provide complete specifications including engine details, oil capacity, viscosity, and recommendations suitable for Iraq's hot climate.`
+        }
+      ],
+      temperature: 0.3,
+      maxTokens: 1000,
+    });
+
+    return await oilResult.text;
+  } catch (error) {
+    console.error('Simple AI oil recommendation failed:', error);
+    return `⚠️ Sorry, I encountered an error while searching for oil recommendations. Please try again.`;
+  }
+}
+
+/**
+ * Simple AI-powered car data extraction (inspired by successful approach)
+ */
+async function simpleAICarExtraction(query: string): Promise<ExtractedCarData> {
+  try {
+    const carParsingPrompt = `You are a car expert assistant. Parse user input to extract car information and correct any typos.
+
+User input will be about cars and oil. Extract:
+- Car make (brand) 
+- Car model
+- Year
+- Correct any spelling mistakes
+
+Return ONLY a JSON object like this:
+{"make": "Toyota","model": "Corolla", "year": "2020","correctedQuery": "Toyota Corolla 2020"}
+
+If you can't identify all parts, make your best guess and note it in correctedQuery.
+
+User input: "${query}"`;
+
+    const openAI = createOpenAI({
+      apiKey: process.env.OPENROUTER_API_KEY || "",
+      baseURL: "https://openrouter.ai/api/v1",
+      headers: {
+        "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+        "X-Title": "CarsiqAi - Enhanced",
+      },
+    });
+
+    const carParsingResult = await streamText({
+      model: openAI('google/gemini-2.0-flash-001'),
+      messages: [
+        {
+          role: 'user',
+          content: carParsingPrompt
+        }
+      ],
+      temperature: 0.3,
+      maxTokens: 500,
+    });
+
+    const carParsingText = await carParsingResult.text;
+    const parsedCarData = JSON.parse(carParsingText);
+    
+    return {
+      carBrand: parsedCarData.make || '',
+      carModel: parsedCarData.model || '',
+      year: parsedCarData.year ? parseInt(parsedCarData.year) : undefined,
+      correctedQuery: parsedCarData.correctedQuery || query,
+      isValid: !!(parsedCarData.make && parsedCarData.model),
+      confidence: 90 // High confidence for AI parsing
+    };
+  } catch (error) {
+    console.error('Simple AI extraction failed, using fallback:', error);
+    return enhancedExtractCarData(query);
+  }
+}
+
+/**
  * Enhanced car data extraction with better accuracy
  */
 function enhancedExtractCarData(query: string): ExtractedCarData {
@@ -1238,7 +1350,7 @@ function formatSearchResultsForAI(searchResults: any): string {
   }
 
   formattedData += `**📊 مستوى الثقة:** ${searchResults?.overallConfidence === 'high' ? 'عالي' :
-      searchResults?.overallConfidence === 'medium' ? 'متوسط' : 'منخفض'
+    searchResults?.overallConfidence === 'medium' ? 'متوسط' : 'منخفض'
     }\n`;
 
   const allSources = new Set();
@@ -2156,7 +2268,7 @@ ${carTrimData.model_drive ? `- نظام الدفع: ${carTrimData.model_drive}` 
       let chrysler300Specs: Record<string, any> = {};
       try {
         const chryslerData = officialSpecs['chrysler']?.['300'] || {};
-        
+
         // تحديد نطاق السنوات المناسب
         let yearRange = '2011-2014';
         if (parseInt(year) >= 2015 && parseInt(year) <= 2019) {
@@ -2164,7 +2276,7 @@ ${carTrimData.model_drive ? `- نظام الدفع: ${carTrimData.model_drive}` 
         } else if (parseInt(year) >= 2020) {
           yearRange = '2020-2024';
         }
-        
+
         chrysler300Specs = chryslerData[yearRange] || chryslerData['2011-2014'] || {};
         console.log(`Using officialSpecs for Chrysler 300 ${year}, year range: ${yearRange}`);
       } catch (specError) {
@@ -2411,6 +2523,32 @@ ${carTrimData.model_drive ? `- نظام الدفع: ${carTrimData.model_drive}` 
       } catch (analyticsError) {
         console.error("Failed to trigger analytics:", analyticsError);
         // Non-fatal error, continue
+      }
+    }
+
+    // Option to use simple AI approach for better accuracy
+    const useSimpleAI = process.env.USE_SIMPLE_AI === 'true' || false;
+    
+    if (useSimpleAI) {
+      console.log(`[${requestId}] Using simple AI approach for oil recommendation`);
+      try {
+        // Step 1: Parse car data with AI
+        const carData = await simpleAICarExtraction(userQuery);
+        console.log(`[${requestId}] AI parsed car data:`, carData);
+        
+        // Step 2: Get oil recommendation with AI
+        const oilRecommendation = await simpleAIOilRecommendation(carData.correctedQuery || userQuery);
+        console.log(`[${requestId}] AI oil recommendation generated`);
+        
+        // Return simple text response
+        return new Response(oilRecommendation, {
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+          },
+        });
+      } catch (simpleAIError) {
+        console.error(`[${requestId}] Simple AI approach failed:`, simpleAIError);
+        // Fall back to complex approach
       }
     }
 
