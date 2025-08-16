@@ -288,8 +288,11 @@ function enhancedExtractCarData(query: string): ExtractedCarData {
 
   console.log(`[DEBUG] Detected brand: "${detectedBrand}" with confidence: ${confidence}`);
 
-  // Enhanced model detection
+  // Enhanced model detection - prioritize specific models first
   const commonModels = [
+    // Chrysler models first (higher priority)
+    'c300', '300', '300c',
+    // Other models
     'كامري', 'كورولا', 'rav4', 'هايلندر', 'برادو', 'لاند كروزر',
     'النترا', 'إلنترا', 'سوناتا', 'توسان', 'سنتافي', 'أكسنت', 'i10', 'i20', 'i30',
     '6', 'مازدا 6', 'cx-5', 'cx-9', 'mx-5', '3', 'مازدا 3',
@@ -317,10 +320,17 @@ function enhancedExtractCarData(query: string): ExtractedCarData {
       detectedModel = model
       confidence += 25
 
-      // Special handling for Camaro model
+      // Special handling for specific models
       if (model === 'كامارو' || model === 'camaro' || model === 'كمارو' || model === 'كامرو') {
         detectedModel = 'camaro'
         confidence += 5 // Extra confidence for this specific model
+      }
+      
+      // Special handling for Chrysler 300
+      if ((model === 'c300' || model === '300' || model === '300c') && 
+          (detectedBrand === 'كرايسلر' || detectedBrand === 'chrysler')) {
+        detectedModel = '300'
+        confidence += 10 // Extra confidence for Chrysler 300
       }
 
       break
