@@ -1230,9 +1230,9 @@ const officialSpecs: ManufacturerSpecs = {
       "2011-2014": {
         capacity: "6.0L",
         capacityL: 6.0,
-        viscosity: "5W-30",
+        viscosity: "5W-20",
         oilType: "Full Synthetic",
-        filterNumber: "EF36296XL", // Denckermann filter
+        filterNumber: "68191349AA", // Mopar OEM filter for V6
         airFilterNumber: "A141009", // Denckermann air filter
         engineSize: "3.6L V6 Pentastar",
         engineCode: "ERB",
@@ -1241,7 +1241,7 @@ const officialSpecs: ManufacturerSpecs = {
         changeInterval: "8000",
         source: "Chrysler Official Manual",
         lastVerifiedDate: "2024-08-16",
-        notes: "3.6L Pentastar V6 engine, common in 300C models"
+        notes: "3.6L Pentastar V6 engine, requires 5W-20 as per official specs"
       },
       "2015-2019": {
         capacity: "5.9L",
@@ -1280,9 +1280,9 @@ const officialSpecs: ManufacturerSpecs = {
       "2011-2014": {
         capacity: "7.0L",
         capacityL: 7.0,
-        viscosity: "5W-30",
+        viscosity: "5W-20",
         oilType: "Full Synthetic",
-        filterNumber: "EF36296XL", // Denckermann filter
+        filterNumber: "MO-899", // Mopar OEM filter for V8 HEMI
         airFilterNumber: "A141009", // Denckermann air filter
         engineSize: "5.7L V8 HEMI",
         engineCode: "EZH",
@@ -1291,7 +1291,7 @@ const officialSpecs: ManufacturerSpecs = {
         changeInterval: "8000",
         source: "Chrysler Official Manual",
         lastVerifiedDate: "2024-08-16",
-        notes: "5.7L HEMI V8 engine, high performance variant"
+        notes: "5.7L HEMI V8 engine, requires 5W-20 as per official specs"
       }
     }
   },

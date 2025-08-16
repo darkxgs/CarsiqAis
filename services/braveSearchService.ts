@@ -171,15 +171,16 @@ export class BraveSearchService {
             `Mazda ${carModel} ${yearStr} "oil change" "how much oil" capacity specifications`,
             `"Mazda ${carModel}" ${yearStr} "turbo" "non-turbo" oil capacity differences`
           );
-        }
-        
         } else if (carBrand.toLowerCase() === 'chrysler' || carBrand.toLowerCase() === 'كرايسلر') {
+          // Force Chrysler 300 search regardless of detected model
+          const chryslerModel = carModel === '3' ? '300' : carModel;
           queries.push(
             `"Chrysler 300" ${yearStr} "3.6L V6" oil capacity "6.0 quarts" "5.7 liters"`,
             `"Chrysler 300C" ${yearStr} "5.7L HEMI" oil capacity "7.0 quarts" "6.6 liters"`,
             `"Chrysler 300" ${yearStr} oil capacity "with filter" specifications manual`,
             `Chrysler 300 ${yearStr} "oil change" "how much oil" capacity maintenance guide`,
-            `"Chrysler 300" ${yearStr} "recommended oil" "5W-30" "0W-20" viscosity specifications`
+            `"Chrysler 300" ${yearStr} "recommended oil" "5W-20" viscosity specifications`,
+            `"2012 Chrysler 300" oil capacity "6.0 liters" "7.0 liters" specifications`
           );
         }
         
