@@ -17,6 +17,7 @@ interface OilRecommendation {
   capacity: string;
   viscosity: string;
   type: string;
+  apiSpec: string;
   brand: string;
   filterNumber?: string;
   changeInterval: string;
@@ -171,6 +172,7 @@ Analyze the search results and provide a JSON response with the following struct
   "capacity": "X.X liters",
   "viscosity": "XW-XX",
   "type": "Full Synthetic",
+  "apiSpec": "API SN/SN PLUS or other appropriate specification",
   "brand": "Recommended brand from: Castrol, Mobil 1, Liqui Moly, Valvoline, Motul, Meguin, Hanata",
   "filterNumber": "Filter part number if found",
   "changeInterval": "Recommended interval in km",
@@ -186,6 +188,8 @@ REQUIREMENTS:
 4. Adapt for Iraqi hot climate (prefer Full Synthetic, consider dust protection)
 5. If conflicting information, choose the most recent or official source
 6. Include source attribution in reasoning
+7. Always include API specification (API SN/SN PLUS is default if not specified)
+8. For brand recommendations, consider car origin (American, European, Asian) in your reasoning
 
 Respond with ONLY the JSON object, no additional text.`;
 
@@ -245,12 +249,13 @@ Respond with ONLY the JSON object, no additional text.`;
   }
 
   /**
-   * Format recommendation for Arabic display
+   * Format recommendation for Arabic display with brand categorization by car origin
    */
   formatRecommendationForDisplay(recommendation: OilRecommendation, carData: CarData): string {
     const confidenceEmoji = recommendation.confidence === 'high' ? '🟢' : 
                            recommendation.confidence === 'medium' ? '🟡' : '🔴';
 
+    // القسم الأول: معلومات أساسية عن الزيت
     let response = `🔍 **توصية زيت محرك محدثة من المصادر الرسمية**\n\n`;
     
     response += `🚗 **السيارة:** ${carData.brand} ${carData.model}`;
@@ -258,10 +263,35 @@ Respond with ONLY the JSON object, no additional text.`;
     if (carData.engineSize) response += ` (${carData.engineSize})`;
     response += `\n\n`;
 
-    response += `🛢️ **سعة الزيت:** ${recommendation.capacity}\n`;
+    // الخطوة الأولى (الأساسيات): عرض اللزوجة والمعايير والكمية في الأعلى
+    response += `## 1. الأساسيات\n\n`;
     response += `⚙️ **اللزوجة:** ${recommendation.viscosity}\n`;
-    response += `🔧 **نوع الزيت:** ${recommendation.type}\n`;
-    response += `🏭 **العلامة التجارية الموصى بها:** ${recommendation.brand}\n`;
+    response += `📊 **المعايير:** ${recommendation.type} - ${recommendation.apiSpec}\n`;
+    response += `🛢️ **سعة الزيت:** ${recommendation.capacity}\n\n`;
+    
+    // الخطوة الثانية: خيارات البراند حسب نوع السيارة
+    response += `## 2. خيارات البراند حسب نوع السيارة\n\n`;
+    
+    // تصنيف العلامات التجارية حسب منشأ السيارة مع ترتيب يعتمد على الربحية
+    const carOrigin = this.determineCarOrigin(carData.brand);
+    
+    if (carOrigin === 'american') {
+      response += `🇺🇸 **السيارات الأمريكية** (فورد، جيب، شفر، دودج ...)\n\n`;
+      response += `• الخيار الأول: ⭐ **Valvoline** (زيت أمريكي ممتاز للسيارات الأمريكية)\n`;
+      response += `• الخيار الثاني: **Castrol** (بديل عالمي موثوق)\n\n`;
+    } else if (carOrigin === 'european') {
+      response += `🇪🇺 **السيارات الأوروبية** (مرسيدس، BMW، أودي، فولكس ...)\n\n`;
+      response += `• الخيار الأول: ⭐ **Liqui Moly** (زيت ألماني متخصص للسيارات الأوروبية)\n`;
+      response += `• الخيار الثاني: **Meguin** (بديل ألماني اقتصادي)\n\n`;
+    } else { // كوري/ياباني أو غير ذلك
+      response += `🇯🇵🇰🇷 **السيارات الكورية واليابانية** (كيا، هيونداي، تويوتا، نيسان ...)\n\n`;
+      response += `• الخيار الأول: ⭐ **Valvoline** أو **Castrol** (نحن نحدد أيهم أولوية حسب الربحية)\n`;
+      response += `• الخيار الثاني: **Liqui Moly** (للي يريد بريميوم)\n`;
+      response += `• الخيار الثالث: **Meguin** (بديل ألماني اقتصادي)\n\n`;
+    }
+    
+    // القسم الثالث: معلومات إضافية
+    response += `## 3. معلومات إضافية\n\n`;
     
     if (recommendation.filterNumber) {
       response += `📦 **فلتر الزيت:** ${recommendation.filterNumber}\n`;
@@ -284,6 +314,42 @@ Respond with ONLY the JSON object, no additional text.`;
     response += `⚠️ **تنبيه:** المعلومات محدثة من المواقع الرسمية للشركات المصنعة وموثوقة 100%.`;
 
     return response;
+  }
+
+  /**
+   * تحديد منشأ السيارة (أمريكية، أوروبية، آسيوية)
+   */
+  private determineCarOrigin(brand: string): 'american' | 'european' | 'asian' {
+    const brandLower = brand.toLowerCase();
+    
+    // السيارات الأمريكية
+    const americanBrands = [
+      'ford', 'chevrolet', 'chevy', 'gmc', 'cadillac', 'chrysler', 'dodge', 'jeep', 'ram', 'buick',
+      'lincoln', 'tesla', 'pontiac', 'hummer', 'saturn', 'oldsmobile'
+    ];
+    
+    // السيارات الأوروبية
+    const europeanBrands = [
+      'mercedes', 'bmw', 'audi', 'volkswagen', 'vw', 'porsche', 'volvo', 'jaguar', 'land rover',
+      'range rover', 'mini', 'bentley', 'rolls royce', 'aston martin', 'ferrari', 'lamborghini',
+      'maserati', 'alfa romeo', 'fiat', 'peugeot', 'renault', 'citroen', 'opel', 'seat', 'skoda',
+      'smart', 'bugatti', 'mclaren'
+    ];
+    
+    // السيارات الآسيوية (يابانية وكورية)
+    const asianBrands = [
+      'toyota', 'honda', 'nissan', 'mazda', 'subaru', 'mitsubishi', 'lexus', 'infiniti', 'acura',
+      'suzuki', 'daihatsu', 'isuzu', 'hyundai', 'kia', 'genesis', 'daewoo', 'ssangyong'
+    ];
+    
+    if (americanBrands.some(b => brandLower.includes(b))) {
+      return 'american';
+    } else if (europeanBrands.some(b => brandLower.includes(b))) {
+      return 'european';
+    } else {
+      // افتراضياً نعتبر السيارة آسيوية إذا لم تكن أمريكية أو أوروبية
+      return 'asian';
+    }
   }
 }
 
