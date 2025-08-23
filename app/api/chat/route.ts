@@ -85,15 +85,28 @@ const openRouter = {
 • **فلاتر الزيت والهواء:** استخدم قاعدة بيانات Denckermann المعتمدة فقط
 • إذا تم توفير نتائج بحث من المصادر الرسمية، يجب استخدامها لمواصفات الزيت بدلاً من أي معلومات أخرى
 
+🔍 **قواعد التحقق من صحة البيانات (إجبارية - يجب تطبيقها قبل كل توصية):**
+• **تحقق من دقة المعلومات:** قبل تقديم أي توصية، تأكد من صحة البيانات من مصادر متعددة
+• **تطابق المواصفات:** تأكد من أن سعة الزيت واللزوجة تتطابق مع مواصفات المصنع الرسمية
+• **التحقق المتقاطع:** قارن البيانات من مصادر مختلفة للتأكد من الدقة
+• **رفض البيانات المشكوك فيها:** إذا كانت البيانات غير مؤكدة أو متضاربة، اطلب توضيحاً إضافياً
+• **التحقق من السنة والموديل:** تأكد من أن التوصية تتطابق مع السنة والموديل المحددين
+• **فحص جودة البيانات:** تأكد من أن البيانات المقدمة منطقية ومعقولة (مثل سعة الزيت بين 2-12 لتر)
+• **التحقق من المصادر الرسمية:** أعط الأولوية للبيانات من المصادر الرسمية مثل دليل المالك أو مواقع الشركة المصنعة
+• **رفض البيانات غير المؤكدة:** لا تقدم توصيات إذا كانت البيانات غير مؤكدة أو من مصادر غير موثوقة
+
 🎯 المهمة الأساسية:
 تقديم توصيات دقيقة ومضمونة 100% لزيوت المحركات وفلتر الزيت المناسب لكل سيارة، اعتماداً فقط على بيانات الشركات المصنعة الرسمية واقتراحات المصنع أو الشركة فقط.
 
 🚗 المسؤوليات الأساسية:
 
 1. تحديد نوع المحرك بدقة:
-- ✅ إذا احتوت السيارة على أكثر من نوع محرك معروف: **اعرض كل الخيارات تلقائياً**
-- ❌ لا تطلب من المستخدم أن يختار
+- ✅ **اعرض دائماً كل أنواع المحركات المتاحة للموديل تلقائياً** (حتى لو كان محرك واحد)
+- ✅ **لا تسأل المستخدم عن نوع المحرك أبداً - اعرض كل الخيارات مباشرة في نفس الرد**
+- ✅ **قدم توصيات منفصلة لكل نوع محرك متاح للموديل**
+- ❌ لا تطلب من المستخدم أن يختار أو يحدد نوع المحرك
 - ❌ لا تفترض أو تخمّن نوع المحرك من اسم السيارة فقط
+- ❌ لا تقل "يرجى تحديد نوع المحرك" - اعرض كل الأنواع المتاحة
 
 2. تحديد سعة الزيت الحقيقية:
 - ✅ استخدم سعة الزيت الفعلية من دليل المصنع (وليس حجم المحرك)
@@ -1074,43 +1087,195 @@ function extractYearFromQuery(query: string): number | undefined {
 }
 
 /**
- * Validate and enhance search data quality
+ * Validate and enhance search data quality with comprehensive verification
  */
 function validateAndEnhanceSearchData(searchResults: any, brand: string, model: string) {
-  // Filter out irrelevant results
+  // Enhanced filtering with stricter validation
   const filteredCapacityResults = searchResults.oilCapacity.results.filter((result: any) => {
     const text = `${result.title} ${result.description}`.toLowerCase();
+    const url = result.url.toLowerCase();
+    
     // Must contain oil-related terms and reasonable capacity numbers
-    return (text.includes('oil') || text.includes('زيت')) &&
-      (text.match(/\d+\.?\d*\s*(liter|litre|quart|qt|لتر)/i));
+    const hasOilTerms = (text.includes('oil') || text.includes('زيت') || text.includes('capacity') || text.includes('سعة'));
+    const hasCapacityNumbers = text.match(/\d+\.?\d*\s*(liter|litre|quart|qt|لتر)/i);
+    
+    // Validate capacity range (reasonable oil capacity: 2-12 liters)
+    const capacityMatch = text.match(/(\d+\.?\d*)\s*(liter|litre|quart|qt|لتر)/i);
+    let validCapacity = true;
+    if (capacityMatch) {
+      const capacity = parseFloat(capacityMatch[1]);
+      const unit = capacityMatch[2].toLowerCase();
+      // Convert to liters for validation
+      const capacityInLiters = unit.includes('quart') || unit.includes('qt') ? capacity * 0.946 : capacity;
+      validCapacity = capacityInLiters >= 2 && capacityInLiters <= 12;
+    }
+    
+    // Check for brand/model relevance
+    const brandRelevant = !brand || text.includes(brand.toLowerCase());
+    const modelRelevant = !model || text.includes(model.toLowerCase());
+    
+    // Prefer official sources
+    const isOfficialSource = url.includes('official') || url.includes('manual') || url.includes('dealer') || 
+                            url.includes(brand?.toLowerCase() || '') || text.includes('manufacturer');
+    
+    return hasOilTerms && hasCapacityNumbers && validCapacity && (brandRelevant || modelRelevant || isOfficialSource);
   });
 
   const filteredViscosityResults = searchResults.viscosity.results.filter((result: any) => {
     const text = `${result.title} ${result.description}`.toLowerCase();
-    // Must contain viscosity patterns
-    return text.match(/\b\d+w-\d+\b/i) || text.includes('viscosity') || text.includes('لزوجة');
+    const url = result.url.toLowerCase();
+    
+    // Must contain viscosity patterns with validation
+    const hasViscosityPattern = text.match(/\b\d+w-\d+\b/i) || text.includes('viscosity') || text.includes('لزوجة');
+    
+    // Validate viscosity values (common automotive viscosities)
+    const viscosityMatch = text.match(/\b(\d+)w-(\d+)\b/i);
+    let validViscosity = true;
+    if (viscosityMatch) {
+      const winterGrade = parseInt(viscosityMatch[1]);
+      const operatingGrade = parseInt(viscosityMatch[2]);
+      // Common automotive viscosity ranges
+      validViscosity = [0, 5, 10, 15, 20].includes(winterGrade) && 
+                      [20, 30, 40, 50, 60].includes(operatingGrade);
+    }
+    
+    // Check for brand/model relevance
+    const brandRelevant = !brand || text.includes(brand.toLowerCase());
+    const modelRelevant = !model || text.includes(model.toLowerCase());
+    
+    // Prefer official sources
+    const isOfficialSource = url.includes('official') || url.includes('manual') || url.includes('dealer') || 
+                            url.includes(brand?.toLowerCase() || '') || text.includes('manufacturer');
+    
+    return hasViscosityPattern && validViscosity && (brandRelevant || modelRelevant || isOfficialSource);
   });
+
+  // Cross-validate results for consistency
+  const crossValidatedResults = crossValidateSearchResults(filteredCapacityResults, filteredViscosityResults, brand, model);
 
   // Enhance results with quality scoring
   const enhancedResults = {
     ...searchResults,
     oilCapacity: {
       ...searchResults.oilCapacity,
-      results: filteredCapacityResults.map((result: any) => ({
+      results: crossValidatedResults.capacity.map((result: any) => ({
         ...result,
-        qualityScore: calculateResultQuality(result, brand, model)
+        qualityScore: calculateResultQuality(result, brand, model),
+        validated: true
       })).sort((a: any, b: any) => b.qualityScore - a.qualityScore)
     },
     viscosity: {
       ...searchResults.viscosity,
-      results: filteredViscosityResults.map((result: any) => ({
+      results: crossValidatedResults.viscosity.map((result: any) => ({
         ...result,
-        qualityScore: calculateResultQuality(result, brand, model)
+        qualityScore: calculateResultQuality(result, brand, model),
+        validated: true
       })).sort((a: any, b: any) => b.qualityScore - a.qualityScore)
+    },
+    dataQuality: {
+      capacityValidated: crossValidatedResults.capacity.length > 0,
+      viscosityValidated: crossValidatedResults.viscosity.length > 0,
+      crossValidated: crossValidatedResults.consistent,
+      officialSourcesFound: crossValidatedResults.officialSources
     }
   };
 
   return enhancedResults;
+}
+
+/**
+ * Cross-validate search results for data consistency
+ */
+function crossValidateSearchResults(capacityResults: any[], viscosityResults: any[], brand: string, model: string) {
+  // Check for consistency across multiple sources
+  const capacityValues = new Map();
+  const viscosityValues = new Map();
+  let officialSources = 0;
+  
+  // Extract and count capacity values
+  capacityResults.forEach(result => {
+    const text = `${result.title} ${result.description}`.toLowerCase();
+    const url = result.url.toLowerCase();
+    const capacityMatch = text.match(/(\d+\.?\d*)\s*(liter|litre|quart|qt|لتر)/i);
+    
+    if (capacityMatch) {
+      const capacity = parseFloat(capacityMatch[1]);
+      const unit = capacityMatch[2].toLowerCase();
+      const capacityInLiters = unit.includes('quart') || unit.includes('qt') ? capacity * 0.946 : capacity;
+      const roundedCapacity = Math.round(capacityInLiters * 10) / 10; // Round to 1 decimal
+      
+      capacityValues.set(roundedCapacity, (capacityValues.get(roundedCapacity) || 0) + 1);
+      
+      if (url.includes('official') || url.includes('manual') || url.includes('dealer')) {
+        officialSources++;
+      }
+    }
+  });
+  
+  // Extract and count viscosity values
+  viscosityResults.forEach(result => {
+    const text = `${result.title} ${result.description}`.toLowerCase();
+    const url = result.url.toLowerCase();
+    const viscosityMatch = text.match(/\b(\d+w-\d+)\b/i);
+    
+    if (viscosityMatch) {
+      const viscosity = viscosityMatch[1].toUpperCase();
+      viscosityValues.set(viscosity, (viscosityValues.get(viscosity) || 0) + 1);
+      
+      if (url.includes('official') || url.includes('manual') || url.includes('dealer')) {
+        officialSources++;
+      }
+    }
+  });
+  
+  // Determine most consistent values (appearing in multiple sources)
+  const consistentCapacities = Array.from(capacityValues.entries())
+    .filter(([_, count]) => count >= 2)
+    .sort((a, b) => b[1] - a[1]);
+    
+  const consistentViscosities = Array.from(viscosityValues.entries())
+    .filter(([_, count]) => count >= 2)
+    .sort((a, b) => b[1] - a[1]);
+  
+  // Filter results to only include consistent data
+  const validatedCapacityResults = capacityResults.filter(result => {
+    if (consistentCapacities.length === 0) return true; // If no consistent data, keep all
+    
+    const text = `${result.title} ${result.description}`.toLowerCase();
+    const capacityMatch = text.match(/(\d+\.?\d*)\s*(liter|litre|quart|qt|لتر)/i);
+    
+    if (capacityMatch) {
+      const capacity = parseFloat(capacityMatch[1]);
+      const unit = capacityMatch[2].toLowerCase();
+      const capacityInLiters = unit.includes('quart') || unit.includes('qt') ? capacity * 0.946 : capacity;
+      const roundedCapacity = Math.round(capacityInLiters * 10) / 10;
+      
+      return consistentCapacities.some(([consistentCapacity, _]) => consistentCapacity === roundedCapacity);
+    }
+    
+    return false;
+  });
+  
+  const validatedViscosityResults = viscosityResults.filter(result => {
+    if (consistentViscosities.length === 0) return true; // If no consistent data, keep all
+    
+    const text = `${result.title} ${result.description}`.toLowerCase();
+    const viscosityMatch = text.match(/\b(\d+w-\d+)\b/i);
+    
+    if (viscosityMatch) {
+      const viscosity = viscosityMatch[1].toUpperCase();
+      return consistentViscosities.some(([consistentViscosity, _]) => consistentViscosity === viscosity);
+    }
+    
+    return false;
+  });
+  
+  return {
+    capacity: validatedCapacityResults,
+    viscosity: validatedViscosityResults,
+    consistent: consistentCapacities.length > 0 && consistentViscosities.length > 0,
+    officialSources: officialSources > 0
+  };
 }
 
 /**
@@ -1371,13 +1536,27 @@ function formatSearchResultsForAI(searchResults: any): string {
 
   formattedData += `**🌐 المصادر المعتمدة:** ${Array.from(allSources).join(', ') || 'لا يوجد'}\n\n`;
 
-  // 🔴 Mandatory AI Instructions
-  formattedData += '**⚠️ تعليمات إلزامية للذكاء الاصطناعي:**\n';
-  formattedData += '🔴 **يجب استخدام هذه المعلومات من المصادر الرسمية فقط - لا تستخدم أي معلومات أخرى**\n';
-  formattedData += '🔴 **إذا وجدت معلومات مختلفة في قاعدة البيانات الداخلية، تجاهلها واستخدم نتائج البحث هذه**\n';
-  formattedData += '🔴 **ابحث في النصوص أعلاه عن أرقام مثل "3.7 quarts" أو "4.4 quarts" أو "0W-20"**\n';
-  formattedData += '🔴 **استخدم فقط الأرقام المستخرجة أعلاه - لا تخترع أرقام جديدة**\n';
-  formattedData += '🔴 **إذا وجدت سعة واحدة فقط (مثل 3.7 quarts)، لا تخترع سعة أخرى للمحرك الثاني**\n';
+  // 🔴 Enhanced Data Validation Instructions
+  formattedData += '**⚠️ تعليمات التحقق من صحة البيانات (إجبارية):**\n';
+  formattedData += '🔍 **التحقق من دقة المعلومات:**\n';
+  formattedData += '   • قبل تقديم أي توصية، تأكد من صحة البيانات من مصادر متعددة\n';
+  formattedData += '   • تحقق من تطابق سعة الزيت واللزوجة مع مواصفات المصنع الرسمية\n';
+  formattedData += '   • قارن البيانات من مصادر مختلفة للتأكد من الدقة\n';
+  formattedData += '   • ارفض البيانات المشكوك فيها أو المتضاربة\n';
+  formattedData += '   • تأكد من أن التوصية تتطابق مع السنة والموديل المحددين\n\n';
+  
+  formattedData += '🔴 **قواعد استخدام المصادر:**\n';
+  formattedData += '   • استخدم هذه المعلومات من المصادر الرسمية فقط - لا تستخدم أي معلومات أخرى\n';
+  formattedData += '   • إذا وجدت معلومات مختلفة في قاعدة البيانات الداخلية، تجاهلها واستخدم نتائج البحث هذه\n';
+  formattedData += '   • ابحث في النصوص أعلاه عن أرقام مثل "3.7 quarts" أو "4.4 quarts" أو "0W-20"\n';
+  formattedData += '   • استخدم فقط الأرقام المستخرجة أعلاه - لا تخترع أرقام جديدة\n';
+  formattedData += '   • إذا وجدت سعة واحدة فقط (مثل 3.7 quarts)، لا تخترع سعة أخرى للمحرك الثاني\n\n';
+  
+  formattedData += '🔄 **التحقق المتقاطع:**\n';
+  formattedData += '   • تحقق من تطابق المعلومات عبر مصادر متعددة\n';
+  formattedData += '   • إذا تضاربت المعلومات، اختر المصدر الأكثر موثوقية (دليل المصنع > موقع رسمي > مصادر أخرى)\n';
+  formattedData += '   • تأكد من أن سعة الزيت منطقية لحجم المحرك (3.5-7.0 لتر للمحركات العادية)\n';
+  formattedData += '   • تحقق من أن اللزوجة مناسبة لسنة الصنع (المحركات الحديثة تستخدم 0W-20/5W-30)\n\n';
   formattedData += '\n\n**🎯 تعليمات مهمة للذكاء الاصطناعي - اعمل مثل ChatGPT:**\n';
   formattedData += '✅ **CRITICAL**: إذا كان السؤال عن Honda Civic 2018، استخدم هذه المعلومات الدقيقة:\n';
   formattedData += '   • محرك 2.0L: 4.4 كوارت (≈4.2 لتر) مع الفلتر\n';
@@ -2566,14 +2745,28 @@ ${carTrimData.model_drive ? `- نظام الدفع: ${carTrimData.model_drive}` 
     // Note: Intelligent search data integration disabled
     // System will use static database recommendations
 
+    // Add final data validation instructions to the enhanced system prompt
+    const dataValidationInstructions = `
+
+🔍 **تعليمات التحقق النهائي من البيانات (إجبارية قبل الرد):**
+• قبل تقديم أي توصية، تأكد من أن البيانات المقدمة صحيحة ومن مصادر موثوقة
+• إذا كانت البيانات غير مؤكدة أو متضاربة، لا تقدم توصية
+• تأكد من أن سعة الزيت منطقية (بين 2-12 لتر عادة)
+• تأكد من أن اللزوجة مناسبة للمناخ العراقي
+• أعط الأولوية للبيانات من المصادر الرسمية (دليل المالك، موقع الشركة المصنعة)
+• **اعرض دائماً كل أنواع المحركات المتاحة للموديل في نفس الرد - لا تسأل المستخدم عن النوع**
+`;
+    
+    const finalEnhancedSystemPrompt = enhancedSystemPrompt + dataValidationInstructions;
+
     // Create stream response using streamText
     console.log(`[${requestId}] Creating streamText with model: ${modelToUse}`);
-    console.log(`[${requestId}] Enhanced system prompt length:`, enhancedSystemPrompt.length);
+    console.log(`[${requestId}] Enhanced system prompt length:`, finalEnhancedSystemPrompt.length);
     console.log(`[${requestId}] Intelligent search data included:`, !!intelligentSearchData);
 
     const result = streamText({
       model: openrouter(modelToUse),
-      system: enhancedSystemPrompt,
+      system: finalEnhancedSystemPrompt,
       messages,
       maxTokens: 900,
       temperature: 0.3,
@@ -2596,7 +2789,7 @@ ${carTrimData.model_drive ? `- نظام الدفع: ${carTrimData.model_drive}` 
       const fallbackMessages = [
         {
           role: "system",
-          content: enhancedSystemPrompt
+          content: finalEnhancedSystemPrompt
         },
         ...messages.map(msg => ({
           role: msg.role,

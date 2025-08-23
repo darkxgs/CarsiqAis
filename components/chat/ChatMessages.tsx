@@ -206,65 +206,73 @@ const MessageContent = ({ content, role }: { content: string; role: string }) =>
   const renderedContent = useMemo(() => {
     if (role !== "assistant") return content
 
-    // First, convert literal \n to actual newlines
-    const normalizedContent = content.replace(/\\n/g, '\n')
+    // Normalize content: convert literal \n to actual newlines and clean up whitespace
+    let normalizedContent = content
+      .replace(/\\n/g, '\n')  // Convert literal \n to newlines
+      .replace(/\r\n/g, '\n')  // Normalize Windows line endings
+      .replace(/\r/g, '\n')   // Normalize Mac line endings
+      .trim()  // Remove leading/trailing whitespace
 
-    // First, parse and render HTML tags by converting to React elements
+    // Parse and render HTML tags by converting to React elements
     const parseHtml = (htmlContent: string) => {
-      // Replace both <b>text</b> and **text** with temporary markers that won't be split
-      let markedContent = htmlContent.replace(/<b>(.*?)<\/b>/g, '___BOLD_START___$1___BOLD_END___');
-      // Also handle markdown-style bold with ** (but avoid matching emoji sequences like 1️⃣**)
-      markedContent = markedContent.replace(/(?<!\d️⃣|\d\uFE0F\u20E3)\*\*(.*?)\*\*/g, '___BOLD_START___$1___BOLD_END___');
+      // More robust bold text handling - avoid conflicts with emojis
+      let markedContent = htmlContent
+        .replace(/<b>(.*?)<\/b>/g, '___BOLD_START___$1___BOLD_END___')
+        // Handle markdown bold but be more careful with emoji sequences
+        .replace(/(?<!\d️⃣|\d\uFE0F\u20E3|\w)\*\*([^*]+?)\*\*(?!\*)/g, '___BOLD_START___$1___BOLD_END___')
 
-      // Process paragraphs and then restore bold tags as React elements
-      return markedContent.split('\n\n').map((paragraph, i) => {
-        const isNumberedEmoji = /^(\d️⃣|\d\uFE0F\u20E3)/.test(paragraph)
-        const isHeading = (paragraph?.trim?.() || '').endsWith(':') && paragraph.length < MAX_HEADING_LENGTH
+      // Split into paragraphs more reliably
+      const paragraphs = markedContent
+        .split(/\n\s*\n/)  // Split on double newlines with optional whitespace
+        .filter(p => p.trim())  // Remove empty paragraphs
 
-        // Process the paragraph content to restore bold tags
+      return paragraphs.map((paragraph, i) => {
+        const trimmedParagraph = paragraph.trim()
+        const isNumberedEmoji = /^(\d️⃣|\d\uFE0F\u20E3)/.test(trimmedParagraph)
+        const isHeading = trimmedParagraph.endsWith(':') && trimmedParagraph.length < MAX_HEADING_LENGTH && !isNumberedEmoji
+
+        // Process paragraph content to restore bold tags
         const processParagraphContent = (text: string) => {
-          // Split by bold markers
-          const parts = text.split(/(___BOLD_START___|___BOLD_END___)/g);
+          const parts = text.split(/(___BOLD_START___|___BOLD_END___)/g)
+          const result: React.ReactNode[] = []
+          let isBold = false
+          let currentText = ''
 
-          const result: React.ReactNode[] = [];
-          let isBold = false;
-          let currentText = '';
-
-          parts.forEach((part) => {
+          for (let j = 0; j < parts.length; j++) {
+            const part = parts[j]
+            
             if (part === '___BOLD_START___') {
-              // End current non-bold text if any
               if (currentText) {
-                result.push(currentText);
-                currentText = '';
+                result.push(currentText)
+                currentText = ''
               }
-              isBold = true;
+              isBold = true
             } else if (part === '___BOLD_END___') {
-              // End current bold text
               if (currentText) {
-                result.push(<b key={`bold-${result.length}`}>{currentText}</b>);
-                currentText = '';
+                result.push(<b key={`bold-${result.length}`}>{currentText}</b>)
+                currentText = ''
               }
-              isBold = false;
-            } else {
-              currentText += part;
-              // If we're at the end of parts or the next part is a marker, push the current text
-              if (parts.indexOf(part) === parts.length - 1) {
-                if (isBold) {
-                  result.push(<b key={`bold-${result.length}`}>{currentText}</b>);
-                } else {
-                  result.push(currentText);
-                }
-                currentText = '';
-              }
+              isBold = false
+            } else if (part) {
+              currentText += part
             }
-          });
+          }
 
-          return result;
-        };
+          // Handle any remaining text
+          if (currentText) {
+            if (isBold) {
+              result.push(<b key={`bold-${result.length}`}>{currentText}</b>)
+            } else {
+              result.push(currentText)
+            }
+          }
+
+          return result.length > 0 ? result : [text]
+        }
 
         if (isNumberedEmoji) {
-          const emoji = paragraph.match(/^(\d️⃣|\d\uFE0F\u20E3)/)?.[0]
-          const text = (paragraph.replace(/^(\d️⃣|\d\uFE0F\u20E3)/, '')?.trim?.() || '')
+          const emoji = trimmedParagraph.match(/^(\d️⃣|\d\uFE0F\u20E3)/)?.[0] || ''
+          const text = trimmedParagraph.replace(/^(\d️⃣|\d\uFE0F\u20E3)\s*/, '').trim()
           return (
             <div key={i} className="my-2 flex gap-2 items-start">
               <div className="text-lg flex-shrink-0" aria-hidden="true">{emoji}</div>
@@ -274,28 +282,45 @@ const MessageContent = ({ content, role }: { content: string; role: string }) =>
         } else if (isHeading) {
           return (
             <h3 key={i} className="font-bold text-md mt-3 mb-1" role="heading" aria-level={3}>
-              {processParagraphContent(paragraph)}
+              {processParagraphContent(trimmedParagraph)}
             </h3>
           )
         } else {
-          const hasEmoji = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/.test(paragraph)
-          return (
-            <p key={i} className={`my-1.5 text-sm ${hasEmoji ? 'emoji-content' : ''}`}>
-              {processParagraphContent(paragraph)}
-            </p>
-          )
+          // Handle single line breaks within paragraphs
+          const lines = trimmedParagraph.split('\n').filter(line => line.trim())
+          if (lines.length > 1) {
+            return (
+              <div key={i} className="my-1.5">
+                {lines.map((line, lineIndex) => {
+                  const hasEmoji = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/.test(line)
+                  return (
+                    <p key={lineIndex} className={`text-sm ${hasEmoji ? 'emoji-content' : ''} ${lineIndex > 0 ? 'mt-1' : ''}`}>
+                      {processParagraphContent(line.trim())}
+                    </p>
+                  )
+                })}
+              </div>
+            )
+          } else {
+            const hasEmoji = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/.test(trimmedParagraph)
+            return (
+              <p key={i} className={`my-1.5 text-sm ${hasEmoji ? 'emoji-content' : ''}`}>
+                {processParagraphContent(trimmedParagraph)}
+              </p>
+            )
+          }
         }
       })
     }
 
-    return parseHtml(normalizedContent);
+    return parseHtml(normalizedContent)
   }, [content, role])
 
   if (role === "assistant") {
     return <div className="chat-message-content">{renderedContent}</div>
   }
 
-  return <span>{content}</span>
+  return <span className="whitespace-pre-wrap">{content}</span>
 }
 
 // Action buttons component
@@ -739,4 +764,4 @@ export function ChatMessages({
       </ErrorBoundary>
     </div>
   )
-} 
+}

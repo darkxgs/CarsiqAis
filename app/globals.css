@@ -715,10 +715,18 @@ button:disabled {
 .chat-message-content {
   font-size: 15px;
   line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .chat-message-content p {
   margin-bottom: 0.75rem;
+  white-space: pre-wrap;
+}
+
+.chat-message-content p:last-child {
+  margin-bottom: 0;
 }
 
 .chat-message-content .font-bold {
@@ -744,6 +752,16 @@ button:disabled {
 
 .chat-message-content div.flex:last-child {
   border-bottom: none;
+}
+
+/* Better text formatting */
+.chat-message-content b {
+  font-weight: 600;
+  color: inherit;
+}
+
+.chat-message-content .emoji-content {
+  line-height: 1.8;
 }
 
 /* Mobile optimization for chat messages */
