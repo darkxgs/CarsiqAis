@@ -243,6 +243,8 @@ export class BraveSearchService {
       return [];
     }
 
+    console.log(`🔍 Executing Brave search query: "${query}"`);
+
     // Rate limiting for free tier
     const now = Date.now();
     const timeSinceLastRequest = now - this.lastRequestTime;
@@ -264,6 +266,8 @@ export class BraveSearchService {
       url.searchParams.append('ui_lang', 'en-US');
       url.searchParams.append('safesearch', 'moderate');
 
+      console.log(`🌐 Brave Search URL: ${url.toString()}`);
+
       const response = await fetch(url.toString(), {
         headers: {
           'X-Subscription-Token': this.apiKey,
@@ -271,6 +275,8 @@ export class BraveSearchService {
           'User-Agent': 'CarsiqAi-SearchBot/1.0'
         }
       });
+
+      console.log(`📡 Brave Search response status: ${response.status} ${response.statusText}`);
 
       if (!response.ok) {
         console.error('Brave Search API error:', response.status, response.statusText);
@@ -280,7 +286,14 @@ export class BraveSearchService {
       }
 
       const data: BraveSearchResponse = await response.json();
-      return data.web?.results || [];
+      const results = data.web?.results || [];
+      console.log(`📊 Brave Search returned ${results.length} results (total: ${data.web?.total || 0})`);
+      
+      if (results.length > 0) {
+        console.log(`📝 First result: ${results[0].title} - ${results[0].url}`);
+      }
+      
+      return results;
 
     } catch (error) {
       console.error('Brave Search execution error:', error);

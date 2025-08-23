@@ -2091,11 +2091,35 @@ export function findFilterByVehicle(make: string, model: string): string | null 
   const mappedMake = makeMapping[normalizedMake] || normalizedMake;
   const mappedModel = modelMapping[normalizedModel] || normalizedModel;
 
+  // Debug logging
+  console.log('[DEBUG] findFilterByVehicle - Input:', { make, model });
+  console.log('[DEBUG] findFilterByVehicle - Normalized:', { normalizedMake, normalizedModel });
+  console.log('[DEBUG] findFilterByVehicle - Mapped:', { mappedMake, mappedModel });
+  
+  // Special case for Land Cruiser 300
+  if (mappedMake === 'toyota' && mappedModel === '300') {
+    console.log('[DEBUG] Special case: Toyota 300 detected, checking for Land Cruiser 300');
+    for (const [filterNumber, filterData] of Object.entries(denckermannFilters)) {
+      if (filterData.brand.toLowerCase() === 'toyota') {
+        const hasLandCruiser300 = filterData.compatibleVehicles.some(vehicle => 
+          vehicle.toLowerCase().includes('land cruiser 300')
+        );
+        if (hasLandCruiser300) {
+          console.log(`[DEBUG] Found Land Cruiser 300 filter: ${filterNumber}`);
+          return filterNumber;
+        }
+      }
+    }
+  }
+
   // Search through all filters
   for (const [filterNumber, filterData] of Object.entries(denckermannFilters)) {
     // Check if the brand matches
     const filterBrand = filterData.brand.toLowerCase();
     if (filterBrand === mappedMake || filterBrand === 'universal') {
+      // Debug log for brand match
+      console.log(`[DEBUG] Brand match found for ${filterNumber}:`, { filterBrand, mappedMake, compatibleVehicles: filterData.compatibleVehicles });
+      
       // Special handling for "All [Brand] models" entries
       const hasAllModelsEntry = filterData.compatibleVehicles.some(vehicle => {
         const vehicleName = vehicle.toLowerCase();
@@ -2104,16 +2128,21 @@ export function findFilterByVehicle(make: string, model: string): string | null 
       });
 
       if (hasAllModelsEntry) {
+        console.log(`[DEBUG] All models match found for ${filterNumber}`);
         return filterNumber;
       }
 
       // Check if any compatible vehicle matches the model
       const matchingVehicle = filterData.compatibleVehicles.find(vehicle => {
         const vehicleName = vehicle.toLowerCase();
-        return vehicleName.includes(mappedModel) || mappedModel.includes(vehicleName);
+        const includesModel = vehicleName.includes(mappedModel);
+        const modelIncludesVehicle = mappedModel.includes(vehicleName);
+        console.log(`[DEBUG] Checking vehicle "${vehicleName}" against model "${mappedModel}":`, { includesModel, modelIncludesVehicle });
+        return includesModel || modelIncludesVehicle;
       });
 
       if (matchingVehicle) {
+        console.log(`[DEBUG] Vehicle match found for ${filterNumber}:`, matchingVehicle);
         return filterNumber;
       }
     }

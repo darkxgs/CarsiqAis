@@ -4,7 +4,7 @@ import Script from "next/script"
 import { Analytics } from "@vercel/analytics/react"
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from 'sonner'
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Vazirmatn } from 'next/font/google'
 
 const vazir = Vazirmatn({ 
@@ -15,6 +15,7 @@ const vazir = Vazirmatn({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://carsiq.ai'),
   title: 'هندسة السيارات - مساعد الزيوت الذكي',
   description: 'محادثة ذكية للحصول على استشارات السيارات وتوصيات الشراء بشكل فوري',
   icons: {
@@ -23,7 +24,6 @@ export const metadata: Metadata = {
     apple: '/logo.png',
   },
   manifest: '/manifest.json',
-  themeColor: '#1a73e8',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
@@ -43,6 +43,10 @@ export const metadata: Metadata = {
       alt: 'هندسة السيارات - مساعد الزيوت الذكي'
     }]
   }
+}
+
+export const viewport: Viewport = {
+  themeColor: '#1a73e8'
 }
 
 export default function RootLayout({
