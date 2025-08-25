@@ -171,8 +171,18 @@ Denckermann
 
 // Core OpenRouter client setup
 const createOpenRouterClient = () => {
+  const apiKey = process.env.OPENROUTER_API_KEY || ""
+  
+  // Log the API key being used (masked for security)
+  console.log('🔑 OpenRouter API Key Status:', {
+    hasKey: !!apiKey,
+    keyLength: apiKey.length,
+    keyPrefix: apiKey ? apiKey.substring(0, 8) + '...' : 'NOT_SET',
+    environment: process.env.NODE_ENV || 'unknown'
+  })
+  
   return createOpenAI({
-    apiKey: process.env.OPENROUTER_API_KEY || "",
+    apiKey: apiKey,
     baseURL: "https://openrouter.ai/api/v1",
     headers: {
       "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
