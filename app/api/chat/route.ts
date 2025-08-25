@@ -574,8 +574,58 @@ export async function POST(request: Request) {
       presencePenalty: 0.1
     })
 
-    console.log(`[${requestId}] StreamText created, returning response`)
-    return result.toTextStreamResponse()
+    console.log(`[${requestId}] StreamText created, attempting to return response`)
+    
+    // Try streaming response with fallback for Vercel compatibility
+    try {
+      return result.toTextStreamResponse()
+    } catch (streamError) {
+      console.log(`[${requestId}] Streaming failed, using direct API fallback`)
+      console.error(`[${requestId}] Stream error:`, streamError)
+      
+      // Fallback to direct OpenRouter API call
+      const fallbackMessages = [
+        {
+          role: "system",
+          content: finalSystemPrompt
+        },
+        ...messages.map(msg => ({
+          role: msg.role,
+          content: msg.content
+        }))
+      ]
+      
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+          "X-Title": "Car Service Chat - CarsiqAi"
+        },
+        body: JSON.stringify({
+          model: modelToUse,
+          messages: fallbackMessages,
+          max_tokens: 900,
+          temperature: 0.3
+        })
+      })
+      
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error(`[${requestId}] OpenRouter API error:`, response.status, errorText)
+        throw new Error(`OpenRouter API error: ${response.status}`)
+      }
+      
+      const data = await response.json()
+      const assistantMessage = data.choices?.[0]?.message?.content || "عذراً، لم أتمكن من الحصول على رد."
+      
+      return new Response(assistantMessage, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+        },
+      })
+    }
 
   } catch (error: any) {
     console.error(`[${requestId}] Error processing request:`, error)
