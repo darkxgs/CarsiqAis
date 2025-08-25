@@ -620,7 +620,11 @@ export async function POST(request: Request) {
       const data = await response.json()
       const assistantMessage = data.choices?.[0]?.message?.content || "عذراً، لم أتمكن من الحصول على رد."
       
-      return new Response(assistantMessage, {
+      // Return in AI SDK streaming format for frontend compatibility
+      const streamingFormat = `0:"${assistantMessage.replace(/"/g, '\\"')}"
+`
+      
+      return new Response(streamingFormat, {
         headers: {
           'Content-Type': 'text/plain; charset=utf-8',
         },
