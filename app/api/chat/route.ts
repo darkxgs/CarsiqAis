@@ -579,14 +579,6 @@ export async function POST(request: Request) {
 
     console.log(`[${requestId}] StreamText created, attempting to return response`)
     
-    // Log the AI response content for debugging
-    try {
-      const responseText = await result.text
-      console.log(`[${requestId}] AI Response Content:`, responseText.substring(0, 200) + (responseText.length > 200 ? '...' : ''))
-    } catch (textError) {
-      console.log(`[${requestId}] Could not extract response text for logging:`, textError)
-    }
-    
     // Try streaming response with fallback for Vercel compatibility
     try {
       const streamResponse = result.toTextStreamResponse({
