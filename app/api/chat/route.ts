@@ -173,12 +173,16 @@ Denckermann
 const createOpenRouterClient = () => {
   const apiKey = process.env.OPENROUTER_API_KEY || ""
   
-  // Log the API key being used (masked for security)
-  console.log('🔑 OpenRouter API Key Status:', {
-    hasKey: !!apiKey,
-    keyLength: apiKey.length,
-    keyPrefix: apiKey ? apiKey.substring(0, 8) + '...' : 'NOT_SET',
-    environment: process.env.NODE_ENV || 'unknown'
+  // Log the full API key and all environment variables for debugging
+  console.log('🔑 Full OpenRouter API Key:', apiKey)
+  console.log('🌍 All Environment Variables:', {
+    OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    NODE_ENV: process.env.NODE_ENV,
+    VERCEL: process.env.VERCEL,
+    VERCEL_ENV: process.env.VERCEL_ENV,
+    SUPABASE_URL: process.env.SUPABASE_URL,
+    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY
   })
   
   return createOpenAI({
