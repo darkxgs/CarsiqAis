@@ -566,6 +566,11 @@ export async function POST(request: Request) {
 
     // Create stream response
     console.log(`[${requestId}] Creating streamText response`)
+    console.log(`[${requestId}] Model: ${modelToUse}`)
+    console.log(`[${requestId}] System prompt length: ${finalSystemPrompt.length}`)
+    console.log(`[${requestId}] Messages count: ${messages.length}`)
+    console.log(`[${requestId}] Last user message: ${messages[messages.length - 1]?.content?.substring(0, 100)}...`)
+    
     const result = streamText({
       model: openrouter(modelToUse),
       system: finalSystemPrompt,
@@ -579,7 +584,7 @@ export async function POST(request: Request) {
 
     console.log(`[${requestId}] StreamText created, attempting to return response`)
     
-    // Try streaming response with fallback for Vercel compatibility
+    // Try streaming response with enhanced logging
     try {
       const streamResponse = result.toTextStreamResponse({
         headers: {
@@ -589,8 +594,19 @@ export async function POST(request: Request) {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        },
+        onStart() {
+          console.log(`[${requestId}] Stream started`)
+        },
+        onToken(token) {
+          console.log(`[${requestId}] Token generated: ${token}`)
+        },
+        onCompletion(completion) {
+          console.log(`[${requestId}] Stream completed with content length: ${completion.length}`)
+          console.log(`[${requestId}] Completion preview: ${completion.substring(0, 200)}...`)
         }
       })
+      
       console.log(`[${requestId}] Stream response created successfully`)
       return streamResponse
     } catch (streamError) {
