@@ -581,7 +581,16 @@ export async function POST(request: Request) {
     
     // Try streaming response with fallback for Vercel compatibility
     try {
-      const streamResponse = result.toTextStreamResponse()
+      const streamResponse = result.toTextStreamResponse({
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        }
+      })
       console.log(`[${requestId}] Stream response created successfully`)
       return streamResponse
     } catch (streamError) {
