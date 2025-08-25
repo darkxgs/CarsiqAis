@@ -10,6 +10,9 @@ import { isFilterQuery, isAirFilterQuery, generateFilterRecommendationMessage, g
 import { braveSearchService } from '@/services/braveSearchService'
 import officialSpecs from "@/data/officialSpecs"
 
+// Configure for Vercel Edge Runtime
+export const runtime = 'edge'
+
 // Input validation schemas
 const MessageSchema = z.object({
   role: z.enum(['user', 'assistant', 'system']),
@@ -578,7 +581,9 @@ export async function POST(request: Request) {
     
     // Try streaming response with fallback for Vercel compatibility
     try {
-      return result.toTextStreamResponse()
+      const streamResponse = result.toTextStreamResponse()
+      console.log(`[${requestId}] Stream response created successfully`)
+      return streamResponse
     } catch (streamError) {
       console.log(`[${requestId}] Streaming failed, using direct API fallback`)
       console.error(`[${requestId}] Stream error:`, streamError)
