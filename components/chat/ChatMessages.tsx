@@ -221,10 +221,15 @@ const MessageContent = ({ content, role }: { content: string; role: string }) =>
         // Handle markdown bold but be more careful with emoji sequences
         .replace(/(?<!\d️⃣|\d\uFE0F\u20E3|\w)\*\*([^*]+?)\*\*(?!\*)/g, '___BOLD_START___$1___BOLD_END___')
 
-      // Split into paragraphs more reliably
-      const paragraphs = markedContent
+      // Split into sections - preserve single line breaks for better formatting
+      const sections = markedContent
         .split(/\n\s*\n/)  // Split on double newlines with optional whitespace
-        .filter(p => p.trim())  // Remove empty paragraphs
+        .filter(p => p.trim())  // Remove empty sections
+        
+      // If no double newlines found, treat each single line as a section for better formatting
+      const paragraphs = sections.length === 1 ? 
+        markedContent.split('\n').filter(p => p.trim()) : 
+        sections
 
       return paragraphs.map((paragraph, i) => {
         const trimmedParagraph = paragraph.trim()
@@ -303,8 +308,25 @@ const MessageContent = ({ content, role }: { content: string; role: string }) =>
             )
           } else {
             const hasEmoji = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/.test(trimmedParagraph)
+            // Add more spacing for individual lines to improve readability
+            const isCarTitle = /^[\u0600-\u06FF\s]+\d{4}$/.test(trimmedParagraph.trim()) // Arabic car name with year
+            const isEngineTitle = /محرك|engine/i.test(trimmedParagraph)
+            const isSpecLine = /🛢️|⚙️|🔧|🥇|🥈|🥉|📦/.test(trimmedParagraph)
+            
+            let className = `text-sm ${hasEmoji ? 'emoji-content' : ''}`
+            
+            if (isCarTitle) {
+              className += ' font-bold text-lg my-3 text-center'
+            } else if (isEngineTitle) {
+              className += ' font-semibold my-2 mt-4'
+            } else if (isSpecLine) {
+              className += ' my-1'
+            } else {
+              className += ' my-1.5'
+            }
+            
             return (
-              <p key={i} className={`my-1.5 text-sm ${hasEmoji ? 'emoji-content' : ''}`}>
+              <p key={i} className={className}>
                 {processParagraphContent(trimmedParagraph)}
               </p>
             )
