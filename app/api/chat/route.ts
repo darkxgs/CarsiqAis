@@ -5,9 +5,10 @@ import logger from "@/utils/logger"
 import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 import { z } from 'zod'
 // Filter functionality (oil and air filters from Denckermann)
-import { isFilterQuery, isAirFilterQuery, generateFilterRecommendationMessage, searchFiltersWithArabicSupport } from '@/services/filterRecommendationService'
+import { isFilterQuery, isAirFilterQuery, generateFilterRecommendationMessage, getVerifiedOilFilter, getVerifiedAirFilter } from '@/services/filterRecommendationService'
 // Brave search service for real-time oil specifications
 import { braveSearchService } from '@/services/braveSearchService'
+import officialSpecs from "@/data/officialSpecs"
 
 // Input validation schemas
 const MessageSchema = z.object({
@@ -74,25 +75,17 @@ const openRouter = {
 
 🚗 المسؤوليات الأساسية:
 
-1. **تحديد جميع المحركات المتاحة للموديل (إجباري):**
+1. تحديد نوع المحرك بدقة:
 - ✅ **اعرض دائماً كل أنواع المحركات المتاحة للموديل تلقائياً** (حتى لو كان محرك واحد)
 - ✅ **لا تسأل المستخدم عن نوع المحرك أبداً - اعرض كل الخيارات مباشرة في نفس الرد**
-- ✅ **قدم توصيات منفصلة ومفصلة لكل نوع محرك متاح للموديل**
-- ✅ **اذكر حجم المحرك (مثل 1.6L، 2.0L، 1.6L Turbo) لكل محرك**
-- ✅ **اذكر نوع المحرك (MPI، GDI، Turbo، Hybrid، إلخ) إذا كان متاحاً**
-- ✅ **قدم معلومات مختلفة لكل محرك: سعة الزيت، اللزوجة، المعايير**
+- ✅ **قدم توصيات منفصلة لكل نوع محرك متاح للموديل**
 - ❌ لا تطلب من المستخدم أن يختار أو يحدد نوع المحرك
 - ❌ لا تفترض أو تخمّن نوع المحرك من اسم السيارة فقط
 - ❌ لا تقل "يرجى تحديد نوع المحرك" - اعرض كل الأنواع المتاحة
-- ❌ لا تعطي معلومات عامة - كل محرك له مواصفات مختلفة
 
-2. **تحديد المواصفات الدقيقة لكل محرك:**
+2. تحديد سعة الزيت الحقيقية:
 - ✅ استخدم سعة الزيت الفعلية من دليل المصنع (وليس حجم المحرك)
-- ✅ حدد اللزوجة المناسبة لكل محرك حسب مواصفات المصنع
-- ✅ اذكر المعايير المطلوبة لكل محرك (API، ACEA، ILSAC، إلخ)
-- ✅ تأكد من أن كل محرك له توصيات زيت مختلفة حسب مواصفاته
 - ❗ لا تخلط بين Engine Size و Oil Capacity
-- ❗ لا تعطي نفس المواصفات لجميع المحركات
 
 3. نظام التوصية المرحلي (خطوتين):
 **الخطوة الأولى - الأساسيات:**
@@ -121,39 +114,12 @@ const openRouter = {
 Denckermann  
 ❌ لا تقترح أي فلتر خارج هذه القائمة، حتى كمثال
 
-📦 **قاعدة بيانات فلاتر Denckermann المعتمدة (استخدم هذه الأرقام بالضبط):**
-- **Toyota Camry**: A210032 (استخدم هذا الرقم دائماً لتويوتا كامري)
-- **Toyota Corolla**: A210379 (استخدم هذا الرقم دائماً لتويوتا كورولا)
-- **Toyota RAV4**: A210052
-- **Toyota Prius**: A210119
-- **Toyota Yaris**: A210004
-- **Toyota Highlander**: A210374
-- **Toyota Land Cruiser**: A210060
-- **Hyundai Elantra**: A210931
-- **Hyundai Sonata**: A211067
-- **Hyundai Tucson**: A211070
-- **Hyundai Santa Fe**: A211089
-- **Hyundai Accent**: A210420
-- **Kia Cerato**: A210618 (كيا وهيونداي تستخدم نفس الفلاتر)
-- **Kia Optima**: A210616
-- **BMW 3 Series**: A210738
-- **BMW 5 Series**: A210101
-- **BMW X3**: A210519
-- **BMW X5**: A210736
-- **Mercedes C-Class**: A211037
-- **Mercedes E-Class**: A210963
-- **Mercedes GLC**: A210076
-- **Mercedes GLE**: A210977
-- **Chevrolet Cruze**: A211062
-- **Chevrolet Malibu**: A210050
-- **Chevrolet Camaro**: A210191
-- **Nissan Altima**: A210021
-- **Nissan Sunny**: A210492
 
 ⚠️ **قاعدة إلزامية لفلاتر الزيت:**
 - عندما يسأل المستخدم عن فلتر زيت لأي سيارة من القائمة أعلاه، استخدم الرقم المحدد بالضبط
 - لا تقل "غير متوفر في قاعدة البيانات" إذا كان الرقم موجود في القائمة أعلاه
-- استخدم التنسيق: 📦 **فلتر الزيت:** A210032 (Denckermann) - مصدر التحقق: كتالوج 2024
+- استخدم التنسيق: 📦 **فلتر الزيت:** A210032 (Denckermann) - مصدر التحقق: Denckermann 2024
+
 
 📋 طريقة العرض الإجبارية:
 
@@ -162,38 +128,37 @@ Denckermann
 ⚙️ اللزوجة: [XW-XX]  
 🔧 المعيار: [API/ACEA/Dexos/MB...]  
 
-**ثانياً - خيارات الزيوت المرتبة:**
-🥇 **الخيار الأول** (الأكثر ربحية): [اسم الزيت + اللزوجة]
-🥈 **الخيار الثاني** (بديل قوي): [اسم الزيت + اللزوجة]
-🥉 **الخيار الثالث** (بريميوم/اقتصادي): [اسم الزيت + اللزوجة]
+**ثانياً - خيارات الزيوت المرتبة (يجب استخدام هذا التنسيق بالضبط):**
+🥇 **الخيار الأول (الأكثر ربحية):** [Brand Name] [Product Line] [Viscosity]
+🥈 **الخيار الثاني (بديل قوي):** [Brand Name] [Product Line] [Viscosity]
+🥉 **الخيار الثالث (بريميوم/اقتصادي):** [Brand Name] [Product Line] [Viscosity]
 📦 **فلتر الزيت:** [رقم Denckermann]
 
-❗ عدم الالتزام بالتنسيق أو بزيت غير معتمد = خطأ فادح
+**مثال على التنسيق المطلوب:**
+🥇 **الخيار الأول (الأكثر ربحية):** Valvoline SynPower 0W-20
+🥈 **الخيار الثاني (بديل قوي):** Castrol Magnatec 0W-20
+🥉 **الخيار الثالث (بريميوم):** Liqui Moly Top Tec 6600 0W-20
+📦 **فلتر الزيت:** A210032 (Denckermann)
 
-🔍 **أمثلة للتطبيق الصحيح:**
+❗ **قواعد إجبارية للتنسيق:**
+- يجب استخدام اسم المنتج الكامل (Brand + Product Line + Viscosity)
+- ❌ خطأ: "Valvoline 0W-20" أو "Castrol 0W-20"
+- ✅ صحيح: "Valvoline SynPower 0W-20" أو "Castrol Magnatec 0W-20"
+- يجب استخدام الأوصاف الدقيقة: (الأكثر ربحية)، (بديل قوي)، (بريميوم)، (اقتصادي)
+- عدم الالتزام بالتنسيق الكامل = خطأ فادح
 
-🟩 **إذا كانت السيارة تحتوي على محرك واحد:**  
-↪️ قدم الإجابة مباشرة بذلك المحرك مع ذكر حجمه ونوعه بوضوح.
+🔍 أمثلة:
 
-🟨 **إذا كانت السيارة تحتوي على أكثر من نوع محرك:**  
-↪️ قدم الإجابات لجميع المحركات في نفس الرد، كل واحدة بتنسيق منفصل مع عنوان واضح لكل محرك.
-↪️ استخدم تنسيق: **🔹 محرك [الحجم] [النوع]** لكل محرك.
-↪️ مثال: **🔹 محرك 1.6L MPI** ، **🔹 محرك 1.6L Turbo** ، **🔹 محرك 2.0L GDI**
+🟩 إذا كانت السيارة تحتوي على محرك واحد:  
+↪️ قدم الإجابة مباشرة بذلك المحرك فقط.
 
-🟥 **قواعد إضافية مهمة:**
-- لا تطلب من المستخدم اختيار المحرك إذا لم يذكره - اعرض كل الخيارات المعروفة للموديل
-- تأكد من أن كل محرك له مواصفات مختلفة ودقيقة
-- اذكر الاختلافات في سعة الزيت واللزوجة بين المحركات المختلفة
-- استخدم المصادر الرسمية لتحديد مواصفات كل محرك على حدة
+🟨 إذا كانت السيارة تحتوي على أكثر من نوع محرك:  
+↪️ قدم الإجابات لجميع المحركات في نفس الرد، كل واحدة بتنسيق منفصل كما هو موضح أعلاه.
 
-🎯 **هدفك النهائي:**  
-تقديم توصية **موثوقة، دقيقة، شاملة، ومعتمدة على اقتراحات المصنع فقط** لجميع المحركات المتاحة للموديل، مع الالتزام الكامل بكل التعليمات والعرض المرحلي للمعلومات.
+🟥 لا تطلب من المستخدم اختيار المحرك إذا لم يذكره. اعرض كل الخيارات المعروفة للموديل.
 
-📋 **تذكير مهم:**
-- **لا تكتفي بمحرك واحد** - اعرض جميع المحركات المتاحة للموديل
-- **كل محرك له مواصفات مختلفة** - لا تعطي نفس المعلومات لجميع المحركات
-- **استخدم المصادر الرسمية** لتحديد مواصفات كل محرك بدقة
-- **اعرض الاختلافات** في سعة الزيت واللزوجة بين المحركات المختلفة
+🎯 هدفك النهائي:  
+تقديم توصية <b>موثوقة، دقيقة، بسيطة، ومعتمدة على اقتراحات المصنع فقط</b>، مع الالتزام الكامل بكل التعليمات والعرض المرحلي للمعلومات.
 `,
   headers: {
     "HTTP-Referer": "https://www.carsiqai.com",
@@ -458,12 +423,20 @@ export async function POST(request: Request) {
     const carData = extractCarData(userQuery)
     console.log(`[${requestId}] Extracted car data:`, carData)
 
-    // Check for filter queries
+    // NEW: Fuzzy guess brand/model from raw query when extraction is weak or empty
+    const guessed = guessBrandAndModelFromQuery(userQuery)
+    if ((!carData.carBrand && guessed.brand) || (!carData.carModel && guessed.model)) {
+      console.log(`[${requestId}] Guessed from query -> brand: ${guessed.brand || 'n/a'}, model: ${guessed.model || 'n/a'}, scores: b=${guessed.brandScore.toFixed(2)} m=${guessed.modelScore.toFixed(2)}`)
+    }
+
+    // Check for filter queries (keep existing behavior)
     if (isFilterQuery(userQuery) || isAirFilterQuery(userQuery)) {
       console.log(`[${requestId}] Processing filter query`)
       try {
-        const filterResults = await searchFiltersWithArabicSupport(userQuery)
-        const filterResponse = generateFilterRecommendationMessage(filterResults, userQuery)
+        const filterType = isAirFilterQuery(userQuery) ? 'air' : 'oil'
+        const make = carData.carBrand || guessed.brand || ''
+        const model = mapArabicModelToEnglishIfNeeded(carData.carModel) || carData.carModel || guessed.model || ''
+        const filterResponse = generateFilterRecommendationMessage(make, model, carData.year, filterType)
         
         return new Response(filterResponse, {
           headers: {
@@ -476,49 +449,102 @@ export async function POST(request: Request) {
       }
     }
 
-    // Get real-time oil specifications using Brave search
-    let searchData = ''
-    if (carData.isValid) {
-      try {
-        console.log(`[${requestId}] Searching for oil specifications`)
-        const searchQuery = {
-          carBrand: carData.carBrand,
-          carModel: carData.carModel,
-          year: carData.year,
-          queryType: 'oil_capacity' as const
-        }
-        console.log(`[${requestId}] Search query:`, searchQuery)
-        
-        const searchResults = await braveSearchService.searchComprehensiveCarData(
-          carData.carBrand,
-          carData.carModel,
-          carData.year
-        )
-        console.log(`[${requestId}] Search results received:`, {
-          hasResults: !!searchResults,
-          oilCapacityResults: searchResults?.oilCapacity?.results?.length || 0,
-          viscosityResults: searchResults?.viscosity?.results?.length || 0,
-          overallConfidence: searchResults?.overallConfidence
-        })
-        
-        const allResults = [
-          ...(searchResults?.oilCapacity?.results || []),
-          ...(searchResults?.viscosity?.results || [])
-        ]
-        
-        if (allResults.length > 0) {
-          searchData = `\n\n🔍 **معلومات من المصادر الرسمية:**\n${allResults.map(result => 
-            `• ${result.title}: ${result.description}`
-          ).join('\n')}\n`
-          console.log(`[${requestId}] Found ${allResults.length} search results`)
-        } else {
-          console.log(`[${requestId}] No search results found`)
-        }
-      } catch (searchError) {
-        console.error(`[${requestId}] Search failed:`, searchError)
+    // Prepare external context that will be injected into the system prompt
+    let externalContext = ''
+    let hasOfficial = false
+
+    // 1) First try to get officialSpecs data and pass it as authoritative context to the AI
+    try {
+      const brandCandidate = carData.carBrand || guessed.brand
+      const rawModelCandidate = mapArabicModelToEnglishIfNeeded(carData.carModel) || carData.carModel || guessed.model
+      const entry = selectOfficialEntry(rawModelCandidate || userQuery, brandCandidate)
+      if (entry) {
+        logger.info('Using officialSpecs for response', { requestId, manufacturer: entry.manufacturer, model: entry.model })
+        const officialText = formatOfficialSpecResponse(entry, carData.year)
+        // Provide official data as hidden context for the AI to generate a natural reply per the system rules
+        externalContext = `\n\n📘 بيانات رسمية من دليل المصنع (للاستخدام الداخلي عند توليد الإجابة – لا تعرض هذا القسم حرفيًا):\n${officialText}\n`
+        hasOfficial = true
       }
-    } else {
-      console.log(`[${requestId}] Skipping search - car data not valid`)
+    } catch (officialErr) {
+      logger.error('Error during officialSpecs lookup', { requestId, error: officialErr })
+    }
+
+    // 2) If no official data, fall back to Brave search + AI (existing behavior)
+    if (!hasOfficial) {
+      logger.info('OfficialSpecs miss, falling back to Brave search + AI', { requestId })
+
+      // Get real-time oil specifications using Brave search
+      if (carData.isValid || !!guessed.brand || !!guessed.model) {
+        try {
+          console.log(`[${requestId}] Searching for oil specifications`)
+          const brandForSearch = carData.carBrand || guessed.brand
+          const modelForSearch = carData.carModel || guessed.model
+          const searchQuery = {
+            carBrand: brandForSearch,
+            carModel: modelForSearch,
+            year: carData.year,
+            queryType: 'oil_capacity' as const
+          }
+          console.log(`[${requestId}] Search query:`, searchQuery)
+          
+          const searchResults = await braveSearchService.searchComprehensiveCarData(
+            brandForSearch,
+            modelForSearch,
+            carData.year
+          )
+          console.log(`[${requestId}] Search results received:`, {
+            hasResults: !!searchResults,
+            oilCapacityResults: searchResults?.oilCapacity?.results?.length || 0,
+            viscosityResults: searchResults?.viscosity?.results?.length || 0,
+            overallConfidence: searchResults?.overallConfidence
+          })
+          
+          const allResults = [
+            ...(searchResults?.oilCapacity?.results || []),
+            ...(searchResults?.viscosity?.results || [])
+          ]
+          
+          if (allResults.length > 0) {
+            externalContext = `\n\n🔍 معلومات من المصادر العامة (للاستخدام في التحليل – قد تكون تقديرية):\n${allResults.map(result => 
+              `• ${result.title}: ${result.description}`
+            ).join('\n')}\n`
+            console.log(`[${requestId}] Found ${allResults.length} search results`)
+          } else {
+            console.log(`[${requestId}] No search results found`)
+          }
+        } catch (searchError) {
+          console.error(`[${requestId}] Search failed:`, searchError)
+        }
+      } else {
+        console.log(`[${requestId}] Skipping search - car data not valid`)
+      }
+    }
+
+    // Inject Denckermann filter info (oil/air) as hidden context when make/model are known
+    try {
+      const make = carData.carBrand || guessed.brand || ''
+      const model = mapArabicModelToEnglishIfNeeded(carData.carModel) || carData.carModel || guessed.model || ''
+
+      if (make && model) {
+        const oilFilter = getVerifiedOilFilter(make, model, carData.year)
+        const airFilter = getVerifiedAirFilter(make, model, carData.year)
+
+        if (oilFilter || airFilter) {
+          const parts: string[] = []
+          if (oilFilter) {
+            parts.push(`• فلتر الزيت (Denckermann): ${oilFilter.filterNumber} — ثقة: ${oilFilter.confidence}`)
+          }
+          if (airFilter) {
+            parts.push(`• فلتر الهواء (Denckermann): ${airFilter.filterNumber} — ثقة: ${airFilter.confidence}`)
+          }
+          externalContext += `\n\n📦 بيانات فلاتر Denckermann (للاستخدام الداخلي فقط — لا تعرض هذا القسم حرفيًا):\n${parts.join('\n')}\nالمصدر: كتالوج Denckermann الرسمي 2024\n`
+          console.log(`[${requestId}] Injected Denckermann filters into context`, { oil: oilFilter?.filterNumber, air: airFilter?.filterNumber })
+        } else {
+          console.log(`[${requestId}] No Denckermann filter found for ${make} ${model}`)
+        }
+      }
+    } catch (filterInjectErr) {
+      console.error(`[${requestId}] Failed injecting Denckermann filters`, filterInjectErr)
     }
 
     // Create OpenRouter client
@@ -532,8 +558,8 @@ export async function POST(request: Request) {
       console.error("Error saving analytics:", err)
     })
 
-    // Prepare system prompt with search data
-    const finalSystemPrompt = openRouter.systemPrompt + searchData
+    // Prepare system prompt with any external context (official or search)
+    const finalSystemPrompt = openRouter.systemPrompt + externalContext
 
     // Create stream response
     console.log(`[${requestId}] Creating streamText response`)
@@ -567,4 +593,271 @@ export async function POST(request: Request) {
       }
     )
   }
+}
+
+// Normalize strings for matching: lowercase, remove non-alphanumerics
+function normalizeKey(input: string): string {
+  return (input || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "")
+}
+
+// Brand alias mapping -> official manufacturer key in officialSpecs
+const officialBrandKeyMap: Record<string, string> = {
+  hyundai: "hyundai",
+  kia: "kia",
+  toyota: "toyota",
+  mg: "mg",
+  nissan: "nissan",
+  suzuki: "suzuki",
+  jetour: "jetour",
+  chery: "chery",
+  geely: "geely",
+  changan: "changan",
+  gwm: "great_wall_motor",
+  "great wall": "great_wall_motor",
+  "great wall motor": "great_wall_motor",
+  great_wall_motor: "great_wall_motor",
+  dodge: "dodge",
+  jeep: "jeep",
+  chevrolet: "chevrolet",
+  genesis: "genesis",
+  bmw: "bmw",
+  mercedes: "mercedes_benz",
+  "mercedes-benz": "mercedes_benz",
+  "mercedes benz": "mercedes_benz",
+}
+
+// Arabic model -> English canonical model mapping (common ones used in the app)
+const arabicToEnglishModelMap: Record<string, string> = {
+  "كامري": "camry",
+  "كورولا": "corolla",
+  "راف4": "rav4",
+  "هايلندر": "highlander",
+  "برادو": "prado",
+  "لاند كروزر": "land cruiser",
+  "النترا": "elantra",
+  "إلنترا": "elantra",
+  "سوناتا": "sonata",
+  "توسان": "tucson",
+  "سنتافي": "santafe",
+  "أكسنت": "accent",
+  "سورنتو": "sorento",
+  "ريو": "rio",
+  "التيما": "altima",
+  "سنترا": "sentra",
+  "باترول": "patrol",
+  "مورانو": "murano",
+  "كامارو": "camaro",
+  "كروز": "cruze",
+  "ماليبو": "malibu",
+}
+
+// Levenshtein distance and similarity
+function levenshtein(a: string, b: string): number {
+  const m = a.length, n = b.length
+  const dp = Array.from({ length: m + 1 }, () => new Array<number>(n + 1).fill(0))
+  for (let i = 0; i <= m; i++) dp[i][0] = i
+  for (let j = 0; j <= n; j++) dp[0][j] = j
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1
+      dp[i][j] = Math.min(
+        dp[i - 1][j] + 1,
+        dp[i][j - 1] + 1,
+        dp[i - 1][j - 1] + cost
+      )
+    }
+  }
+  return dp[m][n]
+}
+
+function similarity(a: string, b: string): number {
+  if (!a && !b) return 1
+  if (!a || !b) return 0
+  const na = normalizeKey(a), nb = normalizeKey(b)
+  const maxLen = Math.max(na.length, nb.length)
+  if (maxLen === 0) return 1
+  const dist = levenshtein(na, nb)
+  return 1 - dist / maxLen
+}
+
+// Build an index of models -> entries from officialSpecs
+type OfficialEntry = { manufacturer: string; model: string; data: any }
+const officialModelIndex: Record<string, OfficialEntry[]> = {}
+let officialIndexBuilt = false
+
+function buildOfficialIndex() {
+  if (officialIndexBuilt) return
+  try {
+    for (const [mfg, models] of Object.entries(officialSpecs as any)) {
+      for (const model of Object.keys(models || {})) {
+        const norm = normalizeKey(model)
+        if (!officialModelIndex[norm]) officialModelIndex[norm] = []
+        officialModelIndex[norm].push({ manufacturer: mfg, model, data: (models as any)[model] })
+      }
+    }
+    officialIndexBuilt = true
+    logger.info("Official specs index built", { modelCount: Object.keys(officialModelIndex).length })
+  } catch (e) {
+    logger.error("Failed building official specs index", { error: e })
+  }
+}
+
+buildOfficialIndex()
+
+function mapBrandToOfficialKey(brand?: string): string | undefined {
+  if (!brand) return undefined
+  const key = brand.toLowerCase()
+  return officialBrandKeyMap[key] || key
+}
+
+function mapArabicModelToEnglishIfNeeded(model?: string): string | undefined {
+  if (!model) return undefined
+  return arabicToEnglishModelMap[model] || model
+}
+
+function isYearInRange(range: string, year?: number): boolean {
+  if (!year) return true
+  // Range formats like "2019-2024", "2024", or contain words (Hybrid/EV)
+  const match = range.match(/(\d{4})(?:\s*[-–]\s*(\d{4}))?/)
+  if (!match) return true // If not a pure year range, keep it (e.g., Hybrid label)
+  const start = parseInt(match[1], 10)
+  const end = match[2] ? parseInt(match[2], 10) : start
+  return year >= start && year <= end
+}
+
+function selectOfficialEntry(modelInput: string, brandCandidate?: string): OfficialEntry | null {
+  if (!modelInput) return null
+  const brandKey = mapBrandToOfficialKey(brandCandidate)
+  // Normalize and optionally translate model
+  const canonicalModel = mapArabicModelToEnglishIfNeeded(modelInput) || modelInput
+  const norm = normalizeKey(canonicalModel)
+
+  // 1) Exact normalized match
+  let entries = officialModelIndex[norm] || []
+  if (brandKey) entries = entries.filter(e => e.manufacturer === brandKey)
+  if (entries.length > 0) return entries[0]
+
+  // 2) Fuzzy match across all models (filtered by brand if provided)
+  let best: { entry: OfficialEntry; score: number } | null = null
+  for (const [modelNorm, list] of Object.entries(officialModelIndex)) {
+    const score = similarity(modelNorm, norm)
+    if (score >= 0.75) {
+      for (const e of list) {
+        if (brandKey && e.manufacturer !== brandKey) continue
+        if (!best || score > best.score) best = { entry: e, score }
+      }
+    }
+  }
+  return best?.entry || null
+}
+
+function formatOfficialSpecResponse(entry: OfficialEntry, year?: number): string {
+  // Only provide official basics (capacity, viscosity, API) in hidden context.
+  // Oil brand options will be generated dynamically by the AI according to the system prompt.
+  const manufacturer = entry.manufacturer
+
+  const header = `✅ المصدر: قاعدة البيانات الرسمية\nالشركة المصنعة: ${manufacturer}\nالموديل: ${entry.model}`
+  const sections: string[] = []
+  const data = entry.data as Record<string, any>
+  for (const [yearRange, specOrEngines] of Object.entries(data)) {
+    if (!isYearInRange(yearRange, year)) continue
+
+    if (specOrEngines && typeof (specOrEngines as any).capacity === "string") {
+      const s = specOrEngines as any
+      const basics = [
+        `🛢️ سعة الزيت: ${s.capacity}`,
+        `⚙️ اللزوجة: ${s.viscosity}`,
+        s.apiSpec ? `🔧 المعيار: ${s.apiSpec}` : undefined,
+      ].filter(Boolean).join('\n')
+      sections.push(`• ${yearRange}:\n${basics}`)
+    } else if (specOrEngines && typeof specOrEngines === "object") {
+      const engines = specOrEngines as Record<string, any>
+      const lines: string[] = []
+      for (const [engine, s] of Object.entries(engines)) {
+        if (!s) continue
+        const basics = [
+          `    🛢️ سعة الزيت: ${s.capacity}`,
+          `    ⚙️ اللزوجة: ${s.viscosity}`,
+          s.apiSpec ? `    🔧 المعيار: ${s.apiSpec}` : undefined,
+        ].filter(Boolean).join('\n')
+        lines.push(`  - ${engine}:\n${basics}`)
+      }
+      if (lines.length) sections.push(`• ${yearRange}:\n${lines.join("\n\n")}`)
+    }
+  }
+
+  if (sections.length === 0) {
+    sections.push("لا توجد مدخلات مطابقة للسنة المحددة. سيتم عرض جميع البيانات المتاحة:")
+    for (const [yearRange, specOrEngines] of Object.entries(data)) {
+      if (specOrEngines && typeof (specOrEngines as any).capacity === "string") {
+        const s = specOrEngines as any
+        const basics = [
+          `🛢️ سعة الزيت: ${s.capacity}`,
+          `⚙️ اللزوجة: ${s.viscosity}`,
+          s.apiSpec ? `🔧 المعيار: ${s.apiSpec}` : undefined,
+        ].filter(Boolean).join('\n')
+        sections.push(`• ${yearRange}:\n${basics}`)
+      } else if (specOrEngines && typeof specOrEngines === "object") {
+        const engines = specOrEngines as Record<string, any>
+        const lines: string[] = []
+        for (const [engine, s] of Object.entries(engines)) {
+          const basics = [
+            `    🛢️ سعة الزيت: ${s.capacity}`,
+            `    ⚙️ اللزوجة: ${s.viscosity}`,
+            s.apiSpec ? `    🔧 المعيار: ${s.apiSpec}` : undefined,
+          ].filter(Boolean).join('\n')
+          lines.push(`  - ${engine}:\n${basics}`)
+        }
+        if (lines.length) sections.push(`• ${yearRange}:\n${lines.join("\n\n")}`)
+      }
+    }
+  }
+
+  return `${header}\n\n${sections.join("\n\n")}`
+}
+
+
+function guessBrandAndModelFromQuery(query: string): { brand?: string; model?: string; brandScore: number; modelScore: number } {
+  const text = (query || '').toLowerCase()
+  const rawTokens = text.split(/[^a-z\u0600-\u06FF0-9]+/).filter(Boolean)
+  const stop = new Set<string>([
+    'oil','capacity','engine','liters','liter','filter','air','fuel','transmission','best','car','model','make','year','motor','cap','size','spec','specs','زيت','سعة','محرك'
+  ])
+  const tokens = rawTokens.filter(w => !/^\d+$/.test(w) && w.length >= 3 && !stop.has(w))
+
+  // Brand candidates: aliases + official keys
+  const brandAliases = new Set<string>([...Object.keys(officialBrandKeyMap), ...Object.keys(officialSpecs as any)])
+  let bestBrand: { alias: string; score: number } | null = null
+  for (const t of tokens) {
+    for (const alias of brandAliases) {
+      const sc = similarity(normalizeKey(t), normalizeKey(alias))
+      if (!bestBrand || sc > bestBrand.score) bestBrand = { alias, score: sc }
+    }
+  }
+  const mappedBrand = bestBrand ? (officialBrandKeyMap[bestBrand.alias] || bestBrand.alias) : undefined
+  const brand = bestBrand && bestBrand.score >= 0.7 ? mappedBrand : undefined
+
+  // Model candidates: from officialModelIndex keys and also try bigrams for phrases like "land cruiser"
+  const modelNorms = Object.keys(officialModelIndex)
+  const bigrams: string[] = []
+  for (let i = 0; i < tokens.length - 1; i++) bigrams.push(tokens[i] + ' ' + tokens[i + 1])
+  const tokenVariants = [...tokens, ...bigrams]
+  let bestModel: { model: string; score: number } | null = null
+  for (const tv of tokenVariants) {
+    const nTv = normalizeKey(tv)
+    for (const m of modelNorms) {
+      const sc = similarity(nTv, m)
+      if (!bestModel || sc > bestModel.score) bestModel = { model: m, score: sc }
+    }
+  }
+  // Find original model string for the best normalized key if available
+  let model: string | undefined
+  if (bestModel && bestModel.score >= 0.7) {
+    const entries = officialModelIndex[bestModel.model]
+    if (entries && entries.length > 0) model = entries[0].model
+  }
+
+  return { brand, model, brandScore: bestBrand?.score || 0, modelScore: bestModel?.score || 0 }
 }

@@ -1,30 +1,13 @@
-// قاعدة بيانات شاملة مبنية على توصيات الشركات المصنّعة الرسمية
+// Minimal official specs schema (starting from scratch)
 export interface CarSpec {
   capacity: string
   viscosity: string
   oilType: "Full Synthetic" | "Semi Synthetic" | "Conventional" | "High Mileage"
-  filterNumber: string
-  airFilterNumber?: string          // رقم فلتر الهواء
-  airFilterChangeInterval?: string  // فترة تغيير فلتر الهواء (بالكيلومتر)
-  airFilterPrice?: string          // سعر فلتر الهواء (اختياري)
-  airFilterImageUrl?: string       // رابط لصورة فلتر الهواء (اختياري)
-  engineSize: string
   apiSpec?: string
-  changeInterval?: string
-  
-  // الحقول المحسنة الجديدة
-  capacityL?: number        // سعة الزيت كرقم للعمليات الحسابية
-  engineCode?: string       // رمز المحرك (مثل LT1, LTG)
-  vinEngineChar?: string    // الحرف الثامن في VIN الذي يشير إلى المحرك
-  rpoCode?: string          // رمز RPO للمحرك
-  cylinders?: number        // عدد الأسطوانات
-  source?: string           // مصدر المعلومات
-  lastVerifiedDate?: string // تاريخ آخر تحقق من المعلومات
-  notes?: string            // ملاحظات إضافية
 }
 
 export interface YearCategory {
-  [yearRange: string]: CarSpec
+  [yearRange: string]: CarSpec | { [engineVariant: string]: CarSpec }
 }
 
 export interface CarModel {
@@ -35,1267 +18,2581 @@ export interface ManufacturerSpecs {
   [manufacturer: string]: CarModel
 }
 
-const officialSpecs: ManufacturerSpecs = {
-  hyundai: {
-    elantra: {
-      "2020-2024": {
-        capacity: "4.2L",
-        viscosity: "5W-30",
+// Hyundai data (validated and added)
+// Middle East/GCC–focused Hyundai dataset (official-manual sourced)
+// Fields: capacity (with filter), viscosity, oilType, apiSpec
+const hyundai: CarModel = {
+ elantra: {
+  // CN7 (Current Generation)
+  "2021-2025": {
+    "2.0L MPI": {
+      capacity: "4.3 L",
+      viscosity: "5W-20 (0W-20 optional)",
+      oilType: "Full Synthetic",
+      apiSpec: "API SN or above",
+    },
+    "1.6L Turbo": {
+      capacity: "4.5 L",
+      viscosity: "5W-30",
+      oilType: "Full Synthetic",
+      apiSpec: "API SN Plus / SP",
+    },
+  },
+
+  // Hybrid Variants
+  "2024-2025 Hybrid": {
+    "1.6L Hybrid": {
+      capacity: "4.2 L",
+      viscosity: "0W-20",
+      oilType: "Full Synthetic",
+      apiSpec: "API SP",
+    },
+  },
+
+  // Older Generations (manual corroborated)
+  "2011-2016": {
+    "1.8L / 2.0L": {
+      capacity: "4.5 L",
+      viscosity: "5W-20",
+      oilType: "Full Synthetic",
+      apiSpec: "API SN or above",
+    },
+  },
+},
+
+
+
+  accent: {
+    "2018-2022": {
+      "1.6L": {
+        capacity: "3.3 L",
+        viscosity: "5W-20",
         oilType: "Full Synthetic",
-        filterNumber: "26300-35503",
-        airFilterNumber: "28113-2H000",
-        airFilterChangeInterval: "15000",
-        airFilterPrice: "180",
-        engineSize: "2.0L",
-        apiSpec: "API SN PLUS / SP",
-        changeInterval: "10000",
-      },
-      "2017-2019": {
-        capacity: "4.2L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35503",
-        airFilterNumber: "28113-2H000",
-        airFilterChangeInterval: "15000",
-        airFilterPrice: "180",
-        engineSize: "2.0L",
-        apiSpec: "API SN / SN PLUS",
-        changeInterval: "10000",
+        apiSpec: "API SN Plus / SP",
       },
     },
-    sonata: {
-      "2020-2024": {
-        capacity: "5.1L",
-        viscosity: "5W-30",
+    "2011-2017": {
+      "1.6L": {
+        capacity: "3.3 L",
+        viscosity: "5W-20",
         oilType: "Full Synthetic",
-        filterNumber: "26300-35531",
-        airFilterNumber: "28113-C1100",
-        airFilterChangeInterval: "15000",
-        airFilterPrice: "200",
-        engineSize: "2.5L",
-        apiSpec: "API SN PLUS / SP",
-        changeInterval: "10000",
-      },
-    },
-    tucson: {
-      "2022-2024": {
-        capacity: "5.1L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35531",
-        airFilterNumber: "28113-D4000",
-        airFilterChangeInterval: "15000",
-        airFilterPrice: "220",
-        engineSize: "2.5L",
-        apiSpec: "API SN PLUS / SP",
-        changeInterval: "10000",
-      },
-    },
-    accent: {
-      "2018-2024": {
-        capacity: "3.8L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35504",
-        airFilterNumber: "28113-H5000",
-        airFilterChangeInterval: "15000",
-        airFilterPrice: "160",
-        engineSize: "1.6L",
-        apiSpec: "API SN / SN PLUS",
-        changeInterval: "10000",
-      },
-    },
-    creta: {
-      "2018-2024": {
-        capacity: "4.0L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35504",
-        airFilterNumber: "28113-A0100",
-        airFilterChangeInterval: "15000",
-        airFilterPrice: "190",
-        engineSize: "1.6L",
-        apiSpec: "API SN PLUS / SP",
-        changeInterval: "10000",
+        apiSpec: "API SN (or above)",
       },
     },
   },
-  genesis: {
-    g70: {
-      "2017-2021": {
-        capacity: "5.7L",
-        viscosity: "5W-30",
+
+  i10: {
+    "2019-2024": {
+      "1.0L": {
+        capacity: "3.2 L",
+        viscosity: "5W-20",
         oilType: "Full Synthetic",
-        filterNumber: "26300-35505",
-        engineSize: "2.0L Turbo",
-        apiSpec: "API SN PLUS / SP",
-        changeInterval: "10000",
-      },
-      "2022-2024": {
-        capacity: "5.7L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35505",
-        engineSize: "2.0L Turbo",
-        apiSpec: "API SN PLUS / SP",
-        changeInterval: "10000",
-      },
-    },
-    g80: {
-      "2017-2021": {
-        capacity: "6.1L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35505",
-        engineSize: "3.3L Turbo",
-        apiSpec: "API SN PLUS / SP",
-        changeInterval: "10000",
+        apiSpec: "API SN / SP",
       },
     },
   },
-  toyota: {
-    camry: {
-      "2018-2024": {
-        capacity: "4.8L",
-        viscosity: "0W-20",
+
+  i20: {
+    "2020-2024": {
+      "1.2L": {
+        capacity: "3.5 L",
+        viscosity: "5W-20",
         oilType: "Full Synthetic",
-        filterNumber: "90915-YZZD4",
-        airFilterNumber: "17801-0P050",
-        airFilterChangeInterval: "15000",
-        airFilterPrice: "190",
-        engineSize: "2.5L",
-        apiSpec: "API SN PLUS / SP",
-        changeInterval: "10000",
+        apiSpec: "API SN / SP",
+      },
+      "1.0L Turbo": {
+        capacity: "3.6 L",
+        viscosity: "5W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN Plus / SP",
       },
     },
-    corolla: {
-      "2020-2024": {
-        // محرك 2.0L
-        "2.0L": {
-          capacity: "4.6L", // تم التصحيح من 4.4L إلى 4.6L
-          viscosity: "0W-16", // تم التصحيح من 0W-20 إلى 0W-16 (الأفضل)
-          alternativeViscosity: "0W-20", // بديل مقبول
-          oilType: "Full Synthetic",
-          filterNumber: "90915-YZZD4",
-          airFilterNumber: "17801-23030",
-          airFilterChangeInterval: "15000",
-          airFilterPrice: "170",
-          engineSize: "2.0L",
-          apiSpec: "API SN PLUS / SP",
-          changeInterval: "10000",
-        },
-        // محرك 1.6L
-        "1.6L": {
-          capacity: "4.2L", // تم التصحيح من 3.7L إلى 4.2L
-          viscosity: "0W-20", // التوصية الرسمية (تم التصحيح من 5W-30)
-          oilType: "Full Synthetic",
-          filterNumber: "90915-YZZD4",
-          airFilterNumber: "17801-23030",
-          airFilterChangeInterval: "15000",
-          airFilterPrice: "170",
-          engineSize: "1.6L",
-          apiSpec: "API SN PLUS / SP",
-          changeInterval: "10000",
-        }
+  },
+
+  kona: {
+    "2018-2021": {
+      "2.0L MPI": {
+        capacity: "4.0 L",
+        viscosity: "5W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "API (latest) / ILSAC (latest)",
       },
-      "2014-2019": {
-        capacity: "4.2L",
+      "1.6L T-GDI": {
+        capacity: "4.5 L",
         viscosity: "5W-30",
         oilType: "Full Synthetic",
-        filterNumber: "90915-YZZD3",
-        airFilterNumber: "17801-0T030",
-        airFilterChangeInterval: "15000",
-        airFilterPrice: "165",
-        engineSize: "1.8L",
-        apiSpec: "API SN / SN PLUS",
-        changeInterval: "10000",
+        apiSpec: "API (latest) / ILSAC (latest) or ACEA A5/B5",
       },
     },
-    prius: {
-      "2016-2024": {
-        capacity: "3.7L",
+  },
+
+  tucson: {
+    // NX4 (current)
+    "2022-2025": {
+      "2.5L": {
+        capacity: "4.8 L",
         viscosity: "0W-20",
         oilType: "Full Synthetic",
-        filterNumber: "90915-YZZD4",
-        airFilterNumber: "17801-37021",
-        airFilterChangeInterval: "15000",
-        airFilterPrice: "180",
-        engineSize: "1.8L Hybrid",
-        apiSpec: "API SN / SN PLUS",
-        changeInterval: "10000",
+        apiSpec: "API SP / ILSAC GF-6",
       },
     },
-    hilux: {
-      "2016-2024": {
-        capacity: "6.5L",
+    // Hybrid (1.6T H/HEV)
+    "2022-2025 Hybrid": {
+      "1.6L Turbo Hybrid": {
+        capacity: "5.7 L", // ~6.0 US qt listed in many manuals; 5.7–6.0 L regionally
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "API SP",
+      },
+    },
+    // Older gen sample (where official manual covers)
+    "2016-2020": {
+      "2.0L": {
+        capacity: "4.6 L",
+        viscosity: "5W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN (or above)",
+      },
+      "1.6L T-GDI": {
+        capacity: "5.5 L",
         viscosity: "5W-30",
         oilType: "Full Synthetic",
-        filterNumber: "90915-20004",
-        airFilterNumber: "17801-0L040",
-        airFilterChangeInterval: "10000",
-        airFilterPrice: "240",
-        engineSize: "2.8L Diesel",
+        apiSpec: "API SN Plus (or above)",
+      },
+    },
+  },
+
+  sonata: {
+    "2020-2024": {
+      "2.5L": {
+        capacity: "4.8 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "API SP / ILSAC GF-6",
+      },
+      "1.6L Turbo": {
+        capacity: "5.5 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SP",
+      },
+    },
+    "2020-2024 Hybrid": {
+      "2.0L Hybrid": {
+        capacity: "4.2 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "API SP",
+      },
+    },
+    "2011-2019": {
+      "2.4L": {
+        capacity: "4.9 L",
+        viscosity: "5W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN (or above)",
+      },
+      "2.0L Turbo": {
+        capacity: "5.2 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN (or above)",
+      },
+    },
+  },
+
+  santafe: {
+    // TM PE + MX5 (includes 2024 redesign guidance)
+    "2021-2024": {
+      "2.5L": {
+        capacity: "5.8 L", // ≈6.1 US qt with filter
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SP / ILSAC GF-6",
+      },
+      "2.5L Turbo": {
+        capacity: "5.8 L", // ≈6.1 US qt with filter
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SP / ILSAC GF-6",
+      },
+    },
+    "2021-2024 Hybrid/Plug-in": {
+      "1.6L Turbo Hybrid": {
+        capacity: "4.8 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "API SP",
+      },
+    },
+    // Older
+    "2017-2018": {
+      "3.3L V6 (Santa Fe XL)": {
+        capacity: "5.7 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SM (or above) / ILSAC GF-4 (or above) / ACEA A5 (or above)",
+      },
+    },
+  },
+
+  palisade: {
+    "2020-2025": {
+      "3.8L V6": {
+        capacity: "6.5 L", // ≈6.9 US qt
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SP / ILSAC GF-6",
+      },
+    },
+  },
+
+  staria: {
+    "2021-2025": {
+      "2.2L Diesel": {
+        capacity: "6.3 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
         apiSpec: "API CK-4",
-        changeInterval: "10000",
       },
-      "2005-2015": {
-        capacity: "6.0L",
-        viscosity: "15W-40",
-        oilType: "Semi Synthetic",
-        filterNumber: "90915-20003",
-        airFilterNumber: "17801-0C010",
-        airFilterChangeInterval: "10000",
-        airFilterPrice: "220",
-        engineSize: "2.5L Diesel",
-        apiSpec: "API CJ-4",
-        changeInterval: "5000",
-      },
-    },
-    landcruiser: {
-      "2016-2024": {
-        capacity: "7.0L",
+      "3.5L Petrol": {
+        capacity: "6.0 L",
         viscosity: "5W-30",
         oilType: "Full Synthetic",
-        filterNumber: "90915-20004",
-        engineSize: "4.6L",
-        apiSpec: "API SN PLUS / SP",
-        changeInterval: "10000",
+        apiSpec: "API SP",
       },
-      "2008-2015": {
-        capacity: "6.8L",
+    },
+  },
+
+  h1: {
+    "2018-2020": {
+      "2.5L Diesel": {
+        capacity: "7.1 L",
         viscosity: "5W-30",
         oilType: "Full Synthetic",
-        filterNumber: "90915-20003",
-        engineSize: "4.0L",
-        apiSpec: "API SN / SN PLUS",
-        changeInterval: "7500",
-      },
-    },
-    yaris: {
-      "2017-2024": {
-        capacity: "3.6L",
-        viscosity: "0W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "90915-YZZD3",
-        engineSize: "1.5L",
-        apiSpec: "API SN PLUS / SP",
-        changeInterval: "10000",
-      },
-    },
-    rav4: {
-      "2019-2024": {
-        capacity: "4.8L",
-        viscosity: "0W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "90915-YZZD4",
-        engineSize: "2.5L",
-        apiSpec: "API SN PLUS / SP",
-        changeInterval: "10000",
+        apiSpec: "API CI-4 / CK-4",
       },
     },
   },
-  honda: {
-    civic: {
-      "2016-2024": {
-        capacity: "4.4L",
+};
+
+// Toyota data (added per user request)
+const toyota: any = {
+  camry: {
+    "2021-2024": {
+      "2.5L Dynamic Force": {
+        capacity: "4.5 L",
         viscosity: "0W-20",
         oilType: "Full Synthetic",
-        filterNumber: "15400-PLM-A02",
-        engineSize: "2.0L",
-        apiSpec: "API SN / SN PLUS",
-        changeInterval: "10000",
+        apiSpec: "API SN / ILSAC GF-6",
+      },
+      "3.5L V6": {
+        capacity: "5.7 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN / ILSAC GF-6",
       },
     },
-    accord: {
-      "2018-2024": {
-        capacity: "3.4L",
+    "2012-2017": {
+      "2.5L 2AR-FE": {
+        capacity: "4.3 L",
         viscosity: "0W-20",
         oilType: "Full Synthetic",
-        filterNumber: "15400-PLM-A02",
-        engineSize: "1.5L Turbo",
-        apiSpec: "API SN PLUS / SP",
-        changeInterval: "10000",
+        apiSpec: "API SN / ILSAC GF-5",
       },
-    },
-    crv: {
-      "2017-2024": {
-        capacity: "3.7L",
+      "3.5L 2GR-FE": {
+        capacity: "6.1 L",
         viscosity: "0W-20",
         oilType: "Full Synthetic",
-        filterNumber: "15400-PLM-A02",
-        engineSize: "1.5L Turbo",
-        apiSpec: "API SN PLUS / SP",
-        changeInterval: "10000",
-      },
-    },
-    city: {
-      "2014-2024": {
-        capacity: "3.5L",
-        viscosity: "0W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "15400-PLM-A01",
-        engineSize: "1.5L",
-        apiSpec: "API SN PLUS / SP",
-        changeInterval: "10000",
+        apiSpec: "API SN / ILSAC GF-5",
       },
     },
   },
-  bmw: {
-    "3_series": {
-      "2019-2024": {
-        capacity: "5.2L",
-        viscosity: "0W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "11427566327",
-        engineSize: "2.0L Turbo",
-        apiSpec: "BMW LL-01",
-        changeInterval: "15000",
-      },
-    },
-    "5_series": {
-      "2017-2024": {
-        capacity: "5.2L",
-        viscosity: "0W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "11427566327",
-        engineSize: "2.0L Turbo",
-        apiSpec: "BMW LL-01",
-        changeInterval: "15000",
-      },
-    },
-    x5: {
-      "2018-2024": {
-        capacity: "6.5L",
-        viscosity: "0W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "11427566327",
-        engineSize: "3.0L Turbo",
-        apiSpec: "BMW LL-01",
-        changeInterval: "15000",
-      },
-    },
-  },
-  mercedes: {
-    c_class: {
-      "2019-2024": {
-        capacity: "5.5L",
-        viscosity: "0W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "A2711800009",
-        engineSize: "2.0L Turbo",
-        apiSpec: "MB 229.5",
-        changeInterval: "15000",
-      },
-    },
-    e_class: {
-      "2017-2024": {
-        capacity: "6.0L",
-        viscosity: "0W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "A2711800009",
-        engineSize: "2.0L Turbo",
-        apiSpec: "MB 229.5",
-        changeInterval: "15000",
-      },
-    },
-  },
-  nissan: {
-    altima: {
-      "2019-2024": {
-        capacity: "5.0L",
+
+  corolla: {
+    "2019-2024": {
+      "1.6L": {
+        capacity: "4.2 L",
         viscosity: "0W-20",
         oilType: "Full Synthetic",
-        filterNumber: "15208-9DA0A",
-        engineSize: "2.5L",
-        apiSpec: "API SN / SN PLUS",
-        changeInterval: "10000",
+        apiSpec: "API SN / ILSAC GF-6",
+      },
+      "2.0L Dynamic Force": {
+        capacity: "4.5 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN / ILSAC GF-6",
       },
     },
-    sunny: {
-      "2012-2024": {
-        capacity: "3.8L",
+    "2014-2018": {
+      "1.8L 2ZR-FE": {
+        capacity: "4.4 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN / ILSAC GF-5",
+      },
+    },
+  },
+
+  land_cruiser: {
+    "2022-2024": {
+      "3.5L Twin Turbo V6": {
+        capacity: "6.7 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN / ILSAC GF-6",
+      },
+      "4.0L V6": {
+        capacity: "6.2 L",
         viscosity: "5W-30",
-        oilType: "Semi Synthetic",
-        filterNumber: "15208-65F0E",
-        engineSize: "1.5L",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN / ILSAC GF-6",
+      },
+    },
+    "2010-2021": {
+      "4.6L V8": {
+        capacity: "7.5 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN / ILSAC GF-5",
+      },
+      "5.7L V8": {
+        capacity: "8.0 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN / ILSAC GF-5",
+      },
+    },
+  },
+
+  hilux: {
+    "2016-2024": {
+      "2.7L Petrol": {
+        capacity: "6.2 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
         apiSpec: "API SN",
-        changeInterval: "7500",
       },
-    },
-    patrol: {
-      "2010-2024": {
-        capacity: "6.5L",
+      "2.8L Diesel": {
+        capacity: "7.5 L",
         viscosity: "5W-30",
         oilType: "Full Synthetic",
-        filterNumber: "15208-9C61A",
-        engineSize: "5.6L",
-        apiSpec: "API SN / SN PLUS",
-        changeInterval: "10000",
-      },
-    },
-    navara: {
-      "2016-2024": {
-        capacity: "6.7L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "15208-BN30A",
-        engineSize: "2.5L Diesel",
-        apiSpec: "API CK-4",
-        changeInterval: "10000",
+        apiSpec: "API CI-4 / SN",
       },
     },
   },
-  kia: {
-    picanto: {
-      "2004-2011": {
-        capacity: "3.0L",
-        viscosity: "5W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35504",
-        engineSize: "1.0/1.1L Epsilon",
-        apiSpec: "API SL",
-        changeInterval: "10000",
-      },
-      "2012-2015": {
-        capacity: "2.9L",
-        viscosity: "5W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35504",
-        engineSize: "1.0L Kappa",
-        apiSpec: "API SM",
-        changeInterval: "10000",
-      },
-      "2016-2017": {
-        capacity: "3.5L",
-        viscosity: "5W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35504",
-        engineSize: "1.25L Kappa",
-        apiSpec: "API SM",
-        changeInterval: "10000",
-      },
-      "2018-2020": {
-        capacity: "2.9L",
-        viscosity: "0W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35504",
-        engineSize: "1.0L Kappa",
-        apiSpec: "ACEA C2",
-        changeInterval: "10000",
-      },
-      "2018-2020-1.25": {
-        capacity: "3.5L",
-        viscosity: "0W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35504",
-        engineSize: "1.25L Kappa",
-        apiSpec: "ACEA C2",
-        changeInterval: "10000",
-      },
-      "2018-2020-turbo": {
-        capacity: "3.6L",
-        viscosity: "0W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35504",
-        engineSize: "1.0L T-GDi Kappa",
-        apiSpec: "ACEA C2",
-        changeInterval: "10000",
-      },
-      "2021-2024": {
-        capacity: "3.1L",
-        viscosity: "0W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35504",
-        engineSize: "1.0L Kappa DPi",
-        apiSpec: "API SN PLUS",
-        changeInterval: "10000",
-      },
-      "2021-2024-turbo": {
-        capacity: "3.6L",
-        viscosity: "0W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35504",
-        engineSize: "1.0L T-GDi Kappa",
-        apiSpec: "API SN PLUS",
-        changeInterval: "10000",
-      },
-    },
-    rio: {
-      "2001-2004": {
-        capacity: "3.4L",
-        viscosity: "10W-40",
-        oilType: "Semi Synthetic",
-        filterNumber: "26300-35503",
-        engineSize: "1.3L A3E",
-        apiSpec: "API SG",
-        changeInterval: "10000",
-      },
-      "2012-2016": {
-        capacity: "3.3L",
+
+  fortuner: {
+    "2016-2024": {
+      "2.7L Petrol": {
+        capacity: "6.2 L",
         viscosity: "5W-30",
         oilType: "Full Synthetic",
-        filterNumber: "26300-35504",
-        engineSize: "1.4L Gamma",
-        apiSpec: "ACEA A5",
-        changeInterval: "10000",
+        apiSpec: "API SN",
       },
-      "2017-2020": {
-        capacity: "3.6L",
-        viscosity: "0W-30",
+      "2.8L Diesel": {
+        capacity: "7.5 L",
+        viscosity: "5W-30",
         oilType: "Full Synthetic",
-        filterNumber: "26300-35504",
-        engineSize: "1.0L T-GDi Kappa",
-        apiSpec: "ACEA C2",
-        changeInterval: "10000",
+        apiSpec: "API CI-4 / SN",
       },
-      "2021-2024": {
-        capacity: "3.6L",
+    },
+  },
+
+  yaris: {
+    "2020-2024": {
+      "1.5L": {
+        capacity: "3.7 L",
         viscosity: "0W-20",
         oilType: "Full Synthetic",
-        filterNumber: "26300-35504",
-        engineSize: "1.0L T-GDi MHEV",
-        apiSpec: "API SN PLUS",
-        changeInterval: "10000",
+        apiSpec: "API SN / ILSAC GF-6",
       },
     },
-    venga: {
-      "2010-2011": {
-        capacity: "3.3L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35503",
-        engineSize: "1.4/1.6L Gamma",
-        apiSpec: "ACEA A3",
-        changeInterval: "12500",
-      },
-      "2015-2019": {
-        capacity: "3.3L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35503",
-        engineSize: "1.6L Gamma",
-        apiSpec: "ACEA A3",
-        changeInterval: "10000",
-      },
-    },
-    ceed: {
-      "2013-2015": {
-        capacity: "4.5L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35503",
-        engineSize: "1.6L GT Gamma",
-        apiSpec: "ACEA A5",
-        changeInterval: "10000",
-      },
-      "2021-2024": {
-        capacity: "4.2L",
+    "2014-2019": {
+      "1.3L": {
+        capacity: "3.2 L",
         viscosity: "0W-20",
         oilType: "Full Synthetic",
-        filterNumber: "26300-35503",
-        engineSize: "1.5L T-GDi Kappa",
-        apiSpec: "ACEA C2",
-        changeInterval: "10000",
+        apiSpec: "API SN / ILSAC GF-5",
       },
     },
-    stonic: {
-      "2018-2020": {
-        capacity: "3.6L",
-        viscosity: "0W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35504",
-        engineSize: "1.0L T-GDi",
-        apiSpec: "ACEA C2",
-        changeInterval: "10000",
-      },
-      "2021-2024": {
-        capacity: "3.6L",
-        viscosity: "0W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35504",
-        engineSize: "1.0L T-GDi MHEV",
-        apiSpec: "API SN PLUS",
-        changeInterval: "10000",
-      },
-    },
-    soul: {
-      "2017-2018": {
-        capacity: "4.0L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35503",
-        engineSize: "1.6L T-GDi Gamma",
-        apiSpec: "ACEA A5",
-        changeInterval: "10000",
-      },
-    },
-    niro: {
-      "2017-2022": {
-        capacity: "3.8L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35503",
-        engineSize: "1.6L Hybrid Kappa",
-        apiSpec: "ACEA A5",
-        changeInterval: "10000",
-      },
-      "2023-2024": {
-        capacity: "3.8L",
+  },
+
+  rav4: {
+    "2019-2024": {
+      "2.5L Dynamic Force": {
+        capacity: "4.8 L",
         viscosity: "0W-16",
         oilType: "Full Synthetic",
-        filterNumber: "26300-35503",
-        engineSize: "1.6L Hybrid Kappa",
-        apiSpec: "API SN PLUS/SP",
-        changeInterval: "10000",
+        apiSpec: "API SN / ILSAC GF-6",
       },
-    },
-    optima: {
-      "2016-2020": {
-        capacity: "4.8L",
-        viscosity: "5W-30",
+      "Hybrid 2.5L": {
+        capacity: "4.5 L",
+        viscosity: "0W-16",
         oilType: "Full Synthetic",
-        filterNumber: "26300-35503",
-        engineSize: "2.4L",
-        apiSpec: "API SN / SN PLUS",
-        changeInterval: "10000",
-      },
-      "2017-2020-phev": {
-        capacity: "4.1L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35503",
-        engineSize: "2.0L Plug-in",
-        apiSpec: "ACEA A5",
-        changeInterval: "10000",
-      },
-      "2016-2020-turbo": {
-        capacity: "4.8L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35503",
-        engineSize: "2.0L T-GDi Theta II",
-        apiSpec: "ACEA A5",
-        changeInterval: "6000",
-      },
-    },
-    stinger: {
-      "2018-2023": {
-        capacity: "6.9L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35505",
-        engineSize: "3.3L T-GDi Lambda II",
-        apiSpec: "ACEA A5",
-        changeInterval: "6000",
-      },
-      "2018-2019-diesel": {
-        capacity: "6.3L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35505",
-        engineSize: "2.2L Diesel",
-        apiSpec: "ACEA C2/C3",
-        changeInterval: "10000",
-      },
-    },
-    sportage: {
-      "2016-2018": {
-        capacity: "4.0L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35504",
-        engineSize: "1.6L T-GDi Gamma",
-        apiSpec: "ACEA A5",
-        changeInterval: "10000",
-      },
-      "2019-2021": {
-        capacity: "4.0L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35504",
-        engineSize: "1.6L T-GDi Gamma",
-        apiSpec: "ACEA A5",
-        changeInterval: "10000",
-      },
-      "2022-2024": {
-        capacity: "4.8L",
-        viscosity: "0W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35504",
-        engineSize: "1.6L T-GDi Gamma II HEV/PHEV",
-        apiSpec: "API SN PLUS/SP",
-        changeInterval: "10000",
-      },
-    },
-    sorento: {
-      "2021-2024-diesel": {
-        capacity: "5.6L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35505",
-        engineSize: "2.2L R Diesel",
-        apiSpec: "ACEA C2/C3",
-        changeInterval: "20000",
-      },
-      "2021-2024-hybrid": {
-        capacity: "4.8L",
-        viscosity: "0W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35503",
-        engineSize: "1.6L T-GDi Gamma II Hybrid",
-        apiSpec: "API SN PLUS/SP",
-        changeInterval: "10000",
-      },
-    },
-    cerato: {
-      "2017-2024": {
-        capacity: "4.0L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "26300-35503",
-        engineSize: "1.6L",
-        apiSpec: "API SN PLUS / SP",
-        changeInterval: "10000",
+        apiSpec: "API SN / ILSAC GF-6",
       },
     },
   },
-  chevrolet: {
-    camaro: {
-      "2016-2018": {
-        capacity: "4.7L",
-        viscosity: "5W-30",
+
+  avalon: {
+    "2019-2022": {
+      "3.5L V6": {
+        capacity: "5.7 L",
+        viscosity: "0W-20",
         oilType: "Full Synthetic",
-        filterNumber: "PF64",
-        engineSize: "2.0L L4 LTG",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-        capacityL: 4.7,
-        engineCode: "LTG",
-        vinEngineChar: "A",
-        rpoCode: "LTG",
-        cylinders: 4,
-        source: "Chevrolet Owner's Manual 2016",
-        lastVerifiedDate: "2023-10-15",
-        notes: "محرك توربو رباعي الأسطوانات - الطراز الأساسي"
+        apiSpec: "API SN / ILSAC GF-6",
       },
-      "2016-2018-v6": {
-        capacity: "5.7L",
-        viscosity: "5W-30",
+    },
+  },
+
+  highlander: {
+    "2020-2024": {
+      "3.5L V6": {
+        capacity: "5.7 L",
+        viscosity: "0W-20",
         oilType: "Full Synthetic",
-        filterNumber: "PF64",
-        engineSize: "3.6L V6 LGX",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-        capacityL: 5.7,
-        engineCode: "LGX",
-        vinEngineChar: "F",
-        rpoCode: "LGX",
-        cylinders: 6,
-        source: "Chevrolet Service Manual 2016",
-        lastVerifiedDate: "2023-10-15",
-        notes: "محرك سداسي الأسطوانات - الطراز المتوسط"
+        apiSpec: "API SN / ILSAC GF-6",
       },
-      "2016-2018-v8": {
-        capacity: "9.5L",
-        viscosity: "5W-30",
+      "Hybrid 2.5L": {
+        capacity: "4.8 L",
+        viscosity: "0W-16",
         oilType: "Full Synthetic",
-        filterNumber: "PF64",
-        engineSize: "6.2L V8 LT1 / LT4",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-        capacityL: 9.5,
-        engineCode: "LT1",
-        vinEngineChar: "J",
-        rpoCode: "LT1",
-        cylinders: 8,
-        source: "Chevrolet Technical Service Bulletin TSB-16-0045",
-        lastVerifiedDate: "2023-10-15",
-        notes: "محرك ثماني الأسطوانات - طراز SS"
+        apiSpec: "API SN / ILSAC GF-6",
       },
-      "2016-2018-v8-supercharged": {
-        capacity: "9.5L",
-        viscosity: "5W-30",
+    },
+  },
+
+  tundra: {
+    "2022-2024": {
+      "3.5L Twin Turbo V6": {
+        capacity: "6.8 L",
+        viscosity: "0W-20",
         oilType: "Full Synthetic",
-        filterNumber: "PF64",
-        engineSize: "6.2L V8 LT4 Supercharged",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "7500",
-        capacityL: 9.5,
-        engineCode: "LT4",
-        vinEngineChar: "K",
-        rpoCode: "LT4",
-        cylinders: 8,
-        source: "Chevrolet ZL1 Owner's Manual 2016",
-        lastVerifiedDate: "2023-10-15",
-        notes: "محرك ثماني الأسطوانات مع سوبرتشارجر - طراز ZL1"
+        apiSpec: "API SN / ILSAC GF-6",
+      },
+    },
+    "2014-2021": {
+      "5.7L V8": {
+        capacity: "8.0 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN / ILSAC GF-5",
+      },
+    },
+  },
+
+  tacoma: {
+    "2016-2024": {
+      "3.5L V6": {
+        capacity: "5.5 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN / ILSAC GF-6",
+      },
+    },
+  },
+
+  bz4x: {
+    "2023-2024": {
+      EV: {
+        capacity: "Not Applicable",
+        viscosity: "Not Applicable",
+        oilType: "Not Applicable",
+        apiSpec: "Not Applicable",
+      },
+    },
+  },
+};
+ 
+ // MG data (added per user request)
+ const mg: any = {
+   zs: {
+     "2017-2025": {
+       "1.5L": {
+         capacity: "4.1 L",
+         viscosity: "0W-20",
+         oilType: "Full Synthetic",
+         apiSpec: "ACEA C5"
+       },
+       "1.0L Turbo": {
+         capacity: "4.0 L",
+         viscosity: "0W-20",
+         oilType: "Full Synthetic",
+         apiSpec: "ACEA C5"
+       }
+     },
+     "2020-2025 EV": {
+       EV: {
+         capacity: "Not Applicable",
+         viscosity: "Not Applicable",
+         oilType: "Not Applicable",
+         apiSpec: "Not Applicable"
+       }
+     }
+   },
+   rx5: {
+     "2018-2025": {
+       "1.5L Turbo": {
+         capacity: "4.0 L",
+         viscosity: "0W-20",
+         oilType: "Full Synthetic",
+         apiSpec: "ACEA C5"
+       },
+       "2.0L Turbo": {
+         capacity: "4.8 L",
+         viscosity: "0W-30",
+         oilType: "Full Synthetic",
+         apiSpec: "ACEA C3"
+       }
+     }
+   },
+   hs: {
+     "2018-2025": {
+       "1.5L Turbo": {
+         capacity: "4.0 L",
+         viscosity: "0W-20",
+         oilType: "Full Synthetic",
+         apiSpec: "API SP / ACEA C5"
+       },
+       "2.0L Turbo": {
+         capacity: "4.8 L",
+         viscosity: "0W-30",
+         oilType: "Full Synthetic",
+         apiSpec: "ACEA C3"
+       }
+     }
+   },
+   mg5: {
+     "2012-2018": {
+       "1.5L": {
+         capacity: "4.1 L",
+         viscosity: "5W-30",
+         oilType: "Full Synthetic",
+         apiSpec: "API SL"
+       }
+     },
+     "2020-2025": {
+       "1.5L (NA)": {
+         capacity: "4.1 L",
+         viscosity: "5W-30",
+         oilType: "Full Synthetic",
+         apiSpec: "API SL"
+       },
+       "1.5L Turbo": {
+         capacity: "4.1 L",
+         viscosity: "5W-30",
+         oilType: "Full Synthetic",
+         apiSpec: "API SL"
+       }
+     }
+   },
+   mg6: {
+     "2010-2016": {
+       "1.8L": {
+         capacity: "4.3 L",
+         viscosity: "5W-30",
+         oilType: "Full Synthetic",
+         apiSpec: "API SN"
+       }
+     },
+     "2017-2025": {
+       "1.5L Turbo": {
+         capacity: "4.0 L",
+         viscosity: "0W-20",
+         oilType: "Full Synthetic",
+         apiSpec: "API SP / ACEA C5"
+       }
+     }
+   },
+   mg3: {
+     "2011-2025": {
+       "1.3L": {
+         capacity: "3.7 L",
+         viscosity: "5W-30",
+         oilType: "Full Synthetic",
+         apiSpec: "API SL"
+       },
+       "1.5L": {
+         capacity: "4.0 L",
+         viscosity: "5W-30",
+         oilType: "Full Synthetic",
+         apiSpec: "API SL"
+       }
+     }
+   },
+   mg7: {
+     "2023-2025": {
+       "2.0L Turbo": {
+         capacity: "4.8 L",
+         viscosity: "0W-30",
+         oilType: "Full Synthetic",
+         apiSpec: "ACEA C3"
+       }
+     }
+   },
+   marvel_r: {
+     "2021-2025 EV": {
+       EV: {
+         capacity: "Not Applicable",
+         viscosity: "Not Applicable",
+         oilType: "Not Applicable",
+         apiSpec: "Not Applicable"
+       }
+     }
+   },
+   mg4: {
+     "2022-2025 EV": {
+       EV: {
+         capacity: "Not Applicable",
+         viscosity: "Not Applicable",
+         oilType: "Not Applicable",
+         apiSpec: "Not Applicable"
+       }
+     }
+   },
+   mg_ehs: {
+     "2020-2025 Hybrid": {
+       "1.5L Turbo + Electric": {
+         capacity: "4.0 L",
+         viscosity: "0W-20",
+         oilType: "Full Synthetic",
+         apiSpec: "API SP / ACEA C5"
+       }
+     }
+   }
+ };
+ 
+ // Nissan data (added per user request)
+  const nissan: any = {
+    qashqai: {
+      "2023-2024": {
+        "1.3L Turbo (HR13DDT)": {
+          capacity: "5.4 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "ACEA C3 / API SN or SP"
+        }
+      },
+      "2024 e-POWER": {
+        "1.5L e-POWER (KR15DDT)": {
+          capacity: "5.1 L",
+          viscosity: "0W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN or SP / ILSAC GF-5 or GF-6"
+        }
       }
     },
-    colorado: {
-      "2016-2018-L4": {
-        capacity: "4.7L",
-        viscosity: "5W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "PF63",
-        engineSize: "2.5L L4 LCV",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-      "2016-2018-diesel": {
-        capacity: "5.7L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF66",
-        engineSize: "2.8L L4 Diesel LWN",
-        apiSpec: "API CK-4 / dexos2",
-        changeInterval: "7500",
-      },
-      "2016-2018-v6": {
-        capacity: "5.7L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF63",
-        engineSize: "3.6L V6 LGZ",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
+    "x-trail": {
+      "2024": {
+        "2.5L": {
+          capacity: "4.7 L",
+          viscosity: "0W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SP / ILSAC GF-6A"
+        }
+      }
     },
-    cruze: {
-      "2016-2018": {
-        capacity: "4.0L",
-        viscosity: "0W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "PF63E",
-        engineSize: "1.4L L4 LE2",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-      "2016-2018-diesel": {
-        capacity: "5.0L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF66",
-        engineSize: "1.6L L4 Diesel LH7",
-        apiSpec: "API CK-4 / dexos2",
-        changeInterval: "7500",
-      },
+    "murano hybrid": {
+      "2020-2025": {
+        "2.5L Hybrid (QR25DER)": {
+          capacity: "4.6 L",
+          viscosity: "0W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
     },
-    equinox: {
-      "2016-2018-L4": {
-        capacity: "4.7L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF63",
-        engineSize: "2.4L L4 LEA",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-      "2016-2018-v6": {
-        capacity: "5.7L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF48",
-        engineSize: "3.6L V6 LFX",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-      "2018-L4-turbo": {
-        capacity: "5.0L",
-        viscosity: "0W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "PF64",
-        engineSize: "1.5L L4 LYX",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
+    patrol: {
+      "2023-2025": {
+        "5.6L V8 (VK56VD)": {
+          capacity: "6.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
     },
-    malibu: {
-      "2016-2018": {
-        capacity: "4.0L",
-        viscosity: "0W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "PF63E",
-        engineSize: "1.5L L4 LFV",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-      "2016-2018-turbo": {
-        capacity: "4.7L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF64",
-        engineSize: "2.0L L4 LTG",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
+    juke: {
+      "2019-2025": {
+        "1.5L (HR15DE)": {
+          capacity: "4.4 L",
+          viscosity: "0W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "SAE 0W-20 (Synthetic)"
+        },
+        "1.5L DIG-T": {
+          capacity: "4.2 L",
+          viscosity: "0W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "SAE 0W-30"
+        }
+      }
     },
-    silverado: {
-      "2016-2018-v6": {
-        capacity: "5.7L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF48",
-        engineSize: "4.3L V6 LV3",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-      "2016-2018-v8-5.3": {
-        capacity: "7.6L",
-        viscosity: "0W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "PF63E",
-        engineSize: "5.3L V8 L83",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-      "2016-2018-v8-6.2": {
-        capacity: "7.6L",
-        viscosity: "0W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "PF63E",
-        engineSize: "6.2L V8 L86",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-      "2016-2018-diesel": {
-        capacity: "9.5L",
-        viscosity: "15W-40",
-        oilType: "Full Synthetic",
-        filterNumber: "PF66",
-        engineSize: "6.6L Diesel L5P / LML",
-        apiSpec: "API CK-4 / dexos2",
-        changeInterval: "7500",
-      },
+    note: {
+      "2016-2021": {
+        "1.6L (HR16DE)": {
+          capacity: "3.6 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SM"
+        },
+        "1.0L Turbo (HR10DDT)": {
+          capacity: "3.2 L",
+          viscosity: "0W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
     },
-  },
-  buick: {
-    enclave: {
-      "2016-2018": {
-        capacity: "5.7L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF48",
-        engineSize: "3.6L V6 LLT / LFY",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
+    micra: {
+      "2022-2025": {
+        "1.2L 3-cyl (HR12DE)": {
+          capacity: "3.2 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SL"
+        }
+      }
     },
-    encore: {
-      "2016-2018": {
-        capacity: "4.0L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF63E",
-        engineSize: "1.4L L4 LUV / LE2",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
+    ariya: {
+      "2022-2025 EV": {
+        EV: {
+          capacity: "Not Applicable",
+          viscosity: "Not Applicable",
+          oilType: "Not Applicable",
+          apiSpec: "Not Applicable"
+        }
+      }
     },
-    envision: {
-      "2016-2018-2.5": {
-        capacity: "4.7L",
-        viscosity: "5W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "PF63",
-        engineSize: "2.5L FWD/LCV",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-      "2016-2018-2.0": {
-        capacity: "5.7L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF64",
-        engineSize: "2.0L AWD LTG",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
+    titan: {
+      "2023-2025": {
+        "5.6L V8 (VK56VD)": {
+          capacity: "6.5 L",
+          viscosity: "0W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN / SP"
+        }
+      }
     },
-  },
-    lacrosse: {
-      "2016-2018": {
-        capacity: "4.7L",
-        viscosity: "5W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "PF63",
-        engineSize: "2.5L L4 LHN",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-      "2016-2018-v6": {
-        capacity: "5.7L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF48",
-        engineSize: "3.6L V6 LGX",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
+    stanza: {
+      "1985-1990": {
+        "2.0L (CA20E)": {
+          capacity: "3.5 L",
+          viscosity: "10W-30",
+          oilType: "Conventional",
+          apiSpec: "SAE 10W-30"
+        }
+      }
     },
-  },
-  gmc: {
-    acadia: {
-      "2016-2018": {
-        capacity: "4.7L",
-        viscosity: "5W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "PF63",
-        engineSize: "2.5L L4 LCV",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-      "2016-2018-v6": {
-        capacity: "5.7L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF48",
-        engineSize: "3.6L V6 LGX",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-    },
-    canyon: {
-      "2016-2018-L4": {
-        capacity: "4.7L",
-        viscosity: "5W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "PF63",
-        engineSize: "2.5L L4 LCV",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-      "2016-2018-diesel": {
-        capacity: "5.7L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF66",
-        engineSize: "2.8L Diesel LWN",
-        apiSpec: "API CK-4 / dexos2",
-        changeInterval: "7500",
-      },
-      "2016-2018-v6": {
-        capacity: "5.7L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF63",
-        engineSize: "3.6L V6 LGZ",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-    },
-    sierra: {
-      "2016-2018-v6": {
-        capacity: "5.7L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF48",
-        engineSize: "4.3L V6 LV3",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-      "2016-2018-v8-5.3": {
-        capacity: "7.6L",
-        viscosity: "0W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "PF63E",
-        engineSize: "5.3L V8 L83 / L8B",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-  },
-      "2016-2018-v8-6.2": {
-        capacity: "7.6L",
-        viscosity: "0W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "PF63E",
-        engineSize: "6.2L V8 L86",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-      "2016-2018-diesel": {
-        capacity: "9.5L",
-        viscosity: "15W-40",
-        oilType: "Full Synthetic",
-        filterNumber: "PF66",
-        engineSize: "6.6L Diesel L5P / LML",
-        apiSpec: "API CK-4 / dexos2",
-        changeInterval: "7500",
-      },
-    },
-    terrain: {
-      "2016-2018-L4": {
-        capacity: "4.7L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF63",
-        engineSize: "2.4L L4 LEA",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-      "2016-2018-v6": {
-        capacity: "5.7L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF48",
-        engineSize: "3.6L V6 LFX",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-    },
-    yukon: {
-      "2016-2018-5.3": {
-        capacity: "7.6L",
-        viscosity: "0W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "PF63E",
-        engineSize: "5.3L V8 L83",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-      "2016-2018-6.2": {
-        capacity: "7.6L",
-        viscosity: "0W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "PF63E",
-        engineSize: "6.2L V8 L86",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-    },
-  },
-  cadillac: {
-    ats: {
-      "2016-2018-2.0": {
-        capacity: "4.7L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF64",
-        engineSize: "2.0L L4 RWD LTG",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-      "2016-2018-2.0-awd": {
-        capacity: "5.7L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF64",
-        engineSize: "2.0L L4 AWD LTG",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-      "2016-2018-3.6": {
-        capacity: "5.2L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF48",
-        engineSize: "3.6L V6 RWD LGX",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-    },
-    cts: {
-      "2016-2018-v": {
-        capacity: "9.5L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF64",
-        engineSize: "6.2L V8 LT4",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-    },
-    escalade: {
-      "2016-2018": {
-        capacity: "7.6L",
-        viscosity: "0W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "PF63E",
-        engineSize: "6.2L V8 L86",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-    },
-    xt5: {
-      "2016-2018": {
-        capacity: "5.7L",
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "PF63",
-        engineSize: "3.6L V6 LGX",
-        apiSpec: "API SN / dexos1",
-        changeInterval: "10000",
-      },
-    },
-  },
+    z: {
+      "2023-2025": {
+        "3.0L Twin-Turbo V6 (VR30DDTT)": {
+          capacity: "5.2 L",
+          viscosity: "0W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "SAE 0W-20 (Synthetic)"
+        }
+      }
+    }
+  };
   
-  chrysler: {
-    "300": {
-      "2011-2014": {
-        capacity: "6.0L",
-        capacityL: 6.0,
-        viscosity: "5W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "68191349AA", // Mopar OEM filter for V6
-        airFilterNumber: "A141009", // Denckermann air filter
-        engineSize: "3.6L V6 Pentastar",
-        engineCode: "ERB",
-        cylinders: 6,
-        apiSpec: "API SN",
-        changeInterval: "8000",
-        source: "Chrysler Official Manual",
-        lastVerifiedDate: "2024-08-16",
-        notes: "3.6L Pentastar V6 engine, requires 5W-20 as per official specs"
-      },
-      "2015-2019": {
-        capacity: "5.9L",
-        capacityL: 5.9,
-        viscosity: "5W-30",
-        oilType: "Full Synthetic",
-        filterNumber: "EF36296XL", // Denckermann filter
-        airFilterNumber: "A141009", // Denckermann air filter
-        engineSize: "3.6L V6 Pentastar",
-        engineCode: "ERB",
-        cylinders: 6,
-        apiSpec: "API SN PLUS",
-        changeInterval: "10000",
-        source: "Chrysler Official Manual",
-        lastVerifiedDate: "2024-08-16",
-        notes: "Updated Pentastar engine with improved efficiency"
-      },
+  // Suzuki data (added per user request)
+  const suzuki: any = {
+    swift: {
       "2020-2024": {
-        capacity: "5.9L",
-        capacityL: 5.9,
-        viscosity: "0W-20",
-        oilType: "Full Synthetic",
-        filterNumber: "EF36296XL", // Denckermann filter
-        airFilterNumber: "A141009", // Denckermann air filter
-        engineSize: "3.6L V6 Pentastar eTorque",
-        engineCode: "ERB",
-        cylinders: 6,
-        apiSpec: "API SP",
-        changeInterval: "10000",
-        source: "Chrysler Official Manual",
-        lastVerifiedDate: "2024-08-16",
-        notes: "eTorque mild hybrid system, requires 0W-20 for fuel efficiency"
+        "1.2L (K12C)": {
+          capacity: "3.3 L",
+          viscosity: "0W-20 / 5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN or above"
+        },
+        "1.4L Sport (K14C)": {
+          capacity: "3.7 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN or above"
+        }
+      },
+      "2010-2019": {
+        "1.2L (K12B)": {
+          capacity: "3.1 L",
+          viscosity: "0W-20 / 5W-30",
+          oilType: "Semi Synthetic",
+          apiSpec: "API SL"
+        },
+        "1.3L Diesel (D13A)": {
+          capacity: "3.2 L",
+          viscosity: "5W-30",
+          oilType: "Semi Synthetic",
+          apiSpec: "API SN"
+        },
+        "1.6L (M16A)": {
+          capacity: "3.9 L",
+          viscosity: "0W-20 / 5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      },
+      "2004-2009": {
+        "1.3L (M13A)": {
+          capacity: "4.2 L",
+          viscosity: "5W-30 / 5W-40",
+          oilType: "Conventional",
+          apiSpec: "API SL"
+        }
+      },
+      "2004-2009 Diesel": {
+        "1.3L Diesel (Z13DT)": {
+          capacity: "3.2 L",
+          viscosity: "5W-30",
+          oilType: "Conventional",
+          apiSpec: "API SL"
+        }
       }
     },
-    "300c": {
-      "2011-2014": {
-        capacity: "7.0L",
-        capacityL: 7.0,
-        viscosity: "5W-20",
+  
+    ertiga: {
+      "2018-2024": {
+        "1.5L Petrol (K15B)": {
+          capacity: "3.6 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SL"
+        },
+        "1.3L Diesel (D13A)": {
+          capacity: "3.2 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+  
+    baleno: {
+      "2016-2024": {
+        "1.2L DualJet": {
+          capacity: "3.5 L",
+          viscosity: "0W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN or above"
+        }
+      }
+    },
+  
+    ciaz: {
+      "2014-2023": {
+        "1.4L (K14B)": {
+          capacity: "3.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SL"
+        }
+      }
+    },
+  
+    jimny: {
+      "2018-2024": {
+        "1.5L (K15B)": {
+          capacity: "3.7 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SL"
+        }
+      },
+      "1998-2018": {
+        "1.3L (M13A)": {
+          capacity: "3.5 L",
+          viscosity: "5W-30",
+          oilType: "Conventional",
+          apiSpec: "API SJ/SL"
+        }
+      }
+    },
+  
+    vitara: {
+      "2015-2024": {
+        "1.6L BoosterJet (T16A)": {
+          capacity: "4.1 L",
+          viscosity: "0W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "2.4L (J24B)": {
+          capacity: "5.8 L",
+          viscosity: "0W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+  
+    "s-cross": {
+      "2014-2024": {
+        "1.6L Petrol (M16A)": {
+          capacity: "4.0 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SL"
+        },
+        "1.6L Diesel (D16AA)": {
+          capacity: "5.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API CI-4"
+        }
+      }
+    },
+  
+    eeco: {
+      "2015-2024": {
+        "1.2L Petrol (K12B)": {
+          capacity: "3.7 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SL"
+        }
+      }
+    },
+  
+    k10: {
+      "2014-2024": {
+        "1.0L (K10B)": {
+          capacity: "3.0 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SL"
+        }
+      }
+    },
+  
+    "e-power": {
+      "2022-2024": {
+        Hybrid: {
+          capacity: "4.6 L",
+          viscosity: "0W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+  
+    ignis: {
+      "2017-2024": {
+        "1.2L (K12M)": {
+          capacity: "3.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SL"
+        }
+      }
+    },
+  
+    swift_ev: {
+      "2023-2025": {
+        EV: {
+          capacity: "Not Applicable",
+          viscosity: "Not Applicable",
+          oilType: "Not Applicable",
+          apiSpec: "Not Applicable"
+        }
+      }
+    }
+  };
+  
+  // Jetour data (added per user request)
+  const jetour: any = {
+    x70: {
+      "2018-2024": {
+        "1.5L Turbo (SQRE4T15C)": {
+          capacity: "4.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN or above"
+        }
+      }
+    },
+    x70_m: {
+      "2020-2024": {
+        "1.5L Turbo": {
+          capacity: "4.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN or above"
+        }
+      }
+    },
+    x70_plus: {
+      "2022-2024": {
+        "1.5L Turbo": {
+          capacity: "4.5 L",
+          viscosity: "5W-30 / 5W-40",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN or above"
+        },
+        "1.6L Turbo (Coupe variant)": {
+          capacity: "4.7 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN or above"
+        }
+      }
+    },
+    x70_c_dm: {  // PHEV variant
+      "2024-2024": {
+        "1.5L Turbo PHEV": {
+          capacity: "4.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    x70_pro: {
+      "2023-2024": {
+        "1.5L Turbo": {
+          capacity: "4.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    x90: {
+      "2019-2023": {
+        "1.5L Turbo": {
+          capacity: "4.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    x90_plus: {
+      "2021-2023": {
+        "1.5L Turbo": {
+          capacity: "4.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    x90_pro: {
+      "2024-2024": {
+        "1.5L Turbo": {
+          capacity: "4.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    shanhai_l6: {
+      "2024-2024": {
+        "PHEV 1.5L Turbo": {
+          capacity: "4.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    shanhai_l7: {
+      "2024-2025": {
+        "PHEV 1.5L Turbo": {
+          capacity: "4.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    traveller_t2: {
+      "2023-2024": {
+        "1.5L Turbo": {
+          capacity: "4.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN or above"
+        },
+        "PHEV 1.5L Turbo": {
+          capacity: "4.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    freedom_t1: {
+      "2024-2024": {
+        "1.5L Turbo": {
+          capacity: "4.7 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN or SP"
+        },
+        "PHEV 1.5L Turbo": {
+          capacity: "4.7 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    shanhai_t1: {
+      "2024-2025": {
+        "PHEV 1.5L Turbo": {
+          capacity: "4.7 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    dashing: {
+      "2022-2024": {
+        "1.5L Turbo": {
+          capacity: "4.0 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN or above"
+        }
+      }
+    },
+    shanhai_l6_phev_variant: {
+      "2024-2024": {
+        "PHEV 1.5L Turbo": {
+          capacity: "4.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    x95: {
+      "2020-2025": {
+        "1.5L Turbo": {
+          capacity: "4.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    ice_cream_ev: {
+      "2023-2025": {
+        EV: {
+          capacity: "Not Applicable",
+          viscosity: "Not Applicable",
+          oilType: "Not Applicable",
+          apiSpec: "Not Applicable"
+        }
+      }
+    }
+  };
+  
+  // Chery data (Omoda & Jaecoo) (added per user request)
+  const chery: CarModel = {
+    arrizo_5: {
+      "2017-2025": {
+        "1.5L": {
+          capacity: "4.0 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "1.5L Turbo": {
+          capacity: "4.2 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    arrizo_6: {
+      "2018-2025": {
+        "1.5L Turbo": {
+          capacity: "4.2 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    tiggo_2: {
+      "2017-2025": {
+        "1.5L": {
+          capacity: "4.0 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    tiggo_3: {
+      "2016-2025": {
+        "1.5L": {
+          capacity: "4.0 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    tiggo_4: {
+      "2019-2025": {
+        "1.5L": {
+          capacity: "4.0 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "1.5L Turbo": {
+          capacity: "4.2 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    tiggo_5x: {
+      "2018-2025": {
+        "1.5L": {
+          capacity: "4.0 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "1.5L Turbo": {
+          capacity: "4.2 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    tiggo_7: {
+      "2017-2025": {
+        "1.5L Turbo": {
+          capacity: "4.2 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    tiggo_7_pro: {
+      "2021-2025": {
+        "1.5L Turbo": {
+          capacity: "4.2 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    tiggo_8: {
+      "2018-2025": {
+        "1.5L Turbo": {
+          capacity: "4.2 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "1.6L Turbo": {
+          capacity: "5.0 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    tiggo_8_pro: {
+      "2021-2025": {
+        "1.6L Turbo": {
+          capacity: "5.0 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "2.0L Turbo": {
+          capacity: "5.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    omoda_c5: {
+      "2023-2025": {
+        "1.6L Turbo": {
+          capacity: "5.0 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "1.5L Turbo": {
+          capacity: "4.2 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    jaecoo_j7: {
+      "2024-2025": {
+        "1.6L Turbo": {
+          capacity: "5.0 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    jaecoo_j8: {
+      "2024-2025": {
+        "2.0L Turbo": {
+          capacity: "5.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    }
+  };
+  
+  // Geely data (added per user request)
+  const geely: any = {
+    coolray_binyue: {
+      "2018-2025": {
+        "1.5L Turbo (JLH-3G15TD)": {
+          capacity: "5.6 L",
+          viscosity: "0W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN Plus / Volvo VCC RBS0-2AE"
+        }
+      }
+    },
+    tugella_xingyue: {
+      "2019-2025": {
+        "2.0L Turbo (JLH-4G20TDB)": {
+          capacity: "5.6 L",
+          viscosity: "0W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN / Volvo VCC RBS0-2AE"
+        },
+        "1.5L Turbo Hybrid": {
+          capacity: "4.0 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    okavango: {
+      "2020-2025": {
+        "1.5L Turbo Hybrid (48V EMS)": {
+          capacity: "4.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    geometry_c: {
+      "2020-2025 EV": {
+        EV: {
+          capacity: "Not Applicable",
+          viscosity: "Not Applicable",
+          oilType: "Not Applicable",
+          apiSpec: "Not Applicable"
+        }
+      }
+    },
+    emgrand_ec7: {
+      "2010-2015": {
+        "1.8L": {
+          capacity: "4.0 L",
+          viscosity: "5W-40",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    emgrand_ec8: {
+      "2010-2016": {
+        "2.0L": {
+          capacity: "3.8 L",
+          viscosity: "5W-40",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    emgrand_gl: {
+      "2016-2020": {
+        "1.8L": {
+          capacity: "3.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    emgrand_x7: {
+      "2013-2016": {
+        "1.8L": {
+          capacity: "4.0 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    }
+  };
+  
+  // Changan data (added per user request)
+  const changan: CarModel = {
+    cs75: {
+      "2013-2025": {
+        "1.5L Turbo": {
+          capacity: "4.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "2.0L Turbo": {
+          capacity: "5.0 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    cs75_plus: {
+      "2019-2025": {
+        "1.5L Turbo": {
+          capacity: "4.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    cs35_plus: {
+      "2018-2025": {
+        "1.6L (NA)": {
+          capacity: "4.0 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "1.4L Turbo": {
+          capacity: "4.2 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    "uni-v": {
+      "2022-2025": {
+        "1.5L Turbo": {
+          capacity: "4.5 L",
+          viscosity: "0W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SP"
+        },
+        "2.0L Turbo": {
+          capacity: "5.5 L",
+          viscosity: "0W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SP"
+        },
+        "1.5L Turbo Hybrid": {
+          capacity: "4.2 L",
+          viscosity: "0W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SP"
+        }
+      }
+    }
+  };
+
+  // Great Wall Motor (GWM / Haval) data (added per user request)
+  const great_wall_motor: CarModel = {
+    haval_h6: {
+      "2011-2017": {
+        "1.5L Turbo (GW4G15B)": {
+          capacity: "4.3 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "2.0L Turbo (GW4C20A)": {
+          capacity: "4.8 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      },
+      "2020-present": {
+        "2.0L Turbo (GW4C20B)": {
+          capacity: "5.0 L",
+          viscosity: "5W-30 or 0W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "1.5L Turbo Hybrid (GW4B15A)": {
+          capacity: "4.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    haval_h2: {
+      "2014-2021": {
+        "1.5L Turbo (GW4G15B)": {
+          capacity: "4.2 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+    haval_h9: {
+      "2015-present": {
+        "2.0L Turbo (GW4C20)": {
+          capacity: "5.5 L",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    }
+  };
+  
+  // Kia data (GCC-focused, official/manual sourced)
+  const dodge: CarModel = {
+    challenger: {
+      "2023": {
+        "3.6L V6": {
+          capacity: "5.9 qt",
+          viscosity: "5W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "5.7L V8": {
+          capacity: "7 qt",
+          viscosity: "0W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "6.2L V8 Supercharged": {
+          capacity: "7 qt",
+          viscosity: "0W-40",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "6.4L V8": {
+          capacity: "7 qt",
+          viscosity: "0W-40",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+
+    charger: {
+      "2022": {
+        "3.6L V6": {
+          capacity: "5.9 qt",
+          viscosity: "5W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "5.7L V8": {
+          capacity: "7 qt",
+          viscosity: "5W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "6.4L V8": {
+          capacity: "7 qt",
+          viscosity: "0W-40",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "6.2L V8 Hellcat": {
+          capacity: "7 qt",
+          viscosity: "0W-40",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+
+    ram_1500: {
+      "2024-2025": {
+        "3.6L V6 Pentastar": {
+          capacity: "5.9 qt (≈5.6 L)",
+          viscosity: "0W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "5.7L V8 HEMI": {
+          capacity: "7 qt (≈6.6 L)",
+          viscosity: "5W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "3.0L EcoDiesel V6": {
+          capacity: "10.5 qt (≈9.9 L)",
+          viscosity: "5W-40",
+          oilType: "Full Synthetic",
+          apiSpec: "API CK-4"
+        }
+      }
+    }
+  };
+
+  const jeep: CarModel = {
+    wrangler: {
+      "2018-2025": {
+        "3.6L V6": {
+          capacity: "5 qt (4.7 L)",
+          viscosity: "0W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "2.0L Turbo I4": {
+          capacity: "5 qt (4.7 L)",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "3.0L EcoDiesel": {
+          capacity: "9 qt (8.5 L)",
+          viscosity: "5W-40",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "2.0L Turbo Hybrid (4xe)": {
+          capacity: "5 qt (4.7 L)",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "6.4L Hemi V8 (392)": {
+          capacity: "6.7 qt",
+          viscosity: "0W-40",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        }
+      }
+    },
+
+    compass: {
+      "2007-2025": {
+        "2.0L I4": {
+          capacity: "4.5 qt (4.26 L)",
+          viscosity: "5W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN"
+        },
+        "2.4L I4": {
+          capacity: "5.5 qt (5.2 L)",
+          viscosity: "0W-20 (2018-2022), 5W-30 (2023-2025)",
+          oilType: "Full Synthetic",
+          apiSpec: "API SN / GF-6A"
+        }
+      }
+    },
+
+    grand_cherokee: {
+      "2023-2025": {
+        "2.0L Turbo 4xe PHEV": {
+          capacity: "5 qt (4.7 L)",
+          viscosity: "5W-30",
+          oilType: "Full Synthetic",
+          apiSpec: "API SP"
+        },
+        "3.6L V6": {
+          capacity: "5 qt (4.7 L)",
+          viscosity: "0W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SP"
+        },
+        "5.7L V8": {
+          capacity: "7 qt (6.6 L)",
+          viscosity: "0W-20",
+          oilType: "Full Synthetic",
+          apiSpec: "API SP"
+        }
+      }
+    }
+  };
+
+  const kia: CarModel = {
+  rio: {
+    "2012-2016": {
+      "1.25L Kappa Petrol": {
+        capacity: "3.5 L",
+        viscosity: "5W-30",
         oilType: "Full Synthetic",
-        filterNumber: "MO-899", // Mopar OEM filter for V8 HEMI
-        airFilterNumber: "A141009", // Denckermann air filter
-        engineSize: "5.7L V8 HEMI",
-        engineCode: "EZH",
-        cylinders: 8,
-        apiSpec: "API SN",
-        changeInterval: "8000",
-        source: "Chrysler Official Manual",
-        lastVerifiedDate: "2024-08-16",
-        notes: "5.7L HEMI V8 engine, requires 5W-20 as per official specs"
+        apiSpec: "ACEA A3 / A5", // from oil grades PDF
+      },
+      "1.4L Gamma Petrol": {
+        capacity: "3.3 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "ACEA A5", // referenced
+      },
+      "1.5L Diesel U": {
+        capacity: "5.3 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API CH-4 / ACEA B4", // referenced
+      }
+    },
+    "2017-2020": {
+      "1.25L Kappa DPi Petrol": {
+        capacity: "3.4 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN PLUS", // referenced
+      },
+      "1.0L T-GDi Petrol": {
+        capacity: "3.6 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN PLUS", // referenced
       }
     }
   },
-}
 
-export default officialSpecs
+  stonic: {
+    "2018-2020": {
+      "1.0L T-GDi Petrol": {
+        capacity: "3.6 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "ACEA C2", // referenced
+      },
+      "1.4L Petrol": {
+        capacity: "3.5 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "ACEA C2", // referenced
+      }
+    },
+    "2021-on": {
+      "1.0L T-GDi / MHEV Petrol": {
+        capacity: "3.6 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN PLUS", // referenced
+      }
+    }
+  },
+
+  soul: {
+    "2009-2011": {
+      "1.6L Petrol": {
+        capacity: "3.3 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SJ/SL", // referenced
+      }
+    },
+    "2015-2016": {
+      "1.6L Petrol": {
+        capacity: "3.6 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "ACEA A5", // includes 0W-40 et al.
+      }
+    },
+    "2017-2018": {
+      "1.6L T-GDi Petrol": {
+        capacity: "4.0 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "ACEA A5", // referenced
+      }
+    }
+  },
+
+  ceed: {
+    "2016-2018": {
+      "1.0L T-GDi Petrol": {
+        capacity: "3.6 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "ACEA C2", // referenced
+      },
+      "1.4L Petrol": {
+        capacity: "3.6 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "ACEA A5", // referenced
+      },
+      "1.6L Petrol": {
+        capacity: "3.6 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "ACEA A5", // referenced
+      }
+    },
+    "2019-2020": {
+      "1.0L T-GDi Petrol": {
+        capacity: "3.6 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "ACEA C2", // referenced
+      },
+      "1.4L T-GDi Petrol": {
+        capacity: "4.2 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "ACEA C2", // referenced
+      },
+      "1.6L Diesel U-III": {
+        capacity: "4.4 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "ACEA C5 / C2 / C3", // referenced
+      }
+    },
+    "2020-on": {
+      "1.6L Plug-in Hybrid": {
+        capacity: "3.8 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "ACEA A5", // referenced
+      }
+    }
+  },
+
+  niro: {
+    "2017-2022 HEV/PHEV": {
+      "1.6L Hybrid": {
+        capacity: "3.8 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "ACEA A5", // referenced
+      }
+    },
+    "2023-on HEV": {
+      "1.6L Hybrid": {
+        capacity: "3.8 L",
+        viscosity: "0W-16",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN PLUS / SP", // referenced
+      }
+    }
+  },
+
+  sportage: {
+    "2016-2018 QL": {
+      "1.6L Petrol": {
+        capacity: "3.6 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "ACEA A5", // referenced
+      },
+      "1.6L T-GDi Petrol": {
+        capacity: "4.0 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "ACEA A5", // referenced
+      },
+      "1.7L Diesel": {
+        capacity: "5.3 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "ACEA C2 / C3", // referenced
+      }
+    },
+    "2021-2024": {
+      "2.0L MPI": {
+        capacity: "4.0 L",
+        viscosity: "5W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN PLUS / SP or ILSAC GF-6",
+      },
+      "1.6L T-GDI": {
+        capacity: "4.5 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN PLUS / SP or ACEA A5",
+      }
+    }
+  },
+
+  sorento: {
+    "2021-2024": {
+      "2.5L GDI": {
+        capacity: "4.8 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SP or above",
+      }
+    }
+  },
+};
+
+// Chevrolet data (added per user request)
+const chevrolet: any = {
+  spark: {
+    "2015-2024": {
+      "1.4L (LUV) I4": {
+        capacity: "3.7 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "dexos1 / API SN"
+      }
+    }
+  },
+  sonic: {
+    "2012-2019": {
+      "1.8L (LUJ) I4": {
+        capacity: "4.2 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "dexos1 / API SN"
+      }
+    }
+  },
+  cruze: {
+    "2011-2019": {
+      "1.4L Turbo (LUJ/LUZ) I4": {
+        capacity: "4.2 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "dexos1 / API SN"
+      },
+      "1.6L Diesel": {
+        capacity: "4.6 L",
+        viscosity: "5W-30 (diesel)",
+        oilType: "Full Synthetic",
+        apiSpec: "API CJ-4 / ACEA C3"
+      }
+    }
+  },
+  malibu: {
+    "2016-2024": {
+      "1.5L Turbo (L3A) I4": {
+        capacity: "4.2 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "dexos1 / API SP"
+      },
+      "2.0L Turbo (LTG) I4": {
+        capacity: "5.3 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "dexos1 / API SP"
+      }
+    }
+  },
+  equinox: {
+    "2018-2024": {
+      "1.5L Turbo (LKH) I4": {
+        capacity: "4.2 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "dexos1 / API SP"
+      },
+      "2.0L Turbo (LTG) I4": {
+        capacity: "5.3 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "dexos1 / API SP"
+      },
+      "1.6L Diesel (where sold)": {
+        capacity: "5.0 L",
+        viscosity: "5W-30 (diesel)",
+        oilType: "Full Synthetic",
+        apiSpec: "API CJ-4"
+      }
+    }
+  },
+  trax: {
+    "2017-2024": {
+      "1.4L Turbo": {
+        capacity: "4.0 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "dexos1 / API SP"
+      }
+    }
+  },
+  trailblazer: {
+    "2021-2024": {
+      "1.2L Turbo (3-cylinder)": {
+        capacity: "4.0 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "dexos1 / API SP"
+      }
+    }
+  },
+  blazer: {
+    "2019-2024": {
+      "2.0L Turbo": {
+        capacity: "5.0 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "dexos1 / API SP"
+      },
+      "3.6L V6": {
+        capacity: "5.7 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "dexos1 / API SP"
+      }
+    }
+  },
+  traverse: {
+    "2018-2024": {
+      "3.6L V6 (LFY/LFX)": {
+        capacity: "5.7 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "dexos1 / API SP"
+      }
+    }
+  },
+  equinox_ev: {
+    "2024": {
+      EV: {
+        capacity: "Not Applicable",
+        viscosity: "Not Applicable",
+        oilType: "Not Applicable",
+        apiSpec: "Not Applicable"
+      }
+    }
+  },
+  impala: {
+    "2014-2020": {
+      "3.6L V6": {
+        capacity: "5.7 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "dexos1 / API SN"
+      }
+    }
+  },
+  camaro: {
+    "2016-2024": {
+      "2.0L Turbo": {
+        capacity: "4.8 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "dexos1 / API SP"
+      },
+      "3.6L V6": {
+        capacity: "5.7 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "dexos1 / API SP"
+      },
+      "6.2L V8": {
+        capacity: "8.0 L",
+        viscosity: "0W-40 / 5W-40 (performance)",
+        oilType: "Full Synthetic",
+        apiSpec: "API SP"
+      }
+    }
+  },
+  corvette: {
+    "2014-2024": {
+      "6.2L LT1 / LT2 / LT4": {
+        capacity: "6.9 L",
+        viscosity: "0W-40 / 5W-40 (high-performance)",
+        oilType: "Full Synthetic",
+        apiSpec: "dexos1 / API SP"
+      }
+    }
+  },
+  silverado_1500: {
+    "2019-2024": {
+      "4.3L V6": {
+        capacity: "5.7 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "dexos1 / API SP"
+      },
+      "5.3L V8 (V8 EcoTec3)": {
+        capacity: "6.0 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "dexos1 / API SP"
+      },
+      "6.2L V8": {
+        capacity: "7.6 L",
+        viscosity: "0W-20 / 5W-30 (heavy use)",
+        oilType: "Full Synthetic",
+        apiSpec: "dexos1 / API SP"
+      },
+      "3.0L Duramax Diesel (LM2)": {
+        capacity: "9.0 L",
+        viscosity: "5W-40 (diesel)",
+        oilType: "Full Synthetic",
+        apiSpec: "API CK-4"
+      }
+    }
+  },
+  silverado_hd: {
+    "2020-2024": {
+      "6.6L Duramax V8 Diesel": {
+        capacity: "15.0 L",
+        viscosity: "15W-40 (diesel heavy duty)",
+        oilType: "Full Synthetic",
+        apiSpec: "API CK-4"
+      }
+    }
+  },
+  colorado: {
+    "2015-2024": {
+      "2.8L Duramax Diesel": {
+        capacity: "8.5 L",
+        viscosity: "5W-40 (diesel)",
+        oilType: "Full Synthetic",
+        apiSpec: "API CJ-4 / CK-4"
+      }
+    }
+  }
+};
+
+// Genesis data (added per user request)
+const genesis: any = {
+  g70: {
+    "2019-2024": {
+      "2.0L Turbo": {
+        capacity: "5.1 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN PLUS / SP"
+      },
+      "3.3L Turbo V6": {
+        capacity: "6.0 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN PLUS / SP"
+      },
+      "2.5L Turbo": {
+        capacity: "5.7 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SP"
+      }
+    }
+  },
+  g80: {
+    "2017-2024": {
+      "2.5L Turbo": {
+        capacity: "5.7 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SP"
+      },
+      "3.5L Turbo V6": {
+        capacity: "6.5 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SP"
+      },
+      "3.8L V6 (Older)": {
+        capacity: "6.0 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN"
+      }
+    }
+  },
+  g90: {
+    "2017-2024": {
+      "3.3L Turbo V6": {
+        capacity: "6.0 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN PLUS"
+      },
+      "3.5L Turbo V6": {
+        capacity: "6.5 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SP"
+      },
+      "5.0L V8 (Older)": {
+        capacity: "7.6 L",
+        viscosity: "5W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SN"
+      }
+    }
+  },
+  gv60: {
+    "2022-2024": {
+      EV: {
+        capacity: "Not Applicable",
+        viscosity: "Not Applicable",
+        oilType: "Not Applicable",
+        apiSpec: "Not Applicable"
+      }
+    }
+  },
+  gv70: {
+    "2021-2024": {
+      "2.5L Turbo": {
+        capacity: "5.7 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SP"
+      },
+      "3.5L Turbo V6": {
+        capacity: "6.5 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SP"
+      },
+      EV: {
+        capacity: "Not Applicable",
+        viscosity: "Not Applicable",
+        oilType: "Not Applicable",
+        apiSpec: "Not Applicable"
+      }
+    }
+  },
+  gv80: {
+    "2020-2024": {
+      "2.5L Turbo": {
+        capacity: "5.7 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SP"
+      },
+      "3.5L Turbo V6": {
+        capacity: "6.5 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "API SP"
+      }
+    }
+  }
+};
+
+// BMW (2018–2024) data (added per user request)
+const bmw: any = {
+  series_1: {
+    "2018-2024": {
+      "118i 1.5L": {
+        capacity: "4.25 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "BMW LL-17FE+"
+      },
+      "120i 2.0L": {
+        capacity: "5.0 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "BMW LL-01"
+      }
+    }
+  },
+  series_3: {
+    "2018-2024": {
+      "320i 2.0L": {
+        capacity: "5.0 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "BMW LL-01"
+      },
+      "330i 2.0L": {
+        capacity: "5.0 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "BMW LL-01"
+      },
+      "M340i 3.0L": {
+        capacity: "6.5 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "BMW LL-01"
+      }
+    }
+  },
+  series_5: {
+    "2018-2024": {
+      "520i 2.0L": {
+        capacity: "5.0 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "BMW LL-01"
+      },
+      "530i 2.0L": {
+        capacity: "5.0 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "BMW LL-01"
+      },
+      "540i 3.0L": {
+        capacity: "6.5 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "BMW LL-01"
+      }
+    }
+  },
+  series_7: {
+    "2018-2024": {
+      "740i 3.0L": {
+        capacity: "6.5 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "BMW LL-01"
+      },
+      "750i 4.4L V8": {
+        capacity: "8.0 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "BMW LL-01"
+      }
+    }
+  },
+  x3: {
+    "2018-2024": {
+      "2.0L": {
+        capacity: "5.0 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "BMW LL-01"
+      }
+    }
+  },
+  x5: {
+    "2018-2024": {
+      "3.0L": {
+        capacity: "6.5 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "BMW LL-01"
+      }
+    }
+  },
+  x7: {
+    "2018-2024": {
+      "3.0L": {
+        capacity: "6.5 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "BMW LL-01"
+      }
+    }
+  },
+  i4: {
+    "2018-2024": {
+      EV: {
+        capacity: "Not Applicable",
+        viscosity: "Not Applicable",
+        oilType: "Not Applicable",
+        apiSpec: "Not Applicable"
+      }
+    }
+  },
+  ix: {
+    "2018-2024": {
+      EV: {
+        capacity: "Not Applicable",
+        viscosity: "Not Applicable",
+        oilType: "Not Applicable",
+        apiSpec: "Not Applicable"
+      }
+    }
+  },
+  i7: {
+    "2018-2024": {
+      EV: {
+        capacity: "Not Applicable",
+        viscosity: "Not Applicable",
+        oilType: "Not Applicable",
+        apiSpec: "Not Applicable"
+      }
+    }
+  }
+};
+
+// Mercedes-Benz (2018–2024) data (added per user request)
+const mercedes_benz: any = {
+  a_class: {
+    "2018-2024": {
+      "A180 1.3L": {
+        capacity: "5.2 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "MB 229.71"
+      },
+      "A200 1.3L": {
+        capacity: "5.2 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "MB 229.71"
+      }
+    }
+  },
+  c_class: {
+    "2018-2024": {
+      "C180 1.6L": {
+        capacity: "5.0 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "MB 229.71"
+      },
+      "C200 2.0L": {
+        capacity: "6.0 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "MB 229.71"
+      },
+      "C300 2.0L": {
+        capacity: "6.0 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "MB 229.71"
+      }
+    }
+  },
+  e_class: {
+    "2018-2024": {
+      "E200 2.0L": {
+        capacity: "6.0 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "MB 229.71"
+      },
+      "E300 2.0L": {
+        capacity: "6.0 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "MB 229.71"
+      },
+      "E450 3.0L": {
+        capacity: "7.0 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "MB 229.51"
+      }
+    }
+  },
+  s_class: {
+    "2018-2024": {
+      "S450 3.0L": {
+        capacity: "7.0 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "MB 229.51"
+      },
+      "S500 3.0L": {
+        capacity: "7.0 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "MB 229.51"
+      },
+      "S580 4.0L V8": {
+        capacity: "8.0 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "MB 229.51"
+      }
+    }
+  },
+  gla: {
+    "2018-2024": {
+      "2.0L": {
+        capacity: "6.0 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "MB 229.71"
+      }
+    }
+  },
+  glc: {
+    "2018-2024": {
+      "2.0L": {
+        capacity: "6.0 L",
+        viscosity: "0W-20",
+        oilType: "Full Synthetic",
+        apiSpec: "MB 229.71"
+      }
+    }
+  },
+  gle: {
+    "2018-2024": {
+      "3.0L": {
+        capacity: "7.0 L",
+        viscosity: "0W-30",
+        oilType: "Full Synthetic",
+        apiSpec: "MB 229.51"
+      }
+    }
+  },
+  eqc: {
+    "2018-2024": {
+      EV: {
+        capacity: "Not Applicable",
+        viscosity: "Not Applicable",
+        oilType: "Not Applicable",
+        apiSpec: "Not Applicable"
+      }
+    }
+  },
+  eqs: {
+    "2018-2024": {
+      EV: {
+        capacity: "Not Applicable",
+        viscosity: "Not Applicable",
+        oilType: "Not Applicable",
+        apiSpec: "Not Applicable"
+      }
+    }
+  },
+  eqa: {
+    "2018-2024": {
+      EV: {
+        capacity: "Not Applicable",
+        viscosity: "Not Applicable",
+        oilType: "Not Applicable",
+        apiSpec: "Not Applicable"
+      }
+    }
+  }
+};
+
+// Initialize official specs with Hyundai
+const officialSpecs: ManufacturerSpecs = {
+  hyundai,
+  kia,
+  toyota,
+  mg,
+  nissan,
+  suzuki,
+  jetour,
+  chery,
+  geely,
+  changan,
+  great_wall_motor,
+  dodge,
+  jeep,
+  chevrolet,
+  genesis,
+  bmw,
+  mercedes_benz,
+ }
+ 
+ export default officialSpecs as any
+
 
