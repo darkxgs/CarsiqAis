@@ -137,31 +137,39 @@ export default function ChatPage() {
         let data: string = '';
         
         if (contentType?.includes('text/plain')) {
+          console.log('Processing text/plain response');
           // Handle streaming or plain text responses
           const reader = response.body?.getReader();
           const decoder = new TextDecoder();
           
           if (reader) {
             let fullResponse = '';
+            console.log('Starting to read stream...');
             
             try {
               while (true) {
                 const { done, value } = await reader.read();
-                if (done) break;
+                if (done) {
+                  console.log('Stream reading completed');
+                  break;
+                }
                 
                 const chunk = decoder.decode(value, { stream: true });
+                console.log('Received chunk:', chunk.substring(0, 100) + (chunk.length > 100 ? '...' : ''));
                 
                 // Parse AI SDK streaming format
                 const lines = chunk.split('\n');
                 for (const line of lines) {
                   if (line.startsWith('0:"')) {
                     // Extract content from AI SDK streaming format: 0:"content"
-                    const match = line.match(/0:"(.+?)"/);
+                    const match = line.match(/0:"(.+?)"/); 
                     if (match) {
+                      console.log('Extracted AI SDK content:', match[1].substring(0, 50));
                       fullResponse += match[1];
                     }
                   } else if (line.trim() && !line.startsWith('f:') && !line.startsWith('e:') && !line.startsWith('d:')) {
                     // Handle plain text content
+                    console.log('Adding plain text line:', line.substring(0, 50));
                     fullResponse += line;
                   }
                 }
@@ -170,10 +178,14 @@ export default function ChatPage() {
               console.error('Error reading stream:', streamError);
             }
             
+            console.log('Final fullResponse length:', fullResponse.length);
+            console.log('Final fullResponse preview:', fullResponse.substring(0, 200));
             data = fullResponse;
           } else {
+            console.log('No reader available, using fallback text reading');
             // Fallback to regular text reading
             data = await response.text();
+            console.log('Fallback data length:', data.length);
           }
         } else if (contentType?.includes('application/json')) {
           // Handle JSON error responses
@@ -641,4 +653,4 @@ export default function ChatPage() {
       </div>
     </TooltipProvider>
   )
-} 
+}
