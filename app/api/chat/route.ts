@@ -586,29 +586,29 @@ export async function POST(request: Request) {
     
     // Try streaming response with enhanced logging
     try {
-      const streamResponse = result.toTextStreamResponse({
-        headers: {
-          'Content-Type': 'text/plain; charset=utf-8',
-          'Cache-Control': 'no-cache',
-          'Connection': 'keep-alive',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-        },
-        onStart() {
-          console.log(`[${requestId}] Stream started`)
-        },
-        onToken(token) {
-          console.log(`[${requestId}] Token generated: ${token}`)
-        },
-        onCompletion(completion) {
-          console.log(`[${requestId}] Stream completed with content length: ${completion.length}`)
-          console.log(`[${requestId}] Completion preview: ${completion.substring(0, 200)}...`)
-        }
-      })
+      console.log(`[${requestId}] Attempting to create text stream response`)
       
-      console.log(`[${requestId}] Stream response created successfully`)
-      return streamResponse
+      // Test if we can get the full text first
+      const fullText = await result.text
+      console.log(`[${requestId}] Full text length: ${fullText.length}`)
+      console.log(`[${requestId}] Full text preview: ${fullText.substring(0, 200)}...`)
+      
+      // If we got text, return it as a simple response for now
+      if (fullText && fullText.length > 0) {
+        console.log(`[${requestId}] Returning full text as simple response`)
+        return new Response(fullText, {
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+            'Cache-Control': 'no-cache',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+          }
+        })
+      } else {
+        console.log(`[${requestId}] No text generated, falling back to direct API call`)
+        throw new Error('No content generated')
+      }
     } catch (streamError) {
       console.log(`[${requestId}] Streaming failed, using direct API fallback`)
       console.error(`[${requestId}] Stream error:`, streamError)
