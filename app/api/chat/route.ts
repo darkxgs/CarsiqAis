@@ -206,17 +206,10 @@ Denckermann
 const createOpenRouterClient = () => {
   const apiKey = process.env.OPENROUTER_API_KEY || ""
   
-  // Log the full API key and all environment variables for debugging
-  console.log('🔑 Full OpenRouter API Key:', apiKey)
-  console.log('🌍 All Environment Variables:', {
-    OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
-    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
-    NODE_ENV: process.env.NODE_ENV,
-    VERCEL: process.env.VERCEL,
-    VERCEL_ENV: process.env.VERCEL_ENV,
-    SUPABASE_URL: process.env.SUPABASE_URL,
-    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY
-  })
+  // Validate API key
+  if (!apiKey) {
+    console.error('OpenRouter API key not found')
+  }
   
   return createOpenAI({
     apiKey: apiKey,
@@ -565,8 +558,8 @@ export async function POST(request: Request) {
     
     console.log(`[${requestId}] User query: ${userQuery.substring(0, 100)}...`)
 
-    // Extract car data
-    const carData = extractCarData(userQuery)
+    // Extract car data with AI fallback
+    const carData = await extractCarDataWithAI(userQuery)
     console.log(`[${requestId}] Extracted car data:`, carData)
 
     // NEW: Fuzzy guess brand/model from raw query when extraction is weak or empty
@@ -727,31 +720,19 @@ export async function POST(request: Request) {
 
     console.log(`[${requestId}] StreamText created, attempting to return response`)
     
-    // Try streaming response with enhanced logging
+    // Return proper streaming response
     try {
-      console.log(`[${requestId}] Attempting to create text stream response`)
+      console.log(`[${requestId}] Attempting to create streaming response`)
       
-      // Test if we can get the full text first
-      const fullText = await result.text
-      console.log(`[${requestId}] Full text length: ${fullText.length}`)
-      console.log(`[${requestId}] Full text preview: ${fullText.substring(0, 200)}...`)
-      
-      // If we got text, return it as a simple response for now
-      if (fullText && fullText.length > 0) {
-        console.log(`[${requestId}] Returning full text as simple response`)
-        return new Response(fullText, {
-          headers: {
-            'Content-Type': 'text/plain; charset=utf-8',
-            'Cache-Control': 'no-cache',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-          }
-        })
-      } else {
-        console.log(`[${requestId}] No text generated, falling back to direct API call`)
-        throw new Error('No content generated')
-      }
+      // Use proper streaming response
+      return result.toDataStreamResponse({
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        }
+      })
     } catch (streamError) {
       console.log(`[${requestId}] Streaming failed, using direct API fallback`)
       console.error(`[${requestId}] Stream error:`, streamError)
