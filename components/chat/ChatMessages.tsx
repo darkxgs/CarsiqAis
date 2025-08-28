@@ -206,9 +206,12 @@ const MessageContent = ({ content, role }: { content: string; role: string }) =>
   const renderedContent = useMemo(() => {
     if (role !== "assistant") return content
 
-    // Normalize content: convert literal \n to actual newlines and clean up whitespace
+    // Normalize content: convert escaped characters back to actual characters
     let normalizedContent = content
       .replace(/\\n/g, '\n')  // Convert literal \n to newlines
+      .replace(/\\r/g, '\r')  // Convert literal \r to carriage returns
+      .replace(/\\\\/g, '\\')  // Convert literal \\ to backslashes
+      .replace(/\\"/g, '"')  // Convert literal \" to quotes
       .replace(/\r\n/g, '\n')  // Normalize Windows line endings
       .replace(/\r/g, '\n')   // Normalize Mac line endings
       .trim()  // Remove leading/trailing whitespace
@@ -311,8 +314,7 @@ const MessageContent = ({ content, role }: { content: string; role: string }) =>
             // Add more spacing for individual lines to improve readability
             const isCarTitle = /^[\u0600-\u06FF\s]+\d{4}$/.test(trimmedParagraph.trim()) // Arabic car name with year
             const isEngineTitle = /محرك|engine/i.test(trimmedParagraph)
-            const isSpecLine = /🛢️|⚙️|🔧|🥇|🥈|🥉|📦|سعة الزيت:|اللزوجة:|المعيار:|خيارات الزيوت المطابقة|فلتر الزيت:|فلتر الهواء:/.test(trimmedParagraph)
-            const isOilBrand = /فالفو لاين|كاسترول|ليكوي مولي|ميجوين|Valvoline|Castrol|Liqui Moly|Meguin/.test(trimmedParagraph)
+            const isSpecLine = /🛢️|⚙️|🔧|🥇|🥈|🥉|📦/.test(trimmedParagraph)
             
             let className = `text-sm ${hasEmoji ? 'emoji-content' : ''}`
             
@@ -320,7 +322,7 @@ const MessageContent = ({ content, role }: { content: string; role: string }) =>
               className += ' font-bold text-lg my-3 text-center'
             } else if (isEngineTitle) {
               className += ' font-semibold my-2 mt-4'
-            } else if (isSpecLine || isOilBrand) {
+            } else if (isSpecLine) {
               className += ' my-1'
             } else {
               className += ' my-1.5'

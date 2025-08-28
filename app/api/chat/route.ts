@@ -157,26 +157,24 @@ Denckermann
 هيونداي النترا 2022
 
 محرك 2.0L MPI
-سعة الزيت: 4.3 لتر
-اللزوجة: 5W-20
-المعيار: API SN
-خيارات الزيوت المطابقة
-فالفو لاين SynPower 5W-20
-كاسترول Magnatec 5W-20
-ليكوي مولي Top Tec 6600 5W-20
-فلتر الزيت: A211067 (دنكرمان)
-فلتر الهواء: A142137 (دنكرمان)
+🛢️ سعة الزيت: 4.3 لتر
+⚙️ اللزوجة: 5W-20
+🔧 المعيار: API SN
+
+🥇 **الخيار الأول (الأكثر ربحية):** Valvoline SynPower 5W-20
+🥈 **الخيار الثاني (بديل قوي):** Castrol Magnatec 5W-20
+🥉 **الخيار الثالث (بريميوم):** Liqui Moly Top Tec 6600 5W-20
+📦 **فلتر الزيت:** A211067 (Denckermann)
 
 محرك 1.6L Turbo
-سعة الزيت: 4.5 لتر
-اللزوجة: 5W-30
-المعيار: API SN Plus
-خيارات الزيوت المطابقة
-فالفو لاين SynPower 5W-30
-كاسترول Magnatec 5W-30
-ليكوي مولي Top Tec 4200 5W-30
-فلتر الزيت: A211067 (دنكرمان)
-فلتر الهواء: A142137 (دنكرمان)
+🛢️ سعة الزيت: 4.5 لتر
+⚙️ اللزوجة: 5W-30
+🔧 المعيار: API SN Plus
+
+🥇 **الخيار الأول (الأكثر ربحية):** Valvoline SynPower 5W-30
+🥈 **الخيار الثاني (بديل قوي):** Castrol Magnatec 5W-30
+🥉 **الخيار الثالث (بريميوم):** Liqui Moly Top Tec 4200 5W-30
+📦 **فلتر الزيت:** A211067 (Denckermann)
 
 ❗ **قواعد إجبارية للتنسيق:**
 - يجب استخدام اسم المنتج الكامل (Brand + Product Line + Viscosity)
@@ -699,8 +697,15 @@ export async function POST(request: Request) {
       const data = await response.json()
       const assistantMessage = data.choices?.[0]?.message?.content || "عذراً، لم أتمكن من الحصول على رد."
       
+      // Properly escape content for streaming format while preserving newlines
+      const escapedMessage = assistantMessage
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"')
+        .replace(/\n/g, '\\n')
+        .replace(/\r/g, '\\r')
+      
       // Return in AI SDK streaming format for frontend compatibility
-      const streamingFormat = `0:"${assistantMessage.replace(/"/g, '\\"')}"
+      const streamingFormat = `0:"${escapedMessage}"
 `
       
       return new Response(streamingFormat, {
