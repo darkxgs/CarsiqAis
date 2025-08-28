@@ -365,6 +365,102 @@ async function saveQueryToAnalytics(query: string, carData: ExtractedCarData) {
   }
 }
 
+// AI-powered car data extraction with fallback
+async function extractCarDataWithAI(query: string): Promise<ExtractedCarData> {
+  // First try static extraction
+  const staticResult = extractCarData(query)
+  
+  // If static extraction has high confidence, use it
+  if (staticResult.confidence >= 70) {
+    return staticResult
+  }
+  
+  // Otherwise, use AI extraction as fallback
+  try {
+    const extractionPrompt = `Extract car information from this query: "${query}"
+
+Respond ONLY with a JSON object in this exact format:
+{
+  "carBrand": "brand_name_or_empty_string",
+  "carModel": "model_name_or_empty_string",
+  "year": number_or_null,
+  "confidence": number_between_0_and_100
+}
+
+Rules:
+- Use English brand/model names when possible
+- If Arabic text, translate to English equivalent
+- Set confidence based on how certain you are
+- Return empty strings for brand/model if not found
+- Only extract actual car information, ignore other text`
+
+    // Direct API call to OpenRouter
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+        "X-Title": "Car Service Chat - CarsiqAi"
+      },
+      body: JSON.stringify({
+        model: openRouter.primaryModel,
+        messages: [
+          {
+            role: "system",
+            content: "You are a car data extraction assistant. Always respond with valid JSON only."
+          },
+          {
+            role: "user",
+            content: extractionPrompt
+          }
+        ],
+        max_tokens: 200,
+        temperature: 0.1
+      })
+    })
+
+    if (!response.ok) {
+      throw new Error(`OpenRouter API error: ${response.status}`)
+    }
+
+    const data = await response.json()
+    const aiResponseText = data.choices?.[0]?.message?.content || '{}'
+    
+    // Parse the JSON response (handle markdown code blocks)
+    let aiResult
+    try {
+      // Remove markdown code blocks if present
+      let cleanedResponse = aiResponseText.trim()
+      if (cleanedResponse.startsWith('```json')) {
+        cleanedResponse = cleanedResponse.replace(/```json\s*/, '').replace(/\s*```$/, '')
+      } else if (cleanedResponse.startsWith('```')) {
+        cleanedResponse = cleanedResponse.replace(/```\s*/, '').replace(/\s*```$/, '')
+      }
+      
+      aiResult = JSON.parse(cleanedResponse)
+    } catch (parseError) {
+      console.error('Failed to parse AI response:', aiResponseText)
+      throw new Error('Invalid AI response format')
+    }
+    
+    // Combine static and AI results, preferring higher confidence
+    if (aiResult.confidence > staticResult.confidence) {
+      return {
+        carBrand: aiResult.carBrand || staticResult.carBrand,
+        carModel: aiResult.carModel || staticResult.carModel,
+        year: aiResult.year || staticResult.year,
+        isValid: !!(aiResult.carBrand && aiResult.carModel),
+        confidence: aiResult.confidence
+      }
+    }
+  } catch (error) {
+    console.error('AI extraction failed, falling back to static:', error)
+  }
+  
+  return staticResult
+}
+
 // CarAnalyzer and logger utilities
 function extractCarData(query: string): ExtractedCarData {
   const normalizedQuery = query.toLowerCase().trim()
@@ -696,8 +792,8 @@ export async function POST(request: Request) {
       
       const data = await response.json()
       const assistantMessage = data.choices?.[0]?.message?.content || "عذراً، لم أتمكن من الحصول على رد."
-      
-      // Properly escape content for streaming format while preserving newlines
+       
+       // Properly escape content for streaming format while preserving newlines
       const escapedMessage = assistantMessage
         .replace(/\\/g, '\\\\')
         .replace(/"/g, '\\"')
