@@ -311,7 +311,8 @@ const MessageContent = ({ content, role }: { content: string; role: string }) =>
             // Add more spacing for individual lines to improve readability
             const isCarTitle = /^[\u0600-\u06FF\s]+\d{4}$/.test(trimmedParagraph.trim()) // Arabic car name with year
             const isEngineTitle = /محرك|engine/i.test(trimmedParagraph)
-            const isSpecLine = /🛢️|⚙️|🔧|🥇|🥈|🥉|📦/.test(trimmedParagraph)
+            const isSpecLine = /🛢️|⚙️|🔧|🥇|🥈|🥉|📦|سعة الزيت:|اللزوجة:|المعيار:|خيارات الزيوت المطابقة|فلتر الزيت:|فلتر الهواء:/.test(trimmedParagraph)
+            const isOilBrand = /فالفو لاين|كاسترول|ليكوي مولي|ميجوين|Valvoline|Castrol|Liqui Moly|Meguin/.test(trimmedParagraph)
             
             let className = `text-sm ${hasEmoji ? 'emoji-content' : ''}`
             
@@ -319,7 +320,7 @@ const MessageContent = ({ content, role }: { content: string; role: string }) =>
               className += ' font-bold text-lg my-3 text-center'
             } else if (isEngineTitle) {
               className += ' font-semibold my-2 mt-4'
-            } else if (isSpecLine) {
+            } else if (isSpecLine || isOilBrand) {
               className += ' my-1'
             } else {
               className += ' my-1.5'
