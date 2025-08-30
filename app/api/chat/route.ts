@@ -4,8 +4,8 @@ import CarAnalyzer from "@/utils/carAnalyzer"
 import logger from "@/utils/logger"
 import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 import { z } from 'zod'
-// Filter functionality (oil and air filters from Denckermann)
-import { isFilterQuery, isAirFilterQuery, generateFilterRecommendationMessage, getVerifiedOilFilter, getVerifiedAirFilter } from '@/services/filterRecommendationService'
+// Filter functionality (oil, air, and AC filters from Denckermann)
+import { isFilterQuery, isAirFilterQuery, isACFilterQuery, generateFilterRecommendationMessage, getVerifiedOilFilter, getVerifiedAirFilter, getVerifiedACFilter } from '@/services/filterRecommendationService'
 // Brave search service for real-time oil specifications
 import { braveSearchService } from '@/services/braveSearchService'
 import officialSpecs from "@/data/officialSpecs"
@@ -136,12 +136,16 @@ Denckermann
 🥈 **الخيار الثاني :** [Brand Name] [Product Line] [Viscosity]
 🥉 **الخيار الثالث :** [Brand Name] [Product Line] [Viscosity]
 📦 **فلتر الزيت:** [رقم Denckermann]
+🌬️ **فلتر الهواء:** [رقم Denckermann]
+❄️ **فلتر المكيف:** [رقم Denckermann]
 
 **مثال على التنسيق المطلوب:**
 🥇 **الخيار الأول :** Valvoline SynPower 0W-20
 🥈 **الخيار الثاني :** Castrol Magnatec 0W-20
 🥉 **الخيار الثالث :** Liqui Moly Top Tec 6600 0W-20
 📦 **فلتر الزيت:** A210032 (Denckermann)
+🌬️ **فلتر الهواء:** A220145 (Denckermann)
+❄️ **فلتر المكيف:** M110995 (Denckermann)
 
 ❗ **قواعد إجبارية للتنسيق:**
 - يجب استخدام اسم المنتج الكامل (Brand + Product Line + Viscosity)
@@ -535,10 +539,13 @@ export async function POST(request: Request) {
     }
 
     // Check for filter queries (keep existing behavior)
-    if (isFilterQuery(userQuery) || isAirFilterQuery(userQuery)) {
+    if (isFilterQuery(userQuery) || isAirFilterQuery(userQuery) || isACFilterQuery(userQuery)) {
       console.log(`[${requestId}] Processing filter query`)
       try {
-        const filterType = isAirFilterQuery(userQuery) ? 'air' : 'oil'
+        let filterType = 'oil'
+        if (isAirFilterQuery(userQuery)) filterType = 'air'
+        else if (isACFilterQuery(userQuery)) filterType = 'ac'
+        
         const make = carData.carBrand || guessed.brand || ''
         const model = mapArabicModelToEnglishIfNeeded(carData.carModel) || carData.carModel || guessed.model || ''
         const filterResponse = generateFilterRecommendationMessage(make, model, carData.year, filterType)
@@ -625,7 +632,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // Inject Denckermann filter info (oil/air) as hidden context when make/model are known
+    // Inject Denckermann filter info (oil/air/ac) as hidden context when make/model are known
     try {
       const make = carData.carBrand || guessed.brand || ''
       const model = mapArabicModelToEnglishIfNeeded(carData.carModel) || carData.carModel || guessed.model || ''
@@ -633,8 +640,9 @@ export async function POST(request: Request) {
       if (make && model) {
         const oilFilter = getVerifiedOilFilter(make, model, carData.year)
         const airFilter = getVerifiedAirFilter(make, model, carData.year)
+        const acFilter = getVerifiedACFilter(make, model, carData.year)
 
-        if (oilFilter || airFilter) {
+        if (oilFilter || airFilter || acFilter) {
           const parts: string[] = []
           if (oilFilter) {
             parts.push(`• فلتر الزيت (Denckermann): ${oilFilter.filterNumber} — ثقة: ${oilFilter.confidence}`)
@@ -642,8 +650,11 @@ export async function POST(request: Request) {
           if (airFilter) {
             parts.push(`• فلتر الهواء (Denckermann): ${airFilter.filterNumber} — ثقة: ${airFilter.confidence}`)
           }
+          if (acFilter) {
+            parts.push(`• فلتر المبرد (Denckermann): ${acFilter.filterNumber} — ثقة: ${acFilter.confidence}`)
+          }
           externalContext += `\n\n📦 بيانات فلاتر Denckermann (للاستخدام الداخلي فقط — لا تعرض هذا القسم حرفيًا):\n${parts.join('\n')}\nالمصدر: كتالوج Denckermann الرسمي 2024\n`
-          console.log(`[${requestId}] Injected Denckermann filters into context`, { oil: oilFilter?.filterNumber, air: airFilter?.filterNumber })
+          console.log(`[${requestId}] Injected Denckermann filters into context`, { oil: oilFilter?.filterNumber, air: airFilter?.filterNumber, ac: acFilter?.filterNumber })
         } else {
           console.log(`[${requestId}] No Denckermann filter found for ${make} ${model}`)
         }
@@ -832,6 +843,117 @@ const arabicToEnglishModelMap: Record<string, string> = {
   "كامارو": "camaro",
   "كروز": "cruze",
   "ماليبو": "malibu",
+  // Mercedes-Benz model mappings
+  "a180": "a_class",
+  "a200": "a_class",
+  "a250": "a_class",
+  "a300": "a_class",
+  "A 180": "a_class",
+  "A 200": "a_class",
+  "A 250": "a_class",
+  "A 300": "a_class",
+  "c180": "c_class",
+  "c200": "c_class",
+  "c250": "c_class",
+  "c300": "c_class",
+  "c350": "c_class",
+  "c400": "c_class",
+  "c450": "c_class",
+  "C 180": "c_class",
+  "C 200": "c_class",
+  "C 250": "c_class",
+  "C 300": "c_class",
+  "C 350": "c_class",
+  "C 400": "c_class",
+  "C 450": "c_class",
+  "e200": "e_class",
+  "e250": "e_class",
+  "e300": "e_class",
+  "e350": "e_class",
+  "e400": "e_class",
+  "e450": "e_class",
+  "e500": "e_class",
+  "E 200": "e_class",
+  "E 250": "e_class",
+  "E 300": "e_class",
+  "E 350": "e_class",
+  "E 400": "e_class",
+  "E 450": "e_class",
+  "E 500": "e_class",
+  "s350": "s_class",
+  "s400": "s_class",
+  "s450": "s_class",
+  "s500": "s_class",
+  "s550": "s_class",
+  "s580": "s_class",
+  "S 350": "s_class",
+  "S 400": "s_class",
+  "S 450": "s_class",
+  "S 500": "s_class",
+  "S 550": "s_class",
+  "S 580": "s_class",
+  "gla200": "gla",
+  "gla250": "gla",
+  "GLA 200": "gla",
+  "GLA 250": "gla",
+  "glc200": "glc",
+  "glc250": "glc",
+  "glc300": "glc",
+  "GLC 200": "glc",
+  "GLC 250": "glc",
+  "GLC 300": "glc",
+  "gle300": "gle",
+  "gle350": "gle",
+  "gle400": "gle",
+  "gle450": "gle",
+  "GLE 300": "gle",
+  "GLE 350": "gle",
+  "GLE 400": "gle",
+  "GLE 450": "gle",
+  // BMW model mappings
+  "118i": "series_1",
+  "120i": "series_1",
+  "125i": "series_1",
+  "130i": "series_1",
+  "135i": "series_1",
+  "218i": "series_2",
+  "220i": "series_2",
+  "225i": "series_2",
+  "230i": "series_2",
+  "318i": "series_3",
+  "320i": "series_3",
+  "325i": "series_3",
+  "328i": "series_3",
+  "330i": "series_3",
+  "335i": "series_3",
+  "340i": "series_3",
+  "m340i": "series_3",
+  "418i": "series_4",
+  "420i": "series_4",
+  "425i": "series_4",
+  "428i": "series_4",
+  "430i": "series_4",
+  "435i": "series_4",
+  "440i": "series_4",
+  "518i": "series_5",
+  "520i": "series_5",
+  "525i": "series_5",
+  "528i": "series_5",
+  "530i": "series_5",
+  "535i": "series_5",
+  "540i": "series_5",
+  "550i": "series_5",
+  "m550i": "series_5",
+  "630i": "series_6",
+  "640i": "series_6",
+  "650i": "series_6",
+  "730i": "series_7",
+  "740i": "series_7",
+  "750i": "series_7",
+  "760i": "series_7",
+  "840i": "series_8",
+  "850i": "series_8",
+  "m850i": "series_8",
 }
 
 // Levenshtein distance and similarity
