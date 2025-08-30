@@ -5,7 +5,7 @@
 
 import { findFilterByVehicle, getFilterDetails, searchFiltersByVehicleName, denckermannFilters } from '../data/denckermann-filters';
 import { findAirFilterByVehicle, getAirFilterDetails, searchAirFiltersByVehicleName, denckermannAirFilters } from '../data/denckermann-air-filters';
-import { findACFilterByVehicle, getACFilterDetails, denckermannACFilters } from '../data/denckermann-ac-filters';
+import { findACFilterByVehicle, getACFilterDetails, denckermannACFilters } from '../data/denckermann-ac-filters.ts';
 import logger from '../utils/logger';
 
 export interface FilterRecommendation {
