@@ -1100,7 +1100,6 @@ export function findACFilterByVehicle(make: string, model: string): string | nul
     'lx': 'lx',
     'جي اكس': 'gx',
     'gx': 'gx',
-    'اي اس': 'is',
     'is': 'is',
     'ان اكس': 'nx',
     'nx': 'nx',
