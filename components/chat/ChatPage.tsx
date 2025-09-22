@@ -16,6 +16,9 @@ import {
   createAndSetActiveSession,
   addMessageToActiveSession
 } from "@/utils/chatStorage"
+import MobileContainer from "@/components/mobile/MobileContainer"
+import MobileHeader from "@/components/mobile/MobileHeader"
+import MobileInput from "@/components/mobile/MobileInput"
 
 export default function ChatPage() {
   // State
@@ -522,6 +525,20 @@ export default function ChatPage() {
     // For mobile, use full width
     return baseStyles;
   };
+
+  // Detect if we're on mobile
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // Add effect to set the --vh custom property for mobile browsers
   useEffect(() => {

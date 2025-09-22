@@ -25,9 +25,21 @@ const ChatPageClient = dynamic(
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
+    <div className={`min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 ${isMobile ? 'mobile-container-enhanced' : ''}`}>
       {/* Functional Navigation Header - Sticky */}
       <header className="sticky top-0 z-50 w-full py-2 sm:py-3 md:py-4 px-4 md:px-8 lg:px-12 header-enhanced backdrop-blur-md">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
