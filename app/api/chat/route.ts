@@ -9,8 +9,8 @@ import { isFilterQuery, isAirFilterQuery, isACFilterQuery, generateFilterRecomme
 // Brave search service for real-time oil specifications
 import { braveSearchService } from '@/services/braveSearchService'
 import officialSpecs from "@/data/officialSpecs"
-// API Key Rotation System
-import { getCurrentApiKey, handleApiError, resetFailedAttempts } from '@/utils/apiKeyRotation'
+// API Key Rotation System (Edge Runtime Compatible)
+import { getCurrentApiKey, handleApiError, resetFailedAttempts } from '@/utils/apiKeyRotationEdge'
 
 // Configure for Vercel Edge Runtime
 export const runtime = 'edge'
