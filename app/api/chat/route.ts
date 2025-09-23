@@ -9,8 +9,7 @@ import { isFilterQuery, isAirFilterQuery, isACFilterQuery, generateFilterRecomme
 // Brave search service for real-time oil specifications
 import { braveSearchService } from '@/services/braveSearchService'
 import officialSpecs from "@/data/officialSpecs"
-// API Key Rotation System (Edge Runtime Compatible)
-import { getCurrentApiKey, handleApiError, resetFailedAttempts } from '@/utils/apiKeyRotationEdge'
+// Simple API key from environment
 
 // Configure for Vercel Edge Runtime
 export const runtime = 'edge'
@@ -618,18 +617,18 @@ export async function POST(request: Request) {
 
         const make = carData.carBrand || guessed.brand || ''
         const model = mapArabicModelToEnglishIfNeeded(carData.carModel) || carData.carModel || guessed.model || ''
-        
+
         // Handle AC filter case
         if (filterType === 'ac') {
           const acFilterResponse = `🔍 البحث عن فلتر المكيف\n\n🚗 السيارة: ${make} ${model}${carData.year ? ` ${carData.year}` : ''}\n\n❌ عذراً، بيانات فلاتر المكيف غير متوفرة حالياً في قاعدة البيانات.\n\n💡 نصائح للعثور على فلتر المكيف المناسب:\n• راجع دليل المالك الخاص بسيارتك\n• اتصل بالوكيل المعتمد\n• احضر الفلتر القديم عند الشراء\n• تأكد من رقم المحرك وسنة الصنع\n\n🔄 يمكنك السؤال عن فلتر الزيت أو فلتر الهواء بدلاً من ذلك.`
-          
+
           return new Response(acFilterResponse, {
             headers: {
               'Content-Type': 'text/plain; charset=utf-8',
             },
           })
         }
-        
+
         const filterResponse = generateFilterRecommendationMessage(make, model, carData.year, filterType)
 
         return new Response(filterResponse, {
