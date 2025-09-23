@@ -9,6 +9,8 @@ import { isFilterQuery, isAirFilterQuery, isACFilterQuery, generateFilterRecomme
 // Brave search service for real-time oil specifications
 import { braveSearchService } from '@/services/braveSearchService'
 import officialSpecs from "@/data/officialSpecs"
+// API Key Rotation System
+import { getCurrentApiKey, handleApiError, resetFailedAttempts } from '@/utils/apiKeyRotation'
 
 // Configure for Vercel Edge Runtime
 export const runtime = 'edge'
@@ -55,7 +57,7 @@ const openRouter = {
   maxRetries: 3,
   timeout: 30000,
   // System prompt (the comprehensive Arabic system prompt for car oil recommendations)
-   systemPrompt: `أنت مساعد تقني متخصص في زيوت محركات السيارات وفلاتر الزيت، تمثل فريق الدعم الفني لمتجر "هندسة السيارات" 🇮🇶.
+  systemPrompt: `أنت مساعد تقني متخصص في زيوت محركات السيارات وفلاتر الزيت، تمثل فريق الدعم الفني لمتجر "هندسة السيارات" 🇮🇶.
 
 🚨 **قاعدة أولوية المصادر (الأهم):**
 • **مواصفات الزيت (السعة، اللزوجة، النوع):** استخدم نتائج البحث من المصادر الرسمية فقط
@@ -172,15 +174,18 @@ Denckermann
   },
 }
 
-// Core OpenRouter client setup
+// Enhanced OpenRouter client setup with API key rotation
 const createOpenRouterClient = () => {
-  const apiKey = process.env.OPENROUTER_API_KEY || ""
-  
+  const apiKey = getCurrentApiKey()
+
   // Validate API key
   if (!apiKey) {
-    console.error('OpenRouter API key not found')
+    console.error('No OpenRouter API key available')
+    throw new Error('API key not available')
   }
-  
+
+  console.log(`🔑 Using API key: ${apiKey.substring(0, 20)}...`)
+
   return createOpenAI({
     apiKey: apiKey,
     baseURL: "https://openrouter.ai/api/v1",
@@ -189,6 +194,86 @@ const createOpenRouterClient = () => {
       "X-Title": "Car Service Chat - CarsiqAi"
     }
   })
+}
+
+// Enhanced API call with automatic retry and key rotation
+const makeApiCallWithRetry = async (
+  requestBody: any,
+  maxRetries: number = 3
+): Promise<any> => {
+  let lastError: any = null
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const currentApiKey = getCurrentApiKey()
+      console.log(`🔄 API attempt ${attempt}/${maxRetries} with key: ${currentApiKey.substring(0, 20)}...`)
+
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${currentApiKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+          "X-Title": "Car Service Chat - CarsiqAi"
+        },
+        body: JSON.stringify(requestBody)
+      })
+
+      if (response.ok) {
+        // Success - reset failed attempts counter
+        resetFailedAttempts()
+        return await response.json()
+      }
+
+      // Handle API errors
+      const errorText = await response.text()
+      const error = {
+        status: response.status,
+        statusText: response.statusText,
+        message: errorText,
+        body: errorText
+      }
+
+      console.error(`❌ API call failed (attempt ${attempt}):`, error)
+
+      // Check if we should rotate the API key
+      const rotationOccurred = handleApiError(error)
+
+      if (rotationOccurred) {
+        console.log(`🔄 API key rotated, retrying...`)
+        // Continue to next attempt with new key
+        lastError = error
+        continue
+      }
+
+      // If no rotation occurred and it's not the last attempt, still retry
+      if (attempt < maxRetries) {
+        console.log(`⏳ Retrying in 1 second...`)
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        lastError = error
+        continue
+      }
+
+      // Last attempt failed
+      throw error
+
+    } catch (fetchError: any) {
+      console.error(`🚨 Network error (attempt ${attempt}):`, fetchError)
+      lastError = fetchError
+
+      // For network errors, try rotating key as well
+      const rotationOccurred = handleApiError(fetchError)
+
+      if (attempt < maxRetries) {
+        console.log(`⏳ Retrying after network error in 2 seconds...`)
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        continue
+      }
+    }
+  }
+
+  // All attempts failed
+  throw lastError || new Error('All API attempts failed')
 }
 
 // Analytics tracking and database operations
@@ -301,7 +386,7 @@ async function saveQueryToAnalytics(query: string, carData: ExtractedCarData) {
 
   try {
     const queryType = determineQueryType(query)
-    
+
     const analyticsData = {
       query: query.trim(),
       car_model: carData?.carModel,
@@ -332,12 +417,12 @@ async function saveQueryToAnalytics(query: string, carData: ExtractedCarData) {
 async function extractCarDataWithAI(query: string): Promise<ExtractedCarData> {
   // First try static extraction
   const staticResult = extractCarData(query)
-  
+
   // If static extraction has high confidence, use it
   if (staticResult.confidence >= 70) {
     return staticResult
   }
-  
+
   // Otherwise, use AI extraction as fallback
   try {
     const extractionPrompt = `Extract car information from this query: "${query}"
@@ -357,39 +442,24 @@ Rules:
 - Return empty strings for brand/model if not found
 - Only extract actual car information, ignore other text`
 
-    // Direct API call to OpenRouter
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
-        "X-Title": "Car Service Chat - CarsiqAi"
-      },
-      body: JSON.stringify({
-        model: openRouter.primaryModel,
-        messages: [
-          {
-            role: "system",
-            content: "You are a car data extraction assistant. Always respond with valid JSON only."
-          },
-          {
-            role: "user",
-            content: extractionPrompt
-          }
-        ],
-        max_tokens: 200,
-        temperature: 0.1
-      })
+    // API call with rotation support
+    const data = await makeApiCallWithRetry({
+      model: openRouter.primaryModel,
+      messages: [
+        {
+          role: "system",
+          content: "You are a car data extraction assistant. Always respond with valid JSON only."
+        },
+        {
+          role: "user",
+          content: extractionPrompt
+        }
+      ],
+      max_tokens: 200,
+      temperature: 0.1
     })
-
-    if (!response.ok) {
-      throw new Error(`OpenRouter API error: ${response.status}`)
-    }
-
-    const data = await response.json()
     const aiResponseText = data.choices?.[0]?.message?.content || '{}'
-    
+
     // Parse the JSON response (handle markdown code blocks)
     let aiResult
     try {
@@ -400,13 +470,13 @@ Rules:
       } else if (cleanedResponse.startsWith('```')) {
         cleanedResponse = cleanedResponse.replace(/```\s*/, '').replace(/\s*```$/, '')
       }
-      
+
       aiResult = JSON.parse(cleanedResponse)
     } catch (parseError) {
       console.error('Failed to parse AI response:', aiResponseText)
       throw new Error('Invalid AI response format')
     }
-    
+
     // Combine static and AI results, preferring higher confidence
     if (aiResult.confidence > staticResult.confidence) {
       return {
@@ -420,14 +490,14 @@ Rules:
   } catch (error) {
     console.error('AI extraction failed, falling back to static:', error)
   }
-  
+
   return staticResult
 }
 
 // CarAnalyzer and logger utilities
 function extractCarData(query: string): ExtractedCarData {
   const normalizedQuery = query.toLowerCase().trim()
-  
+
   // Basic brand detection - preserve original language when possible
   const brandMappings = {
     'toyota': ['تويوتا', 'toyota'],
@@ -503,7 +573,7 @@ function extractCarData(query: string): ExtractedCarData {
 
 export async function POST(request: Request) {
   const requestId = Math.random().toString(36).substring(7)
-  
+
   try {
     console.log(`[${requestId}] Processing chat request`)
     logger.info("Chat request received", { requestId })
@@ -511,11 +581,11 @@ export async function POST(request: Request) {
     // Validate request body
     const body = await request.json()
     const validatedBody = RequestBodySchema.parse(body)
-    
+
     // Handle both message formats
     let userQuery: string
-    let messages: Array<{role: 'user' | 'assistant' | 'system', content: string}>
-    
+    let messages: Array<{ role: 'user' | 'assistant' | 'system', content: string }>
+
     if ('message' in validatedBody) {
       // New format: single message string
       userQuery = validatedBody.message
@@ -525,7 +595,7 @@ export async function POST(request: Request) {
       messages = validatedBody.messages
       userQuery = messages[messages.length - 1]?.content || ''
     }
-    
+
     console.log(`[${requestId}] User query: ${userQuery.substring(0, 100)}...`)
 
     // Extract car data with AI fallback
@@ -542,14 +612,26 @@ export async function POST(request: Request) {
     if (isFilterQuery(userQuery) || isAirFilterQuery(userQuery) || isACFilterQuery(userQuery)) {
       console.log(`[${requestId}] Processing filter query`)
       try {
-        let filterType = 'oil'
+        let filterType: 'oil' | 'air' | 'ac' = 'oil'
         if (isAirFilterQuery(userQuery)) filterType = 'air'
         else if (isACFilterQuery(userQuery)) filterType = 'ac'
-        
+
         const make = carData.carBrand || guessed.brand || ''
         const model = mapArabicModelToEnglishIfNeeded(carData.carModel) || carData.carModel || guessed.model || ''
-        const filterResponse = generateFilterRecommendationMessage(make, model, carData.year, filterType)
         
+        // Handle AC filter case
+        if (filterType === 'ac') {
+          const acFilterResponse = `🔍 البحث عن فلتر المكيف\n\n🚗 السيارة: ${make} ${model}${carData.year ? ` ${carData.year}` : ''}\n\n❌ عذراً، بيانات فلاتر المكيف غير متوفرة حالياً في قاعدة البيانات.\n\n💡 نصائح للعثور على فلتر المكيف المناسب:\n• راجع دليل المالك الخاص بسيارتك\n• اتصل بالوكيل المعتمد\n• احضر الفلتر القديم عند الشراء\n• تأكد من رقم المحرك وسنة الصنع\n\n🔄 يمكنك السؤال عن فلتر الزيت أو فلتر الهواء بدلاً من ذلك.`
+          
+          return new Response(acFilterResponse, {
+            headers: {
+              'Content-Type': 'text/plain; charset=utf-8',
+            },
+          })
+        }
+        
+        const filterResponse = generateFilterRecommendationMessage(make, model, carData.year, filterType)
+
         return new Response(filterResponse, {
           headers: {
             'Content-Type': 'text/plain; charset=utf-8',
@@ -598,7 +680,7 @@ export async function POST(request: Request) {
             queryType: 'oil_capacity' as const
           }
           console.log(`[${requestId}] Search query:`, searchQuery)
-          
+
           const searchResults = await braveSearchService.searchComprehensiveCarData(
             brandForSearch,
             modelForSearch,
@@ -610,14 +692,14 @@ export async function POST(request: Request) {
             viscosityResults: searchResults?.viscosity?.results?.length || 0,
             overallConfidence: searchResults?.overallConfidence
           })
-          
+
           const allResults = [
             ...(searchResults?.oilCapacity?.results || []),
             ...(searchResults?.viscosity?.results || [])
           ]
-          
+
           if (allResults.length > 0) {
-            externalContext = `\n\n🔍 معلومات من المصادر العامة (للاستخدام في التحليل – قد تكون تقديرية):\n${allResults.map(result => 
+            externalContext = `\n\n🔍 معلومات من المصادر العامة (للاستخدام في التحليل – قد تكون تقديرية):\n${allResults.map(result =>
               `• ${result.title}: ${result.description}`
             ).join('\n')}\n`
             console.log(`[${requestId}] Found ${allResults.length} search results`)
@@ -683,7 +765,7 @@ export async function POST(request: Request) {
     console.log(`[${requestId}] System prompt length: ${finalSystemPrompt.length}`)
     console.log(`[${requestId}] Messages count: ${messages.length}`)
     console.log(`[${requestId}] Last user message: ${messages[messages.length - 1]?.content?.substring(0, 100)}...`)
-    
+
     const result = streamText({
       model: openrouter(modelToUse),
       system: finalSystemPrompt,
@@ -696,11 +778,11 @@ export async function POST(request: Request) {
     })
 
     console.log(`[${requestId}] StreamText created, attempting to return response`)
-    
+
     // Return proper streaming response
     try {
       console.log(`[${requestId}] Attempting to create streaming response`)
-      
+
       // Use proper streaming response
       return result.toDataStreamResponse({
         headers: {
@@ -713,8 +795,8 @@ export async function POST(request: Request) {
     } catch (streamError) {
       console.log(`[${requestId}] Streaming failed, using direct API fallback`)
       console.error(`[${requestId}] Stream error:`, streamError)
-      
-      // Fallback to direct OpenRouter API call
+
+      // Fallback to direct API call with rotation support
       const fallbackMessages = [
         {
           role: "system",
@@ -725,43 +807,26 @@ export async function POST(request: Request) {
           content: msg.content
         }))
       ]
-      
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
-          "X-Title": "Car Service Chat - CarsiqAi"
-        },
-        body: JSON.stringify({
-          model: modelToUse,
-          messages: fallbackMessages,
-          max_tokens: 900,
-          temperature: 0.3
-        })
+
+      const data = await makeApiCallWithRetry({
+        model: modelToUse,
+        messages: fallbackMessages,
+        max_tokens: 900,
+        temperature: 0.3
       })
-      
-      if (!response.ok) {
-        const errorText = await response.text()
-        console.error(`[${requestId}] OpenRouter API error:`, response.status, errorText)
-        throw new Error(`OpenRouter API error: ${response.status}`)
-      }
-      
-      const data = await response.json()
       const assistantMessage = data.choices?.[0]?.message?.content || "عذراً، لم أتمكن من الحصول على رد."
-       
-       // Properly escape content for streaming format while preserving newlines
+
+      // Properly escape content for streaming format while preserving newlines
       const escapedMessage = assistantMessage
         .replace(/\\/g, '\\\\')
         .replace(/"/g, '\\"')
         .replace(/\n/g, '\\n')
         .replace(/\r/g, '\\r')
-      
+
       // Return in AI SDK streaming format for frontend compatibility
       const streamingFormat = `0:"${escapedMessage}"
 `
-      
+
       return new Response(streamingFormat, {
         headers: {
           'Content-Type': 'text/plain; charset=utf-8',
@@ -1126,7 +1191,7 @@ function guessBrandAndModelFromQuery(query: string): { brand?: string; model?: s
   const text = (query || '').toLowerCase()
   const rawTokens = text.split(/[^a-z\u0600-\u06FF0-9]+/).filter(Boolean)
   const stop = new Set<string>([
-    'oil','capacity','engine','liters','liter','filter','air','fuel','transmission','best','car','model','make','year','motor','cap','size','spec','specs','زيت','سعة','محرك'
+    'oil', 'capacity', 'engine', 'liters', 'liter', 'filter', 'air', 'fuel', 'transmission', 'best', 'car', 'model', 'make', 'year', 'motor', 'cap', 'size', 'spec', 'specs', 'زيت', 'سعة', 'محرك'
   ])
   const tokens = rawTokens.filter(w => !/^\d+$/.test(w) && w.length >= 3 && !stop.has(w))
 

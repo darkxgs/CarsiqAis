@@ -16,21 +16,13 @@ import {
   createAndSetActiveSession,
   addMessageToActiveSession
 } from "@/utils/chatStorage"
-import MobileContainer from "@/components/mobile/MobileContainer"
-import MobileHeader from "@/components/mobile/MobileHeader"
-import MobileInput from "@/components/mobile/MobileInput"
 
 export default function ChatPage() {
   // State
   const [showSettings, setShowSettings] = useState(false)
   const [darkMode, setDarkMode] = useState(true)
   const [searchHistory, setSearchHistory] = useState<string[]>([])
-  const [scale, setScale] = useState(1)
-  const [keyboardVisible, setKeyboardVisible] = useState(false)
-  const [viewportHeight, setViewportHeight] = useState(0)
   const [isFaqExpanded, setIsFaqExpanded] = useState(false)
-  const [textareaHeight, setTextareaHeight] = useState(0)
-  const containerRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
 
   // Chat history state
@@ -235,10 +227,8 @@ export default function ChatPage() {
     // Always use our fallback input since AI SDK doesn't provide input state
     setFallbackInput(e.target.value);
 
-    // Update textarea height for layout calculations
-    if (e.target instanceof HTMLTextAreaElement) {
-      setTextareaHeight(e.target.scrollHeight);
-    }
+    // Simple scroll to bottom on input change
+    setTimeout(scrollToBottom, 50);
   };
 
   // Load chat history from localStorage
@@ -278,104 +268,17 @@ export default function ChatPage() {
     }
   };
 
-  // Detect keyboard visibility changes on mobile
-  const detectKeyboardVisibility = () => {
-    if (typeof window !== 'undefined') {
-      const currentViewportHeight = window.visualViewport?.height || window.innerHeight;
 
-      // If we have no previous reading, just set it
-      if (viewportHeight === 0) {
-        setViewportHeight(currentViewportHeight);
-        return;
-      }
 
-      // If viewport height decreased significantly (> 20%), keyboard is likely visible
-      const heightDecrease = viewportHeight - currentViewportHeight;
-      const decreasePercentage = heightDecrease / viewportHeight;
-
-      if (decreasePercentage > 0.2) {
-        if (!keyboardVisible) {
-          setKeyboardVisible(true);
-          // Scroll to bottom when keyboard appears
-          setTimeout(scrollToBottom, 300);
-        }
-      } else {
-        if (keyboardVisible) {
-          setKeyboardVisible(false);
-        }
-      }
-
-      // Update viewport height
-      setViewportHeight(currentViewportHeight);
-    }
-  };
-
-  // Adjust scale to fit screen
-  const adjustScale = () => {
-    if (!containerRef.current) return;
-
-    const containerHeight = containerRef.current.scrollHeight;
-    const windowHeight = window.innerHeight;
-
-    // Set a minimum scale to prevent excessive zooming
-    const minScale = 0.85;
-
-    if (containerHeight > windowHeight) {
-      // Calculate the scale needed to fit, but don't go below minScale
-      const calculatedScale = (windowHeight / containerHeight) * 0.95;
-      const newScale = Math.max(minScale, calculatedScale);
-
-      // Only update scale if the change is significant to prevent constant small adjustments
-      if (Math.abs(scale - newScale) > 0.01) {
-        setScale(newScale);
-      }
-    } else {
-      // If we don't need to scale down, maintain a scale of 1
-      if (scale !== 1) {
-        setScale(1);
-      }
-    }
-  };
-
-  // Setup viewport and resize listeners
+  // Simple resize listener for scroll management
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.visualViewport) {
-      // Initial viewport height
-      setViewportHeight(window.visualViewport.height || window.innerHeight);
+    const handleResize = () => {
+      setTimeout(scrollToBottom, 100);
+    };
 
-      // Add resize listeners
-      const handleResize = () => {
-        if (window.visualViewport) {
-          detectKeyboardVisibility();
-          scrollToBottom();
-        }
-      };
-
-      const handleScroll = () => {
-        if (window.visualViewport) {
-          detectKeyboardVisibility();
-        }
-      };
-
-      window.visualViewport.addEventListener('resize', handleResize);
-      window.visualViewport.addEventListener('scroll', handleScroll);
-
-      // Cleanup
-      return () => {
-        if (window.visualViewport) {
-          window.visualViewport.removeEventListener('resize', handleResize);
-          window.visualViewport.removeEventListener('scroll', handleScroll);
-        }
-      };
-    }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  // Effect to handle textarea resizing
-  useEffect(() => {
-    if (textareaHeight > 0) {
-      scrollToBottom();
-    }
-  }, [textareaHeight]);
 
   // Load preferences and chat sessions
   useEffect(() => {
@@ -398,13 +301,6 @@ export default function ChatPage() {
     setTimeout(scrollToBottom, 300);
   }, [])
 
-  // Add resize listener for responsive scaling
-  useEffect(() => {
-    adjustScale();
-    window.addEventListener('resize', adjustScale);
-    return () => window.removeEventListener('resize', adjustScale);
-  }, [messages]);
-
   // Save dark mode preference
   useEffect(() => {
     localStorage.setItem("darkMode", darkMode.toString())
@@ -419,16 +315,13 @@ export default function ChatPage() {
   useEffect(() => {
     if (error) console.error("Chat error detected:", error)
 
-    // Re-adjust scale when messages change
-    adjustScale();
-
     // Handle initial session setup
     if (messages.length === 0 && !activeSessionId) {
       handleNewSession()
     }
 
     // Scroll to bottom when messages change
-    scrollToBottom();
+    setTimeout(scrollToBottom, 100);
   }, [messages, error])
 
   // Handle session selection
@@ -493,69 +386,36 @@ export default function ChatPage() {
       sendMessageToAPI(currentInput);
       setFallbackInput('');
 
-      // Reset textarea height
-      setTextareaHeight(0);
-
       // Scroll to bottom after sending
       setTimeout(scrollToBottom, 100);
     }
   }
 
-  // Calculate content width based on sidebar state
+  // Simplified content styles without scaling
   const getContentStyles = () => {
-    const baseStyles = {
-      transform: `scale(${scale})`,
-      transformOrigin: 'top center',
-      height: `${100 / scale}%`,
-      width: '100%',
-      maxHeight: `${100 / scale}%`,
-      paddingBottom: 0
-    };
-
     // For desktop, adjust based on sidebar state
     if (typeof window !== 'undefined' && window.innerWidth >= 768) {
       return {
-        ...baseStyles,
-        marginRight: sidebarOpen ? '18rem' : '0', // Push content away from sidebar (RTL layout)
+        marginRight: sidebarOpen ? '18rem' : '0',
         width: sidebarOpen ? 'calc(100% - 18rem)' : '100%',
         transition: 'margin-right 0.3s ease-in-out, width 0.3s ease-in-out'
       };
     }
 
     // For mobile, use full width
-    return baseStyles;
+    return {};
   };
 
-  // Detect if we're on mobile
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768)
-    }
-    
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
-
-  // Add effect to set the --vh custom property for mobile browsers
+  // Simple viewport height management
   useEffect(() => {
     const setVh = () => {
       const vh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty('--vh', `${vh}px`);
     };
 
-    // Set on initial load
     setVh();
-
-    // Update on resize and orientation change
     window.addEventListener('resize', setVh);
-    window.addEventListener('orientationchange', () => {
-      // Slight delay for orientation changes
-      setTimeout(setVh, 100);
-    });
+    window.addEventListener('orientationchange', () => setTimeout(setVh, 100));
 
     return () => {
       window.removeEventListener('resize', setVh);
@@ -573,8 +433,7 @@ export default function ChatPage() {
   return (
     <TooltipProvider>
       <div
-        className={`min-h-[100svh] transition-colors duration-300 ${darkMode ? 'dark bg-[#1a1f2c]' : 'bg-gray-50'} flex flex-col m-0 p-0 mobile-safe-container relative`}
-        style={{ margin: 0, padding: 0 }}
+        className={`min-h-screen transition-colors duration-300 ${darkMode ? 'dark bg-[#1a1f2c]' : 'bg-gray-50'} flex flex-col mobile-safe-container relative app-container`}
       >
         {/* Chat Sidebar */}
         <ChatSidebar
@@ -588,13 +447,9 @@ export default function ChatPage() {
         />
 
         <div
-          ref={containerRef}
           className="flex-grow flex flex-col overflow-hidden"
           dir="rtl"
-          style={{
-            ...getContentStyles(),
-            height: keyboardVisible ? `calc(${viewportHeight}px - 1px)` : undefined
-          }}
+          style={getContentStyles()}
         >
           {/* Header */}
           <ChatHeader
@@ -610,15 +465,10 @@ export default function ChatPage() {
             ref={messagesContainerRef}
             className="flex-1 overflow-y-auto chat-container flex flex-col w-full bg-gradient-to-b from-transparent to-gray-50/30 dark:to-gray-900/30"
             id="chat-wrapper"
-            style={{
-              height: keyboardVisible ? `calc(100% - ${Math.min(textareaHeight + 80, 250)}px)` : 'auto',
-              paddingBottom: keyboardVisible ? '8px' : '16px'
-            }}
           >
             <ChatMessages
               messages={messages}
               isLoading={isLoading || isApiLoading}
-              keyboardVisible={keyboardVisible}
               isFaqExpanded={isFaqExpanded}
             />
 
@@ -639,7 +489,7 @@ export default function ChatPage() {
           </div>
 
           {/* Input Area */}
-          <div className={`${keyboardVisible ? 'sticky bottom-0 z-40 bg-white dark:bg-gray-900' : ''} border-t border-gray-100 dark:border-gray-800`}>
+          <div className="chat-input-container border-t border-gray-100 dark:border-gray-800">
             <ChatInput
               input={fallbackInput}
               handleInputChange={handleInputChange}
@@ -647,7 +497,6 @@ export default function ChatPage() {
               isLoading={isLoading || isApiLoading}
               iraqiCarSuggestions={iraqiCarSuggestions}
               onStopGeneration={stopGenerating}
-              keyboardVisible={keyboardVisible}
             />
           </div>
         </div>

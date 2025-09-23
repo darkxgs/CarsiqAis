@@ -15,7 +15,6 @@ interface ChatInputProps {
   isLoading: boolean
   iraqiCarSuggestions: string[]
   onStopGeneration?: () => void
-  keyboardVisible?: boolean
 }
 
 export function ChatInput({
@@ -24,8 +23,7 @@ export function ChatInput({
   handleSubmit,
   isLoading = false,
   iraqiCarSuggestions = [],
-  onStopGeneration,
-  keyboardVisible = false
+  onStopGeneration
 }: ChatInputProps) {
   const [inputFocused, setInputFocused] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
@@ -65,8 +63,8 @@ export function ChatInput({
   }
 
   return (
-    <Card className={`rounded-none border-0 shadow-xl bg-gradient-to-r from-red-50 via-orange-50 to-yellow-50 dark:from-gray-900 dark:via-gray-850 dark:to-gray-800 flex-shrink-0 border-t-2 border-red-100 dark:border-red-900/30`}>
-      <CardContent className={`p-2 pb-2 sm:p-4 sm:pb-4 md:p-6 ${keyboardVisible ? 'pb-4 sm:pb-8' : ''}`}>
+    <Card className="rounded-none border-0 shadow-xl bg-gradient-to-r from-red-50 via-orange-50 to-yellow-50 dark:from-gray-900 dark:via-gray-850 dark:to-gray-800 flex-shrink-0">
+      <CardContent className="p-2 pb-2 sm:p-4 sm:pb-4 md:p-6">
         <form onSubmit={handleFormSubmit} className="w-full max-w-4xl mx-auto">
           <div className="relative">
             <div className="flex items-center space-x-3 sm:space-x-4 space-x-reverse">
@@ -167,11 +165,9 @@ export function ChatInput({
                 )}
               </div>
             </div>
-            {!keyboardVisible && (
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-2 sm:mt-3 text-center font-medium">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-2 sm:mt-3 text-center font-medium">
               اكتب استفسارك عن زيت السيارة أو اختر من الأسئلة الشائعة أعلاه
             </p>
-            )}
           </div>
         </form>
       </CardContent>
