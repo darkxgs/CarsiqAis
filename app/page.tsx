@@ -78,6 +78,9 @@ export default function LandingPage() {
             <Link href="/chat" className="text-gray-300 hover:text-white transition-colors duration-300 text-sm font-medium">
               المحادثة
             </Link>
+            <Link href="/oil-guide" className="text-gray-300 hover:text-white transition-colors duration-300 text-sm font-medium flex items-center gap-1">
+              <span>🛢️</span> دليل الزيوت
+            </Link>
             <Link href="/about" className="text-gray-300 hover:text-white transition-colors duration-300 text-sm font-medium">
               عن الخدمة
             </Link>
@@ -129,6 +132,14 @@ export default function LandingPage() {
               >
                 <span className="text-lg">💬</span>
                 <span className="font-medium">المحادثة</span>
+              </Link>
+              <Link
+                href="/oil-guide"
+                className="flex items-center gap-3 text-gray-300 hover:text-white transition-colors duration-300 py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span className="text-lg">🛢️</span>
+                <span className="font-medium">دليل الزيوت</span>
               </Link>
               <Link
                 href="/about"

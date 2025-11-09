@@ -52,5 +52,13 @@
 		</dict>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>ITSAppUsesNonExemptEncryption</key>
+		<false/>
+		<key>NSCameraUsageDescription</key>
+		<string>CarsiqAi needs camera access to scan car documents and VIN numbers.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>CarsiqAi needs photo library access to upload car images.</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>CarsiqAi uses your location to find nearby service centers.</string>
 	</dict>
 </plist>
